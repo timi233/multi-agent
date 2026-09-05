@@ -9,9 +9,16 @@ deploy/compose/.env
 # PostgreSQL / MinIO 数据卷、OTel 日志（含审计/事件数据）
 data/
 
+# ---- Python / 运行时 ----
+.venv/
+__pycache__/
+*.pyc
+workspaces/
+
 # ---- 临时 / 探针产物 ----
 *.bin
 *.log
 
-# ---- OS / IDE ----
+# ---- OS / IDE / 会话 ----
 .DS_Store
+.reasonix/

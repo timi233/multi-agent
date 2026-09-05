@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pi 平台 MVP</title>
+<style>
+  :root { --bg:#0f1115; --panel:#171a21; --line:#2a2f3a; --fg:#e6e9ef; --mut:#8b93a3; --acc:#4f8cff; --ok:#3fb96f; --err:#e5534b; --run:#d29922; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:14px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif; }
+  .wrap { max-width:1100px; margin:0 auto; padding:24px; }
+  h1 { font-size:20px; margin:0 0 4px; } .sub { color:var(--mut); margin-bottom:18px; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:16px; margin-bottom:16px; }
+  label { display:block; color:var(--mut); margin:10px 0 4px; font-size:13px; }
+  input[type=text], textarea { width:100%; background:#0d0f13; color:var(--fg); border:1px solid var(--line); border-radius:8px; padding:9px 12px; font:inherit; }
+  textarea { min-height:90px; resize:vertical; }
+  button { background:var(--acc); color:#fff; border:0; border-radius:8px; padding:9px 18px; font:inherit; cursor:pointer; }
+  button:hover { filter:brightness(1.1); } button:disabled { opacity:.5; cursor:not-allowed; }
+  .btn-ghost { background:transparent; border:1px solid var(--line); color:var(--fg); margin-left:8px; }
+  table { width:100%; border-collapse:collapse; }
+  th,td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); }
+  th { color:var(--mut); font-weight:500; font-size:12px; }
+  tr.clickable { cursor:pointer; } tr.clickable:hover { background:#1c2130; }
+  .badge { display:inline-block; padding:2px 10px; border-radius:20px; font-size:12px; }
+  .b-QUEUED{background:#26303f;color:#9fb6d9}.b-RUNNING{background:#3a2f14;color:var(--run)}
+  .b-SUCCESS{background:#143528;color:var(--ok)}.b-FAILED,.b-CANCELLED{background:#3a1715;color:var(--err)}
+  #detail { white-space:pre-wrap; }
+  .ev { border-left:2px solid var(--line); padding:6px 12px; margin:6px 0; font-size:13px; }
+  .ev .t { color:var(--mut); font-size:12px; }
+  .muted { color:var(--mut); }
+  #events, #files { max-height:320px; overflow:auto; }
+  .half { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media(max-width:800px){ .half{grid-template-columns:1fr} }
+  .file { cursor:pointer; padding:3px 6px; } .file:hover { background:#1c2130; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Pi 平台 MVP</h1>
+  <div class="sub">单机多节点 agent —— 提交任务，agent 在隔离工作区内操作文件</div>
+
+  <div class="panel">
+    <form id="form">
+      <label>标题</label>
+      <input type="text" id="title" value="默认任务" maxlength="200" />
+      <label>任务提示词（agent 将只在其工作区内操作文件）</label>
+      <textarea id="prompt" placeholder="例如：在工作区创建一个 hello.py，内容为打印 hello pi，然后运行它并把输出写入 result.txt"></textarea>
+      <div style="margin-top:12px"><button id="btn-submit">提交任务</button></div>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h2 style="font-size:15px;margin:0 0 8px">任务列表</h2>
+    <table>
+      <thead><tr><th>ID</th><th>标题</th><th>状态</th><th>创建时间</th><th>结束</th></tr></thead>
+      <tbody id="rows"><tr><td colspan="5" class="muted">加载中…</td></tr></tbody>
+    </table>
+  </div>
+
+  <div id="detailPanel" class="panel" style="display:none">
+    <h2 style="font-size:15px;margin:0 0 8px">任务详情 <span id="d-id" class="muted"></span></h2>
+    <div id="d-meta" class="muted" style="margin-bottom:10px"></div>
+    <button id="btn-cancel" class="btn-ghost" style="margin-bottom:10px">取消任务</button>
+    <div class="half">
+      <div>
+        <div class="muted" style="margin-bottom:6px">事件流（轮询）</div>
+        <div id="events"></div>
+      </div>
+      <div>
+        <div class="muted" style="margin-bottom:6px">工作区文件（点击查看）</div>
+        <div id="files"></div>
+        <pre id="file-content" style="background:#0d0f13;border:1px solid var(--line);border-radius:8px;padding:10px;max-height:240px;overflow:auto;margin-top:10px"></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+let current = null, pollTimer = null;
+
+function badge(s) { return `<span class="badge b-${s}">${s}</span>`; }
+function esc(s) { return String(s??'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+async function loadTasks() {
+  try {
+    const res = await fetch('/api/v1/tasks?limit=50');
+    const list = await res.json();
+    $('#rows').innerHTML = list.map(t => `
+      <tr class="clickable" onclick="openTask('${t.id}')">
+        <td class="muted">${esc(t.id)}</td><td>${esc(t.title)}</td>
+        <td>${badge(t.status)}</td>
+        <td>${esc(t.created_at.replace('T',' ').slice(0,19))}</td>
+        <td>${t.finished_at ? esc(t.finished_at.replace('T',' ').slice(0,19)) : ''}</td>
+      </tr>`).join('') || '<tr><td colspan="5" class="muted">暂无任务</td></tr>';
+  } catch(e) { $('#rows').innerHTML = '<tr><td colspan="5" class="muted">加载失败: '+esc(e)+'</td></tr>'; }
+}
+
+async function openTask(id) {
+  current = id; $('#detailPanel').style.display = '';
+  $('#d-id').textContent = id;
+  clearInterval(pollTimer);
+  await refreshDetail();
+  pollTimer = setInterval(refreshDetail, 2000);
+}
+
+async function refreshDetail() {
+  if (!current) return;
+  const t = await (await fetch('/api/v1/tasks/' + current)).json();
+  $('#d-meta').innerHTML = `状态 ${badge(t.status)} &nbsp; 模型 ${esc(t.model)} &nbsp; 工作区 ${esc(t.workspace)}` +
+    (t.error ? `<br>错误: ${esc(t.error)}` : '');
+  $('#btn-cancel').style.display = (t.status==='QUEUED' || t.status==='RUNNING') ? '' : 'none';
+  const evs = await (await fetch('/api/v1/tasks/' + current + '/events')).json();
+  $('#events').innerHTML = evs.map(e => `
+    <div class="ev"><span class="t">#${e.seq} ${esc(e.event_type)}</span><br>${esc(JSON.stringify(e.payload))}</div>
+  `).join('') || '<div class="muted">暂无事件</div>';
+  const files = await (await fetch('/api/v1/tasks/' + current + '/workspace')).json();
+  $('#files').innerHTML = files.map(f =>
+    `<div class="file" onclick="viewFile('${encodeURIComponent(f.path)}')">${f.kind==='dir'?'📁':'📄'} ${esc(f.path)}${f.size!=null?' ('+f.size+'B)':''}</div>`
+  ).join('') || '<div class="muted">（空）</div>';
+}
+
+async function viewFile(rel) {
+  const res = await fetch('/api/v1/tasks/' + current + '/workspace/file?path=' + rel);
+  const data = await res.json();
+  $('#file-content').textContent = res.ok ? (data.content||'') : ('错误: ' + (data.detail||res.status));
+}
+
+$('#form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = $('#btn-submit'); btn.disabled = true;
+  try {
+    const res = await fetch('/api/v1/tasks', {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({title:$('#title').value||'任务', prompt:$('#prompt').value})});
+    const t = await res.json();
+    if (!res.ok) alert('提交失败: ' + JSON.stringify(t.detail || t));
+    $('#prompt').value = ''; loadTasks(); openTask(t.id);
+  } finally { btn.disabled = false; }
+});
+
+$('#btn-cancel').addEventListener('click', async () => {
+  if (!current) return;
+  await fetch('/api/v1/tasks/' + current + '/cancel', {method:'POST'});
+  refreshDetail();
+});
+
+loadTasks();
+setInterval(loadTasks, 3000);
+</script>
+</body>
+</html>
