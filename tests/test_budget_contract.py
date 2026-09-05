@@ -59,8 +59,18 @@ def test_positive_digests_recomputable():
 
 def test_pos_signed_envelope_self_consistent():
     """pos-signed：信封 meta 重算得同一 signatureInput/payloadDigest；
-    value 为真实 Ed25519 签名（可验签，评审 warn-fix）。"""
-    from app.security import keys as node_keys
+    value 为固定 seed 派生密钥的真实 Ed25519 签名，公钥指纹与 registry
+    （deploy/keys/keys.lock.json sk-budget-vector）一致（评审：信封身份=
+    实际签名密钥，可经 registry 解析验签）。"""
+    import base64 as b64
+    import hashlib
+
+    from cryptography.hazmat.primitives import serialization
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+
+    TEST_SEED = bytes.fromhex(
+        "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")
+    REGISTRY_FP = "25db92710d26368a512531d6abb756ba8fed325fdca0241f8d881125d7c10f4d"
 
     v = _vec("pos-signed")
     obj = v["object"]
@@ -69,9 +79,17 @@ def test_pos_signed_envelope_self_consistent():
     env, sig_in, _ = build_signature_envelope(obj, SCHEMA, PROFILE, meta)
     assert env["payloadDigest"] == v["payloadDigest"]
     assert obj["signature"]["payloadDigest"] == v["payloadDigest"]
-    assert base64.b64encode(sig_in).decode() == v["signatureInputB64"]
-    assert node_keys.verify(sig_in, obj["signature"]["value"]) is True
-    assert node_keys.verify(b"tampered", obj["signature"]["value"]) is False
+    assert b64.b64encode(sig_in).decode() == v["signatureInputB64"]
+    key = Ed25519PrivateKey.from_private_bytes(TEST_SEED)
+    pub_der = key.public_key().public_bytes(
+        encoding=serialization.Encoding.DER,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo)
+    assert hashlib.sha256(pub_der).hexdigest() == REGISTRY_FP
+    key.public_key().verify(b64.b64decode(obj["signature"]["value"]), sig_in)  # 验签通过
+    assert obj["signature"]["keyId"] == "sk-budget-vector"
+    assert obj["signature"]["issuer"] == "ledger-test"
+    with pytest.raises(Exception):
+        key.public_key().verify(b64.b64decode(obj["signature"]["value"]), b"tampered")
 
 
 def test_journal_chain_is_real_digests():

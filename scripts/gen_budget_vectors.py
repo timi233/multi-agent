@@ -31,10 +31,27 @@ from app.contracts.codec import (  # noqa: E402
     payload_digest,
 )
 from app.runtime.budget import ROOT_DIGEST, _entry_digest  # noqa: E402
-from app.security import keys as node_keys  # noqa: E402
+
+# 固定 seed 确定性派生测试签名密钥（Ed25519 私钥=32 字节 seed，不落盘不入库；
+# 跨环境可复现，验签方用同一 seed 推导公钥）。对应 deploy/keys/keys.lock.json 的
+# sk-budget-vector（registry 记录指纹）。非生产密钥。
+TEST_KEY_SEED = bytes.fromhex(
+    "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")
+
+from cryptography.hazmat.primitives.asymmetric.ed25519 import (  # noqa: E402
+    Ed25519PrivateKey,
+    Ed25519PublicKey,
+)
+from cryptography.hazmat.primitives import serialization  # noqa: E402
+
+
+def _test_signing_key() -> Ed25519PrivateKey:
+    return Ed25519PrivateKey.from_private_bytes(TEST_KEY_SEED)
 
 OUT_DEFAULT = ROOT / "contracts" / "test-vectors" / "budget_grant" / "v2"
-OUT = Path(os.environ.get("PI_VEC_OUT", OUT_DEFAULT))
+OUT = (Path(os.environ["PI_VEC_OUT"]) / "budget_grant" / "v2"
+       if os.environ.get("PI_VEC_OUT")
+       else OUT_DEFAULT)
 
 SCHEMA = load_schema("budget_grant", "2")
 PROFILE = load_digest_profile("budget_grant", "2")
@@ -107,14 +124,14 @@ CASES = [
                    "previousEntryDigest": ROOT_DIGEST}]}, "required"),
     ("neg-negative-total", False, "totalBudgetTokens 负数必须拒绝",
      {"totalBudgetTokens": -1}, "minimum"),
-    ("pos-signed", True, "含 §9.4 签名信封（对象自洽回填 payloadDigest）",
+    ("pos-signed", True, "含 §9.4 签名信封（确定性测试密钥真实签名，自洽回填 payloadDigest）",
      {"consumedTokens": 1250, "signature": {
-         "signatureAlgorithm": "Ed25519", "keyId": "sk-gate", "issuer": "gateway-service",
+         "signatureAlgorithm": "Ed25519", "keyId": "sk-budget-vector", "issuer": "ledger-test",
          "issuerWorkloadIdentity": "pi.gate", "audience": "pi.platform",
          "objectType": "budget_grant", "schemaVersion": "2",
          "payloadDigest": "sha256:" + "0" * 64,
          "controlPlaneEpoch": 1, "signedAt": "2026-09-05T08:01:00Z",
-         "value": "c" * 86 + "=="}}, None),
+         "value": "A" * 86 + "=="}}, None),
 ]
 
 
@@ -143,8 +160,17 @@ def main() -> int:
                     {k: obj["signature"][k] for k in SIGNATURE_ENVELOPE_KEYS
                      if k in obj["signature"]})
                 entry["signatureInputB64"] = base64.b64encode(sig_in).decode()
-                # 真实 Ed25519 签名（评审 warn-fix：非占位；用 Runtime 密钥）
-                entry["object"]["signature"]["value"] = node_keys.sign(sig_in)
+                # 确定性测试密钥真实 Ed25519 签名（评审：信封身份=实际签名密钥，
+                # 跨环境可复现；registry 条目 sk-budget-vector）
+                entry["object"]["signature"]["value"] = base64.b64encode(
+                    _test_signing_key().sign(sig_in)).decode("ascii")
+                if os.environ.get("PI_BUDGET_VEC_PRINT_FP"):
+                    pub = _test_signing_key().public_key().public_bytes(
+                        encoding=serialization.Encoding.DER,
+                        format=serialization.PublicFormat.SubjectPublicKeyInfo)
+                    import hashlib
+                    print("SK_BUDGET_VECTOR_FP=" +
+                          hashlib.sha256(pub).hexdigest())
             else:
                 entry["signatureInputB64"] = None
         else:

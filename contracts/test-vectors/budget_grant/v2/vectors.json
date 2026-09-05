@@ -399,7 +399,7 @@
       "id": "pos-signed",
       "kind": "positive",
       "expectedSchemaValid": true,
-      "note": "含 §9.4 签名信封（对象自洽回填 payloadDigest）",
+      "note": "含 §9.4 签名信封（确定性测试密钥真实签名，自洽回填 payloadDigest）",
       "expectedError": null,
       "object": {
         "contractId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -446,8 +446,8 @@
         "createdAt": "2026-09-05T08:00:00Z",
         "signature": {
           "signatureAlgorithm": "Ed25519",
-          "keyId": "sk-gate",
-          "issuer": "gateway-service",
+          "keyId": "sk-budget-vector",
+          "issuer": "ledger-test",
           "issuerWorkloadIdentity": "pi.gate",
           "audience": "pi.platform",
           "objectType": "budget_grant",
@@ -455,13 +455,13 @@
           "payloadDigest": "sha256:d42d48284a03801457fd198b239cca62fc1750464f89066acff56c7b5f0567a4",
           "controlPlaneEpoch": 1,
           "signedAt": "2026-09-05T08:01:00Z",
-          "value": "XJt5bvEzH+xxKyK2PztVcpvlJWPcSKE+rIJ+p9P87Ky2U0SsHSyUwfinJTNMy92vuOlnQ4lpV+NA/f8RAINLBg=="
+          "value": "K22TnsBLkJuI9owy/ogMWiFpxRQNBl+Y2rccgMGX63F+tL67fPdyUDM59OuSGvlH16jwmnYLnEqGfXQR14j7AA=="
         }
       },
       "calculateOnLoad": true,
       "canonicalPayloadB64": "eyJhdHRlbXB0SWQiOiIzMzMzMzMzMzMzMzMzMzMzIiwiY29udHJhY3RJZCI6ImFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhIiwiY29udHJhY3RWZXJzaW9uIjoiMiIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDVUMDg6MDA6MDBaIiwiZ3JhbnRJZCI6IjIyMjIyMjIyMjIyMjIyMjIiLCJ0YXNrSWQiOiIwMTIzNDU2Nzg5YWJjZGVmIiwidG90YWxCdWRnZXRUb2tlbnMiOjIwMDAwMCwid29ya2xvYWRJZGVudGl0eSI6InBpLmdhdGUifQ==",
       "payloadDigest": "sha256:d42d48284a03801457fd198b239cca62fc1750464f89066acff56c7b5f0567a4",
-      "signatureInputB64": "eyJhdWRpZW5jZSI6InBpLnBsYXRmb3JtIiwiY29udHJvbFBsYW5lRXBvY2giOjEsImlzc3VlciI6ImdhdGV3YXktc2VydmljZSIsImlzc3Vlcldvcmtsb2FkSWRlbnRpdHkiOiJwaS5nYXRlIiwia2V5SWQiOiJzay1nYXRlIiwib2JqZWN0VHlwZSI6ImJ1ZGdldF9ncmFudCIsInBheWxvYWREaWdlc3QiOiJzaGEyNTY6ZDQyZDQ4Mjg0YTAzODAxNDU3ZmQxOThiMjM5Y2NhNjJmYzE3NTA0NjRmODkwNjZhY2ZmNTZjN2I1ZjA1NjdhNCIsInNjaGVtYVZlcnNpb24iOiIyIiwic2lnbmF0dXJlQWxnb3JpdGhtIjoiRWQyNTUxOSIsInNpZ25hdHVyZUNvbnRleHQiOiJwaS5jb250cmFjdC5zaWduYXR1cmUudjEiLCJzaWduZWRBdCI6IjIwMjYtMDktMDVUMDg6MDE6MDBaIn0="
+      "signatureInputB64": "eyJhdWRpZW5jZSI6InBpLnBsYXRmb3JtIiwiY29udHJvbFBsYW5lRXBvY2giOjEsImlzc3VlciI6ImxlZGdlci10ZXN0IiwiaXNzdWVyV29ya2xvYWRJZGVudGl0eSI6InBpLmdhdGUiLCJrZXlJZCI6InNrLWJ1ZGdldC12ZWN0b3IiLCJvYmplY3RUeXBlIjoiYnVkZ2V0X2dyYW50IiwicGF5bG9hZERpZ2VzdCI6InNoYTI1NjpkNDJkNDgyODRhMDM4MDE0NTdmZDE5OGIyMzljY2E2MmZjMTc1MDQ2NGY4OTA2NmFjZmY1NmM3YjVmMDU2N2E0Iiwic2NoZW1hVmVyc2lvbiI6IjIiLCJzaWduYXR1cmVBbGdvcml0aG0iOiJFZDI1NTE5Iiwic2lnbmF0dXJlQ29udGV4dCI6InBpLmNvbnRyYWN0LnNpZ25hdHVyZS52MSIsInNpZ25lZEF0IjoiMjAyNi0wOS0wNVQwODowMTowMFoifQ=="
     }
   ]
 }

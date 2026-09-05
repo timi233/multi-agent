@@ -92,6 +92,16 @@
       "privateKeyFile": "sk-ledger.pem",
       "publicKeyFile": "sk-ledger.pub.pem"
     },
+    "sk-budget-vector": {
+      "purpose": "BudgetGrant 契约向量测试签名（确定性 seed 派生，非生产；scripts/gen_budget_vectors.py TEST_KEY_SEED）",
+      "issuer": "ledger-test",
+      "allowedObjectTypes": [
+        "budget_grants"
+      ],
+      "pubFingerprintSha256": "25db92710d26368a512531d6abb756ba8fed325fdca0241f8d881125d7c10f4d",
+      "privateKeyFile": "SEED-DERIVED（无文件，确定性派生）",
+      "publicKeyFile": "SEED-DERIVED（无文件，确定性派生）"
+    },
     "sk-skill": {
       "purpose": "Skill Signer",
       "issuer": "skill-governance",
