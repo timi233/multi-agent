@@ -62,7 +62,7 @@
 ## 测试
 
 ```bash
-./scripts/run.sh test   # pytest：状态机、API、工具安全边界（20 项）
+./scripts/run.sh test   # pytest：状态机、API、工具安全边界、worker 并发/恢复/竞争（32 项）
 ```
 
 ## 与蓝图的关系（有意简化，供后续演进）
