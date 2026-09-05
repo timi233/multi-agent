@@ -83,6 +83,29 @@ def recover_stale() -> list[str]:
     return stale
 
 
+def _emit_budget_exhausted(task_id: str, attempt_id: str | None,
+                           reason: str) -> None:
+    """预算耗尽事实事件（独立连接；评估 should-fix-2——结构化 stopReason）。"""
+    try:
+        conn = connect()
+        with conn.cursor() as cur:
+            cur.execute("SELECT id FROM pi_tasks WHERE id=%s", (task_id,))
+            if cur.fetchone():
+                sql = ("INSERT INTO pi_events (task_id, attempt_id, seq, event_type, payload) "
+                       "VALUES (%s, %s, COALESCE((SELECT MAX(seq)+1 FROM pi_events WHERE task_id=%s),1), "
+                       "'BUDGET_EXHAUSTED', %s)")
+                cur.execute(sql, (task_id, attempt_id, task_id,
+                                  json.dumps({"reason": reason}, ensure_ascii=False)))
+                conn.commit()
+    except Exception:
+        pass  # 事件尽力而为：主收敛路径不依赖它
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
+
+
 def _fail_task_isolated(task_id: str, error: str, attempt_id: str | None = None,
                         event_type: str = "ATTEMPT_FAILED") -> bool:
     """用**独立连接**把 RUNNING 任务收敛为 FAILED（含 attempt 收敛与事件）。
@@ -121,6 +144,10 @@ def _fail_task_isolated(task_id: str, error: str, attempt_id: str | None = None,
                     "WHERE id=%s AND status='CLAIMED'",
                     (attempt_id,),
                 )
+            # 任务收敛（任意失败原因）即结算 BudgetGrant（评估 should-fix-1）
+            cur.execute(
+                "UPDATE gw_budget_grants SET status='SETTLED', settled_at=now() "
+                "WHERE task_id=%s AND status='ACTIVE'", (task_id,))
             payload = {"error": error} if event_type == "ATTEMPT_FAILED" else {"reason": error}
             cur.execute(
                 "INSERT INTO pi_events (task_id, attempt_id, seq, event_type, payload) "
@@ -200,6 +227,7 @@ def _run_task(conn, task_id: str) -> None:
                     "UPDATE pi_attempts SET status='TERMINAL_REPORTED', finished_at=now() WHERE id=%s",
                     (attempt_id,),
                 )
+                budget.settle_grant(conn)  # 成功/失败终态同事务结算 Grant
                 _emit_event(conn, task_id, attempt_id, "ATTEMPT_FINISHED",
                             {"status": final, "summary": (summary or "")[:4000]})
             else:
@@ -217,6 +245,7 @@ def _run_task(conn, task_id: str) -> None:
             conn.rollback()
         except Exception:
             pass
+        _emit_budget_exhausted(task_id, attempt_id, str(exc))
         _fail_task_isolated(task_id, f"BUDGET_EXHAUSTED: {exc}", attempt_id)
     except Exception as exc:  # 平台层兜底：先 rollback 释放行锁，再独立连接统一收敛（防自阻塞）
         try:

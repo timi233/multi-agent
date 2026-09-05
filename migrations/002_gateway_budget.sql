@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS gw_budget_grants (
     attempt_id          TEXT,
     total_budget_tokens BIGINT NOT NULL CHECK (total_budget_tokens >= 0),
     consumed_tokens     BIGINT NOT NULL DEFAULT 0,
+    journal_entries     BIGINT NOT NULL DEFAULT 0,   -- 权威条目计数（删行对账锚点，GW-04）
     status              TEXT NOT NULL DEFAULT 'ACTIVE',  -- ACTIVE|EXHAUSTED|SETTLED
     created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
     settled_at          TIMESTAMPTZ

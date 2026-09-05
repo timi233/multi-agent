@@ -17,7 +17,7 @@ import hashlib
 import uuid
 
 ROOT_DIGEST = "pi-budget-root-v1"
-JOURNAL_TYPES = ("RESERVED", "SENT", "SETTLED", "FAILED")
+JOURNAL_TYPES = ("RESERVED", "SENT", "SETTLED", "FAILED", "UNKNOWN")
 
 
 class BudgetError(Exception):
@@ -74,9 +74,7 @@ class BudgetDomain:
                 "SELECT "
                 " COALESCE(SUM(CASE WHEN entry_type='RESERVED' "
                 "   THEN reserved_tokens END), 0) AS reserved_sum, "
-                " COALESCE(SUM(CASE WHEN entry_type='SETTLED' "
-                "   THEN actual_tokens END), 0) "
-                " + COALESCE(SUM(CASE WHEN entry_type='FAILED' "
+                " COALESCE(SUM(CASE WHEN entry_type IN ('SETTLED','FAILED') "
                 "   THEN reserved_tokens END), 0) AS released_sum "
                 "FROM gw_journal WHERE grant_id=%s", (self.grant_id,))
             sums = cur.fetchone()
@@ -123,26 +121,33 @@ class BudgetDomain:
     def sent(self, conn, invocation_id: str) -> None:
         """发送意图持久化（dispatch 前）。仅记录意图，占额已由 RESERVED 承担，
         不重复计入 balance（outstanding 只聚合 RESERVED）。"""
-        reserved = self._last_reserved_tokens(conn, invocation_id)
+        self._last_reserved_tokens(conn, invocation_id)  # 前置校验：SENT 前必须有 RESERVED
         self._append(conn, "SENT", invocation_id, None, 0, None)
 
     def settle(self, conn, invocation_id: str, actual_tokens: int) -> None:
-        """结算：写 SETTLED 并累加 grant.consumed（同一事务由调用方提交）。"""
+        """结算：释放该 invocation 的完整预留（SETTLED.reserved=原预留值），
+        实耗单独累计进 consumed（actual_tokens > 0 且可能超过原预留——超出部分
+        直接计入 consumed，不产生负数余额；后续 reserve 会按可用余额拦截）。
+        同一事务由调用方提交。"""
         if actual_tokens < 0:
             raise BudgetError("actual_tokens must be >= 0")
-        self._append(conn, "SETTLED", invocation_id, None, 0, actual_tokens)
+        reserved = self._last_reserved_tokens(conn, invocation_id)
+        self._append(conn, "SETTLED", invocation_id, None, reserved, actual_tokens)
         with conn.cursor() as cur:
             cur.execute(
                 "UPDATE gw_budget_grants SET consumed_tokens = consumed_tokens + %s "
                 "WHERE id=%s", (actual_tokens, self.grant_id))
 
     def fail(self, conn, invocation_id: str) -> None:
-        """失败：释放该调用的预留占额（不增加 consumed）。
-
-        FAILED 条目在 reserved_tokens 记录被释放的预留量（balance 聚合中
-        计入 released），使 outstanding 回落、占额重新可用。"""
+        """确定未发生调用的失败：释放该调用预留（不增加 consumed）。"""
         reserved = self._last_reserved_tokens(conn, invocation_id)
         self._append(conn, "FAILED", invocation_id, None, reserved, None)
+
+    def unknown(self, conn, invocation_id: str) -> None:
+        """发送后不确定结果（超时/断连，无法证明 Provider 未执行）：保留占额
+        （不释放、不累计 consumed），避免重复消费与超支（评审 fix-blocking-2）。"""
+        self._last_reserved_tokens(conn, invocation_id)
+        self._append(conn, "UNKNOWN", invocation_id, None, 0, None)
 
     def settle_grant(self, conn) -> None:
         """attempt 结束：grant 置 SETTLED（终结，不可再预留）。"""
@@ -188,6 +193,9 @@ class BudgetDomain:
                 "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
                 (self.grant_id, entry_type, invocation_id, request_digest,
                  reserved, actual, previous, digest))
+            cur.execute(  # 权威计数锚点（评审 fix-blocking-4）：删行无法匹配
+                "UPDATE gw_budget_grants SET journal_entries = journal_entries + 1 "
+                "WHERE id=%s", (self.grant_id,))
 
     def reconcile(self, conn) -> list[str]:
         """完整复核（GW-04 对账）：链完整性 + consumed 与 ΣSETTLED 匹配。
@@ -197,19 +205,27 @@ class BudgetDomain:
         problems = self.verify_chain(conn)
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT consumed_tokens FROM gw_budget_grants WHERE id=%s",
+                "SELECT consumed_tokens, journal_entries "
+                "FROM gw_budget_grants WHERE id=%s",
                 (self.grant_id,))
             row = cur.fetchone()
             cur.execute(
-                "SELECT COALESCE(SUM(actual_tokens),0) AS settled_sum "
-                "FROM gw_journal "
-                "WHERE grant_id=%s AND entry_type='SETTLED'",
+                "SELECT COALESCE(SUM(actual_tokens),0) AS settled_sum, COUNT(*) AS cnt "
+                "FROM gw_journal WHERE grant_id=%s AND entry_type='SETTLED'",
                 (self.grant_id,))
-            settled_sum = cur.fetchone()["settled_sum"]
-        if row["consumed_tokens"] != settled_sum:
+            sums = cur.fetchone()
+            cur.execute(
+                "SELECT COUNT(*) AS cnt FROM gw_journal WHERE grant_id=%s",
+                (self.grant_id,))
+            total_cnt = cur.fetchone()["cnt"]
+        if row["consumed_tokens"] != sums["settled_sum"]:
             problems.append(
                 f"对账不一致: grant.consumed={row['consumed_tokens']} "
-                f"!= ΣSETTLED={settled_sum}（Journal 被截断或篡改）")
+                f"!= ΣSETTLED={sums['settled_sum']}（Journal 被截断或篡改）")
+        if row["journal_entries"] != total_cnt:
+            problems.append(
+                f"Journal 条目数不一致: grant.journal_entries="
+                f"{row['journal_entries']} != 实际 {total_cnt}（行被删除）")
         return problems
 
     def verify_chain(self, conn) -> list[str]:

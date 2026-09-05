@@ -22,7 +22,7 @@ class Gateway:
         messages: list[dict],
         tools: list[dict] | None = None,
         max_tokens: int = 4096,
-        retries: int = 2,
+        retries: int = 0,
         tool_choice: str | dict | None = None,
     ) -> dict:
         choice, _ = self.chat_with_usage(
@@ -35,10 +35,14 @@ class Gateway:
         messages: list[dict],
         tools: list[dict] | None = None,
         max_tokens: int = 4096,
-        retries: int = 2,
+        retries: int = 0,
         tool_choice: str | dict | None = None,
     ) -> tuple[dict, dict | None]:
-        """OpenAI 兼容调用，返回 (choice, usage)。usage 供预算结算（GW 层用量事实）。"""
+        """OpenAI 兼容调用，返回 (choice, usage)。
+
+        重试默认关闭（retries=0）：隐式重试会产生多次 Provider 物理请求，
+        预算层无法为每次物理请求记账（评审 fix-blocking-3）；重试由 agent
+        层以"新 invocation + 新预留"驱动（预算内）。"""
         payload: dict = {
             "model": self.model,
             "messages": messages,

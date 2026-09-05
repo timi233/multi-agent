@@ -66,6 +66,7 @@ class Settings:
     # Gateway 预算（蓝图 §18.2 GW-07：超限 100% 阻断；每 attempt 一份 BudgetGrant）
     max_budget_tokens: int = int(os.environ.get("PI_MAX_BUDGET_TOKENS", "200000"))
     budget_reserve_tokens: int = int(os.environ.get("PI_BUDGET_RESERVE_TOKENS", "4096"))
+    llm_attempts: int = int(os.environ.get("PI_LLM_ATTEMPTS", "3"))  # 每轮最多物理请求次数（每次独立预留）
 
     # 运行时
     workspaces_dir: Path = WORKSPACES_DIR

@@ -45,9 +45,12 @@
 
 ## Gateway 预算与 Journal（蓝图 §18.2/§18.3、手册 GW-xx）
 
-- 产物：`migrations/002_gateway_budget.sql`（`gw_budget_grants` + `gw_journal` 链式表）、`app/runtime/budget.py`（`BudgetDomain`）、`tests/test_budget.py`（12 项）。
-- 流程（对齐蓝图"预算具有跨崩溃的消费所有权"）：attempt 初始化创建一份 BudgetGrant；每轮 LLM 调用**调用前持久化预留**（RESERVED）→ 发送意图（SENT）→ 响应后结算（SETTLED，累加 consumed）/异常失败（FAILED，释放预留）；每次操作独立提交；结算只经 settle 更新。
-- 验收对齐：GW-07 预算达到上限后新调用 100% 阻断（含 0 预算任务不触达 LLM，worker 映射 `BUDGET_EXHAUSTED`）；GW-03 精神每笔预留先记账后发送；GW-04 链式 `previousEntryDigest/entryDigest` + `reconcile()` consumed↔ΣSETTLED 对账（纯 Hash 链无法检出删行，由对账补位）；GW-06 同 invocationId 不同 requestDigest 拒绝；GW-09 每次调用生成 Journal 事实（近似 RouteAttestation）。
+- 产物：`migrations/002_gateway_budget.sql`（`gw_budget_grants` + `gw_journal` 链式表）、`app/runtime/budget.py`（`BudgetDomain`）、`tests/test_budget.py`（15 项）。
+- **账目恒等式**（不双计、不泄漏）：`outstanding = Σ(RESERVED.reserved) − Σ((SETTLED|FAILED).reserved)`；`available = total − consumed − outstanding`。SETTLED 完整释放该 invocation 的预留并单独以 `actual_tokens` 累加 consumed（实耗可超预留，超出由后续 reserve 按余额拦截）——预留 30/实耗 25 后 `available = total − 25`。
+- 流程（预算跨崩溃所有权）：attempt 初始化创建 BudgetGrant；每轮 LLM 调用**调用前持久化预留**（RESERVED）→ 发送意图（SENT，不重复占额）→ 响应后结算（SETTLED）/结果不确定（UNKNOWN，保守占额不释放——Provider 可能已执行）/确定未发生（FAILED，释放预留）；每次操作独立提交；结算只经 settle 更新。
+- 重试语义：gateway 隐式重试关闭（`retries=0`），agent 层每轮最多 `PI_LLM_ATTEMPTS`（默认 3）次 Provider 物理请求，**每次物理请求独立 invocation + 独立预留**（预算内）。
+- 验收对齐：GW-07 预算达到上限后新调用 100% 阻断（0 预算任务不触达 LLM，worker 映射 `BUDGET_EXHAUSTED` 并落结构化 `BUDGET_EXHAUSTED` 事件）；GW-03 精神每笔预留先记账后发送；GW-04 Hash 链 + `journal_entries` 权威计数锚点 + consumed↔ΣSETTLED 对账（行删除/篡改均检出）；GW-06 同 invocationId 不同 requestDigest 拒绝；GW-09 每次调用生成 Journal 事实。
+- Grant 生命周期：任务收敛（成功/失败/预算耗尽）在终态事务中 `settle_grant`（SETTLED）。
 - 简化差距（记录）：GW-10"热路径不查询 PostgreSQL"未达（每预算操作一次 PG 往返，单实例可接受）；单实例单代次、无 Ledger Service 分片对账、预算为全局每 attempt（`PI_MAX_BUDGET_TOKENS`/`PI_BUDGET_RESERVE_TOKENS`）、Grant 轮换/故障转移未实现。
 
 ## 兼容性边界（CT-03 语义变更，如实披露）

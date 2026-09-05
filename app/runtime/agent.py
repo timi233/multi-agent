@@ -60,30 +60,41 @@ def run_attempt(
 
     for turn in range(1, max_turns + 1):
         emit_event("AGENT_TURN", {"turn": turn, "traceId": trace_id})
-        invocation_id = uuid.uuid4().hex[:16]
-        request_digest = hashlib.sha256(
-            json.dumps(messages, ensure_ascii=False,
-                       separators=(",", ":")).encode("utf-8")
-        ).hexdigest()[:32]
-        if budget is not None:
-            budget.reserve(budget_conn, invocation_id, request_digest,
-                           settings.budget_reserve_tokens)
-            budget_conn.commit()
-            budget.sent(budget_conn, invocation_id)
-            budget_conn.commit()
-        try:
-            choice, usage = gw.chat_with_usage(messages, tools=TOOL_DEFINITIONS)
-        except GatewayError as exc:
+        # 每轮最多 settings.llm_attempts 次 Provider 物理请求；每次独立
+        # invocation + 调用前预留（评审 fix-blocking-3：隐式重试会无账发送）。
+        last_error: str | None = None
+        for _phys in range(settings.llm_attempts):
+            invocation_id = uuid.uuid4().hex[:16]
+            request_digest = hashlib.sha256(
+                json.dumps(messages, ensure_ascii=False,
+                           separators=(",", ":")).encode("utf-8")
+            ).hexdigest()[:32]
             if budget is not None:
-                budget.fail(budget_conn, invocation_id)
+                budget.reserve(budget_conn, invocation_id, request_digest,
+                               settings.budget_reserve_tokens)
                 budget_conn.commit()
-            error = str(exc)
+                budget.sent(budget_conn, invocation_id)
+                budget_conn.commit()
+            try:
+                choice, usage = gw.chat_with_usage(messages,
+                                                   tools=TOOL_DEFINITIONS)
+            except GatewayError as exc:
+                # 发送后不确定结果（超时/断连）：UNKNOWN 保守占额，不释放
+                # （评审 fix-blocking-2），预算内重试或终止。
+                if budget is not None:
+                    budget.unknown(budget_conn, invocation_id)
+                    budget_conn.commit()
+                last_error = str(exc)
+                continue
+            if budget is not None:
+                actual = (usage or {}).get("total_tokens")
+                budget.settle(budget_conn, invocation_id,
+                              int(actual) if actual is not None else 0)
+                budget_conn.commit()
+            break
+        else:
+            error = last_error or "LLM call failed after all attempts"
             return False, "", error
-        if budget is not None:
-            actual = (usage or {}).get("total_tokens")
-            budget.settle(budget_conn, invocation_id,
-                          int(actual) if actual is not None else 0)
-            budget_conn.commit()
 
         message = choice.get("message") or {}
         content = message.get("content") or ""
