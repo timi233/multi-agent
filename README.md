@@ -30,7 +30,8 @@
 
 # 2) 启动服务（Web + API + 后台 worker）
 ./scripts/run.sh serve 8990
-# 打开 http://127.0.0.1:8990
+# 本机访问 http://127.0.0.1:8990 ；局域网访问 http://10.66.66.2:8990
+# （服务绑定 0.0.0.0，wg0/LAN 网段内设备可直接访问；无认证，勿暴露公网）
 
 # 3) 或 CLI 提交任务
 ./scripts/run.sh submit "在工作区创建 demo.py 并运行，输出写入 out.txt" --title demo
