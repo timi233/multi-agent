@@ -86,8 +86,9 @@ def _fail_task_isolated(task_id: str, error: str, attempt_id: str | None = None,
                         event_type: str = "ATTEMPT_FAILED") -> bool:
     """用**独立连接**把 RUNNING 任务收敛为 FAILED（含 attempt 收敛与事件）。
 
-    独立连接避免 aborted transaction；条件 UPDATE 仅在状态仍为 RUNNING（未被 cancel
-    抢占）时生效，cancel 抢占时不写任何事件（评审 fix-4）。
+    独立连接避免 aborted transaction；条件 UPDATE 仅在状态仍为 RUNNING（未被
+    cancel 抢占）时生效；若未命中（已被取消），把 attempt 按任务实际终态收敛
+    为 TERMINAL_REPORTED 且不写失败事件（评审 fix-6）。
     """
     conn = connect()
     try:
@@ -98,6 +99,20 @@ def _fail_task_isolated(task_id: str, error: str, attempt_id: str | None = None,
                 (error, task_id),
             )
             if cur.fetchone() is None:
+                # cancel 竞争窗口：任务已被 CANCELLED 等终态抢占，仅收敛 attempt
+                if attempt_id:
+                    cur.execute("SELECT status FROM pi_tasks WHERE id=%s", (task_id,))
+                    row = cur.fetchone()
+                    tstate = row["status"] if row else None
+                    if tstate == "CANCELLED":
+                        cur.execute(
+                            "UPDATE pi_attempts SET status='TERMINAL_REPORTED', finished_at=now() "
+                            "WHERE id=%s AND status='CLAIMED'",
+                            (attempt_id,),
+                        )
+                        _emit_event(conn, task_id, attempt_id, "ATTEMPT_CANCELLED",
+                                    {"note": "errored-late-after-cancel"})
+                conn.commit()
                 return False
             if attempt_id:
                 cur.execute(

@@ -196,6 +196,36 @@ def test_fail_isolated_skips_cancelled():
     execute("DELETE FROM pi_tasks WHERE id=%s", (tid,))
 
 
+def test_fail_isolated_unhit_converges_attempt():
+    """补偿未命中（任务已被 cancel 抢占）时 attempt 也应收敛为 TERMINAL_REPORTED，且不写失败事件。"""
+    import uuid
+
+    from app.db import execute
+    from app.worker import _fail_task_isolated
+
+    tid = uuid.uuid4().hex[:16]
+    att_id = uuid.uuid4().hex[:16]
+    execute(
+        "INSERT INTO pi_tasks (id, title, prompt, workspace, status, model) "
+        "VALUES (%s,'race-win','p',%s,'CANCELLED','m')",
+        (tid, f"task-{tid}"),
+    )
+    execute(
+        "INSERT INTO pi_attempts (id, task_id, number, status, trace_id) "
+        "VALUES (%s,%s,1,'CLAIMED',%s)",
+        (att_id, tid, uuid.uuid4().hex),
+    )
+    assert _fail_task_isolated(tid, "late-error", attempt_id=att_id) is False
+    # task 保持 CANCELLED；attempt 收敛；只写收敛事件不写失败事件
+    assert execute("SELECT status FROM pi_tasks WHERE id=%s", (tid,))[0]["status"] == "CANCELLED"
+    assert execute("SELECT status FROM pi_attempts WHERE id=%s", (att_id,))[0]["status"] == "TERMINAL_REPORTED"
+    evs = [e["event_type"] for e in execute("SELECT event_type FROM pi_events WHERE task_id=%s", (tid,))]
+    assert "ATTEMPT_CANCELLED" in evs and "ATTEMPT_FAILED" not in evs, f"事件不符: {evs}"
+    execute("DELETE FROM pi_events WHERE task_id=%s", (tid,))
+    execute("DELETE FROM pi_attempts WHERE id=%s", (att_id,))
+    execute("DELETE FROM pi_tasks WHERE id=%s", (tid,))
+
+
 def test_worker_aborted_terminal_tx_converges(monkeypatch):
     """终态事务中途失败（ATTEMPT_FINISHED 事件写入抛错，事务已持行锁）：
     先 rollback 释放锁再独立收敛，_run_task 必须返回且任务最终 FAILED（不悬挂不死锁）。"""
