@@ -10,6 +10,7 @@ from __future__ import annotations
 import base64
 import hashlib
 import os
+import uuid
 from pathlib import Path
 
 from cryptography.hazmat.primitives import serialization
@@ -30,8 +31,9 @@ def _load() -> Ed25519PrivateKey:
 
 
 def _load_or_create() -> Ed25519PrivateKey:
-    """原子创建（评审 should-fix）：O_EXCL 保证并发生成只有一个成功，
-    竞争失败方回退读取既有密钥，避免互相覆盖导致签名不可验证。"""
+    """原子创建（评审）：同目录临时文件完整写入并 fsync，再以 `os.link`
+    原子发布——读者只可能看到完整文件（link 在目标已存在时失败，竞争方
+    回退读取既有完整密钥），杜绝读到半写文件或互相覆盖。"""
     if PRIVATE_KEY_PATH.exists():
         return _load()
     KEYS_DIR.mkdir(parents=True, exist_ok=True)
@@ -41,13 +43,18 @@ def _load_or_create() -> Ed25519PrivateKey:
         format=serialization.PrivateFormat.PKCS8,
         encryption_algorithm=serialization.NoEncryption(),
     )
+    tmp = KEYS_DIR / f".runtime_ed25519.{os.getpid()}.{uuid.uuid4().hex}.tmp"
+    fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with os.fdopen(fd, "wb") as f:
+        f.write(pem)
+        f.flush()
+        os.fsync(f.fileno())
     try:
-        fd = os.open(PRIVATE_KEY_PATH,
-                     os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
-        with os.fdopen(fd, "wb") as f:
-            f.write(pem)
+        os.link(tmp, PRIVATE_KEY_PATH)  # 原子发布完整文件（已存在则失败）
     except FileExistsError:
-        pass  # 竞争失败：既有密钥为准
+        pass  # 竞争失败：既有完整密钥为准
+    finally:
+        tmp.unlink(missing_ok=True)
     return _load()
 
 
