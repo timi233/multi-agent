@@ -83,6 +83,13 @@
 - Grant 生命周期：任务收敛（成功/失败/预算耗尽）在终态事务中 `settle_grant`（SETTLED）。
 - 简化差距（记录）：GW-10"热路径不查询 PostgreSQL"未达（每预算操作一次 PG 往返，单实例可接受）；单实例单代次、无 Ledger Service 分片对账、预算为全局每 attempt（`PI_MAX_BUDGET_TOKENS`/`PI_BUDGET_RESERVE_TOKENS`）、Grant 轮换/故障转移未实现。
 
+## G3 Artifact / CAS / Evidence（蓝图 §6.9/§9.5/§11.1/§13.2 单机子集）
+
+- 产物：`attempt_terminal_envelope.v2` 契约（schema/digestprofile/10 向量/verified/Node 双实现 25 正向量/registry sk-terminal-vector）、`migrations/004_cas.sql`（`pi_cas_blobs` 内容寻址表 + `pi_artifacts` + `pi_terminal_envelopes`）、`app/runtime/cas.py`、`app/runtime/evidence.py`、`app/runtime/terminal.py::build_terminal_envelope`、worker 终态收存接线、`GET /api/v1/tasks/{id}/artifacts` 与 `/terminal-envelopes`。
+- **AttemptTerminalEnvelope（§11.1 单机子集）**：worker 收敛 Attempt 时签发的 Node 来源终态信封——`outcomeClass`（SUCCESS_COMPLETE/FAILURE_PLATFORM_PROOF/CANCELLED_CONFIRMED 可达，其余保留名）、`runtimeObserved`（platform/reportedBy/missingEvidenceReasons）、输出 `resultArtifacts`（CAS 摘要+尺寸，集合化 by path）、`stopReason`、未确认副作用；**不含权威 PASS**（不覆盖控制面取消/预算/撤销事实）。语义校验：同 path 拒收、self-digest、outcome↔status 搭配、SUCCESS_COMPLETE 不得缺证据（§11.1：缺失证据不能升级为成功）。
+- **CAS（§6.9/§9.5 单机子集）**：sha256 内容寻址（同内容去重），blob 落 `data/cas/<sha256>`（原子写 tmp+fsync+rename、路径由 digest 派生杜绝任意路径）；worker 每步终态（成功/业务失败/预算/异常）收存：快照工作区（相对路径排序，超限以 missingEvidenceReasons 如实披露不失败）→ put CAS → 签名信封 → `pi_artifacts`/`pi_terminal_envelopes` 归档（`verified_ok`=TRUE 强制校验）；`verify_envelope_integrity` 复核 CAS 完整性。
+- 简化差距（记录）：无对象存储凭据/分片/副本（本地目录 CAS 替代 MinIO）；OutputArtifactManifest 独立对象未建（清单内联于信封 resultArtifacts）；EvidenceManifest/EvaluationVerdict 未实现（随 G4/G5）；DB blob 引用与文件双写无独立对账任务（G6）。
+
 ## G2 沙箱硬化（蓝图 §3.4/§6.6、手册 SB/RT-04 单机子集）
 
 - 产物：`app/runtime/tools.py`（`DENIED_COMMANDS` + `assert_command_permitted` + `tool_definitions(read_only)`）、`app/runtime/agent.py::run_attempt(read_only=)`、`app/runtime/capabilities.py`（RT 0.3.1 `isolation.sandboxProfile`）、RT schema `sandboxProfile` 段、`tests/test_sandbox.py`（13 项）。

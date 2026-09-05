@@ -57,6 +57,30 @@ class EventOut(BaseModel):
     created_at: datetime
 
 
+class ArtifactOut(BaseModel):
+    artifact_id: str
+    task_id: str
+    run_id: str | None = None
+    step_index: int | None = None
+    path: str
+    digest: str
+    size: int
+    kind: str
+    created_at: datetime
+
+
+class TerminalEnvelopeOut(BaseModel):
+    envelope_id: str
+    task_id: str
+    attempt_id: str
+    run_id: str | None = None
+    step_index: int | None = None
+    outcome_class: str
+    status: str
+    verified_ok: bool
+    created_at: datetime
+
+
 class WorkspaceEntry(BaseModel):
     path: str
     kind: str  # file|dir

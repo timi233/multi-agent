@@ -27,11 +27,12 @@ VEC = ROOT / "contracts" / "test-vectors"
 
 GEN_SCRIPTS = ["gen_contract_vectors.py", "gen_signature_vectors.py",
                "gen_protocol_vectors.py", "gen_budget_vectors.py",
-               "gen_execution_plan_vectors.py"]
+               "gen_execution_plan_vectors.py", "gen_terminal_envelope_vectors.py"]
 # gen_contract/gen_signature 的 OUT 就是 attempt_contract/v2 目录；
 # gen_protocol 的 OUT 是 test-vectors 根（写 <obj>/v2/...）
 INDEPENDENT_SCRIPTS = ["gen_contract_vectors.py", "gen_protocol_vectors.py",
-                       "gen_budget_vectors.py", "gen_execution_plan_vectors.py"]
+                       "gen_budget_vectors.py", "gen_execution_plan_vectors.py",
+                       "gen_terminal_envelope_vectors.py"]
 
 
 @pytest.mark.parametrize("script", INDEPENDENT_SCRIPTS)
@@ -68,6 +69,8 @@ def test_generators_output_via_tmp_identical():
              VEC / "budget_grant" / "v2" / "vectors.json"),
             (Path(tmp) / "execution_plan_snapshot" / "v2" / "vectors.json",
              VEC / "execution_plan_snapshot" / "v2" / "vectors.json"),
+            (Path(tmp) / "attempt_terminal_envelope" / "v2" / "vectors.json",
+             VEC / "attempt_terminal_envelope" / "v2" / "vectors.json"),
         ]
         for fresh, tracked in pairs:
             assert fresh.read_bytes() == tracked.read_bytes(), \

@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pi.local/contracts/jsonschema/attempt_terminal_envelope/v2",
+  "title": "AttemptTerminalEnvelope v2（蓝图 §11.1 单机子集：Node 来源终态信封）",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "contractVersion": { "const": "2" },
+    "workloadIdentity": { "const": "pi.node" },
+    "terminalEnvelopeId": { "type": "string", "pattern": "^[a-f0-9]{32}$" },
+    "taskId": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+    "attemptId": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+    "runId": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+    "stepIndex": { "type": "integer", "minimum": 1 },
+    "outcomeClass": {
+      "type": "string",
+      "enum": ["SUCCESS_COMPLETE", "FAILURE_NODE_REPORTED",
+               "FAILURE_PLATFORM_PROOF", "CANCELLED_CONFIRMED",
+               "DELIVERY_RECONCILING"]
+    },
+    "status": { "type": "string", "enum": ["SUCCESS", "FAILED", "BUDGET_EXHAUSTED", "CANCELLED"] },
+    "stopReason": { "type": ["string", "null"], "maxLength": 4000 },
+    "runtimeObserved": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "platform": { "const": "single-node-local" },
+        "reportedBy": { "const": "pi.worker" },
+        "missingEvidenceReasons": {
+          "type": "array", "items": { "type": "string" }, "uniqueItems": true
+        }
+      },
+      "required": ["platform", "reportedBy", "missingEvidenceReasons"]
+    },
+    "resultArtifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "size": { "type": "integer", "minimum": 0 },
+          "kind": { "type": "string", "enum": ["file", "dir"] }
+        },
+        "required": ["path", "digest", "size", "kind"]
+      },
+      "uniqueItems": true
+    },
+    "unacknowledgedSideEffects": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "payloadDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "objectType": { "const": "attempt_terminal_envelope" },
+        "schemaVersion": { "const": "2" },
+        "signatureAlgorithm": { "const": "Ed25519" },
+        "keyId": { "type": "string", "minLength": 1 },
+        "issuer": { "type": "string", "minLength": 1 },
+        "issuerWorkloadIdentity": { "const": "pi.node" },
+        "audience": { "type": "string" },
+        "controlPlaneEpoch": { "type": "integer", "minimum": 0 },
+        "signedAt": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T" },
+        "payloadDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "value": { "type": "string", "pattern": "^[A-Za-z0-9+/]{86}==$" }
+      },
+      "required": [
+        "objectType", "schemaVersion", "signatureAlgorithm", "keyId",
+        "issuer", "issuerWorkloadIdentity", "audience", "controlPlaneEpoch",
+        "signedAt", "payloadDigest", "value"
+      ]
+    }
+  },
+  "required": [
+    "contractVersion", "workloadIdentity", "terminalEnvelopeId", "taskId",
+    "attemptId", "runId", "stepIndex", "outcomeClass", "status",
+    "runtimeObserved", "resultArtifacts", "unacknowledgedSideEffects",
+    "payloadDigest", "signature"
+  ]
+}

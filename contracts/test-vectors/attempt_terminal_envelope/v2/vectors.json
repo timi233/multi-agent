@@ -1,0 +1,493 @@
+{
+  "objectType": "attempt_terminal_envelope",
+  "schemaVersion": "2",
+  "canonicalEncoding": "RFC8785-JCS-lite",
+  "vectors": [
+    {
+      "id": "pos-success",
+      "kind": "positive",
+      "expectedSchemaValid": true,
+      "note": "SUCCESS_COMPLETE：产物清单含两文件",
+      "expectedError": null,
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.node",
+        "terminalEnvelopeId": "7a70830a1e9cb9f6d3cf3367bbbabb61",
+        "taskId": "0123456789abcdef",
+        "attemptId": "1010101010101010",
+        "runId": "2020202020202020",
+        "stepIndex": 1,
+        "outcomeClass": "SUCCESS_COMPLETE",
+        "status": "SUCCESS",
+        "stopReason": null,
+        "runtimeObserved": {
+          "platform": "single-node-local",
+          "reportedBy": "pi.worker",
+          "missingEvidenceReasons": []
+        },
+        "resultArtifacts": [
+          {
+            "path": "out/data.json",
+            "digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "size": 128,
+            "kind": "file"
+          },
+          {
+            "path": "out/report.md",
+            "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "size": 42,
+            "kind": "file"
+          }
+        ],
+        "unacknowledgedSideEffects": [],
+        "payloadDigest": "sha256:fb3309518040a0614bcdf620a58fef5e11bd8d67ab49c5b0bd5da6b8f9a1e00a",
+        "signature": {
+          "objectType": "attempt_terminal_envelope",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-terminal-vector",
+          "issuer": "terminal-test",
+          "issuerWorkloadIdentity": "pi.node",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-05T08:01:00Z",
+          "payloadDigest": "sha256:fb3309518040a0614bcdf620a58fef5e11bd8d67ab49c5b0bd5da6b8f9a1e00a",
+          "value": "D/6gBYvXFirKKZCukMQo4FgYyaTW4G4ejiIBFJRzS/mp9569nZ/jLSSsculyxmwZIZkornpN8EcbEtTo44vYBQ=="
+        }
+      },
+      "calculateOnLoad": true,
+      "canonicalPayloadB64": "eyJhdHRlbXB0SWQiOiIxMDEwMTAxMDEwMTAxMDEwIiwiY29udHJhY3RWZXJzaW9uIjoiMiIsIm91dGNvbWVDbGFzcyI6IlNVQ0NFU1NfQ09NUExFVEUiLCJyZXN1bHRBcnRpZmFjdHMiOlt7ImRpZ2VzdCI6InNoYTI1NjpiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiIiwia2luZCI6ImZpbGUiLCJwYXRoIjoib3V0L2RhdGEuanNvbiIsInNpemUiOjEyOH0seyJkaWdlc3QiOiJzaGEyNTY6YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYSIsImtpbmQiOiJmaWxlIiwicGF0aCI6Im91dC9yZXBvcnQubWQiLCJzaXplIjo0Mn1dLCJydW5JZCI6IjIwMjAyMDIwMjAyMDIwMjAiLCJydW50aW1lT2JzZXJ2ZWQvbWlzc2luZ0V2aWRlbmNlUmVhc29ucyI6W10sInJ1bnRpbWVPYnNlcnZlZC9wbGF0Zm9ybSI6InNpbmdsZS1ub2RlLWxvY2FsIiwicnVudGltZU9ic2VydmVkL3JlcG9ydGVkQnkiOiJwaS53b3JrZXIiLCJzdGF0dXMiOiJTVUNDRVNTIiwic3RlcEluZGV4IjoxLCJzdG9wUmVhc29uIjpudWxsLCJ0YXNrSWQiOiIwMTIzNDU2Nzg5YWJjZGVmIiwidGVybWluYWxFbnZlbG9wZUlkIjoiN2E3MDgzMGExZTljYjlmNmQzY2YzMzY3YmJiYWJiNjEiLCJ1bmFja25vd2xlZGdlZFNpZGVFZmZlY3RzIjpbXSwid29ya2xvYWRJZGVudGl0eSI6InBpLm5vZGUifQ==",
+      "payloadDigest": "sha256:fb3309518040a0614bcdf620a58fef5e11bd8d67ab49c5b0bd5da6b8f9a1e00a",
+      "signatureInputB64": "eyJhdWRpZW5jZSI6InBpLnBsYXRmb3JtIiwiY29udHJvbFBsYW5lRXBvY2giOjAsImlzc3VlciI6InRlcm1pbmFsLXRlc3QiLCJpc3N1ZXJXb3JrbG9hZElkZW50aXR5IjoicGkubm9kZSIsImtleUlkIjoic2stdGVybWluYWwtdmVjdG9yIiwib2JqZWN0VHlwZSI6ImF0dGVtcHRfdGVybWluYWxfZW52ZWxvcGUiLCJwYXlsb2FkRGlnZXN0Ijoic2hhMjU2OmZiMzMwOTUxODA0MGEwNjE0YmNkZjYyMGE1OGZlZjVlMTFiZDhkNjdhYjQ5YzViMGJkNWRhNmI4ZjlhMWUwMGEiLCJzY2hlbWFWZXJzaW9uIjoiMiIsInNpZ25hdHVyZUFsZ29yaXRobSI6IkVkMjU1MTkiLCJzaWduYXR1cmVDb250ZXh0IjoicGkuY29udHJhY3Quc2lnbmF0dXJlLnYxIiwic2lnbmVkQXQiOiIyMDI2LTA5LTA1VDA4OjAxOjAwWiJ9"
+    },
+    {
+      "id": "pos-failed-platform-proof",
+      "kind": "positive",
+      "expectedSchemaValid": true,
+      "note": "FAILURE_PLATFORM_PROOF：含缺失证据原因",
+      "expectedError": null,
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.node",
+        "terminalEnvelopeId": "7063b7a6a84d85c14a1076ff64209f93",
+        "taskId": "0123456789abcdef",
+        "attemptId": "1010101010101010",
+        "runId": "2020202020202020",
+        "stepIndex": 1,
+        "outcomeClass": "FAILURE_PLATFORM_PROOF",
+        "status": "FAILED",
+        "stopReason": "step 1 failed",
+        "runtimeObserved": {
+          "platform": "single-node-local",
+          "reportedBy": "pi.worker",
+          "missingEvidenceReasons": [
+            "node-telemetry-unavailable"
+          ]
+        },
+        "resultArtifacts": [],
+        "unacknowledgedSideEffects": [],
+        "payloadDigest": "sha256:304d99ef7236a9bfbfa16bca7663aac39093442ddd5e7298253ba1c47008cabd",
+        "signature": {
+          "objectType": "attempt_terminal_envelope",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-terminal-vector",
+          "issuer": "terminal-test",
+          "issuerWorkloadIdentity": "pi.node",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-05T08:01:00Z",
+          "payloadDigest": "sha256:304d99ef7236a9bfbfa16bca7663aac39093442ddd5e7298253ba1c47008cabd",
+          "value": "PcrIqdBPFMf5mBlYOPVOtqLmgUfkvgqMaitXFo0T7mnVJKx1EL5lVLGVZ+m9gVfpdUCdFTMdux/WOcI8UybXCg=="
+        }
+      },
+      "calculateOnLoad": true,
+      "canonicalPayloadB64": "eyJhdHRlbXB0SWQiOiIxMDEwMTAxMDEwMTAxMDEwIiwiY29udHJhY3RWZXJzaW9uIjoiMiIsIm91dGNvbWVDbGFzcyI6IkZBSUxVUkVfUExBVEZPUk1fUFJPT0YiLCJyZXN1bHRBcnRpZmFjdHMiOltdLCJydW5JZCI6IjIwMjAyMDIwMjAyMDIwMjAiLCJydW50aW1lT2JzZXJ2ZWQvbWlzc2luZ0V2aWRlbmNlUmVhc29ucyI6WyJub2RlLXRlbGVtZXRyeS11bmF2YWlsYWJsZSJdLCJydW50aW1lT2JzZXJ2ZWQvcGxhdGZvcm0iOiJzaW5nbGUtbm9kZS1sb2NhbCIsInJ1bnRpbWVPYnNlcnZlZC9yZXBvcnRlZEJ5IjoicGkud29ya2VyIiwic3RhdHVzIjoiRkFJTEVEIiwic3RlcEluZGV4IjoxLCJzdG9wUmVhc29uIjoic3RlcCAxIGZhaWxlZCIsInRhc2tJZCI6IjAxMjM0NTY3ODlhYmNkZWYiLCJ0ZXJtaW5hbEVudmVsb3BlSWQiOiI3MDYzYjdhNmE4NGQ4NWMxNGExMDc2ZmY2NDIwOWY5MyIsInVuYWNrbm93bGVkZ2VkU2lkZUVmZmVjdHMiOltdLCJ3b3JrbG9hZElkZW50aXR5IjoicGkubm9kZSJ9",
+      "payloadDigest": "sha256:304d99ef7236a9bfbfa16bca7663aac39093442ddd5e7298253ba1c47008cabd",
+      "signatureInputB64": "eyJhdWRpZW5jZSI6InBpLnBsYXRmb3JtIiwiY29udHJvbFBsYW5lRXBvY2giOjAsImlzc3VlciI6InRlcm1pbmFsLXRlc3QiLCJpc3N1ZXJXb3JrbG9hZElkZW50aXR5IjoicGkubm9kZSIsImtleUlkIjoic2stdGVybWluYWwtdmVjdG9yIiwib2JqZWN0VHlwZSI6ImF0dGVtcHRfdGVybWluYWxfZW52ZWxvcGUiLCJwYXlsb2FkRGlnZXN0Ijoic2hhMjU2OjMwNGQ5OWVmNzIzNmE5YmZiZmExNmJjYTc2NjNhYWMzOTA5MzQ0MmRkZDVlNzI5ODI1M2JhMWM0NzAwOGNhYmQiLCJzY2hlbWFWZXJzaW9uIjoiMiIsInNpZ25hdHVyZUFsZ29yaXRobSI6IkVkMjU1MTkiLCJzaWduYXR1cmVDb250ZXh0IjoicGkuY29udHJhY3Quc2lnbmF0dXJlLnYxIiwic2lnbmVkQXQiOiIyMDI2LTA5LTA1VDA4OjAxOjAwWiJ9"
+    },
+    {
+      "id": "pos-cancelled",
+      "kind": "positive",
+      "expectedSchemaValid": true,
+      "note": "CANCELLED_CONFIRMED：控制面取消收敛",
+      "expectedError": null,
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.node",
+        "terminalEnvelopeId": "2d1f06dd799d4fc75c4dc8a57d667b7a",
+        "taskId": "0123456789abcdef",
+        "attemptId": "1010101010101010",
+        "runId": "2020202020202020",
+        "stepIndex": 1,
+        "outcomeClass": "CANCELLED_CONFIRMED",
+        "status": "CANCELLED",
+        "stopReason": "cancelled",
+        "runtimeObserved": {
+          "platform": "single-node-local",
+          "reportedBy": "pi.worker",
+          "missingEvidenceReasons": []
+        },
+        "resultArtifacts": [],
+        "unacknowledgedSideEffects": [],
+        "payloadDigest": "sha256:3e96b7a79367a405aa16102cb36c32a0b6ca2d4a36133e96e68860921eb771ef",
+        "signature": {
+          "objectType": "attempt_terminal_envelope",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-terminal-vector",
+          "issuer": "terminal-test",
+          "issuerWorkloadIdentity": "pi.node",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-05T08:01:00Z",
+          "payloadDigest": "sha256:3e96b7a79367a405aa16102cb36c32a0b6ca2d4a36133e96e68860921eb771ef",
+          "value": "pVlLGkPT59wdx5XiH8JzsfEAyAx3uy79d7QeKcY/zvp3KUi+1o5E9lq+ObZXRvBkjz4/falzbadPfYY8CzKJAw=="
+        }
+      },
+      "calculateOnLoad": true,
+      "canonicalPayloadB64": "eyJhdHRlbXB0SWQiOiIxMDEwMTAxMDEwMTAxMDEwIiwiY29udHJhY3RWZXJzaW9uIjoiMiIsIm91dGNvbWVDbGFzcyI6IkNBTkNFTExFRF9DT05GSVJNRUQiLCJyZXN1bHRBcnRpZmFjdHMiOltdLCJydW5JZCI6IjIwMjAyMDIwMjAyMDIwMjAiLCJydW50aW1lT2JzZXJ2ZWQvbWlzc2luZ0V2aWRlbmNlUmVhc29ucyI6W10sInJ1bnRpbWVPYnNlcnZlZC9wbGF0Zm9ybSI6InNpbmdsZS1ub2RlLWxvY2FsIiwicnVudGltZU9ic2VydmVkL3JlcG9ydGVkQnkiOiJwaS53b3JrZXIiLCJzdGF0dXMiOiJDQU5DRUxMRUQiLCJzdGVwSW5kZXgiOjEsInN0b3BSZWFzb24iOiJjYW5jZWxsZWQiLCJ0YXNrSWQiOiIwMTIzNDU2Nzg5YWJjZGVmIiwidGVybWluYWxFbnZlbG9wZUlkIjoiMmQxZjA2ZGQ3OTlkNGZjNzVjNGRjOGE1N2Q2NjdiN2EiLCJ1bmFja25vd2xlZGdlZFNpZGVFZmZlY3RzIjpbXSwid29ya2xvYWRJZGVudGl0eSI6InBpLm5vZGUifQ==",
+      "payloadDigest": "sha256:3e96b7a79367a405aa16102cb36c32a0b6ca2d4a36133e96e68860921eb771ef",
+      "signatureInputB64": "eyJhdWRpZW5jZSI6InBpLnBsYXRmb3JtIiwiY29udHJvbFBsYW5lRXBvY2giOjAsImlzc3VlciI6InRlcm1pbmFsLXRlc3QiLCJpc3N1ZXJXb3JrbG9hZElkZW50aXR5IjoicGkubm9kZSIsImtleUlkIjoic2stdGVybWluYWwtdmVjdG9yIiwib2JqZWN0VHlwZSI6ImF0dGVtcHRfdGVybWluYWxfZW52ZWxvcGUiLCJwYXlsb2FkRGlnZXN0Ijoic2hhMjU2OjNlOTZiN2E3OTM2N2E0MDVhYTE2MTAyY2IzNmMzMmEwYjZjYTJkNGEzNjEzM2U5NmU2ODg2MDkyMWViNzcxZWYiLCJzY2hlbWFWZXJzaW9uIjoiMiIsInNpZ25hdHVyZUFsZ29yaXRobSI6IkVkMjU1MTkiLCJzaWduYXR1cmVDb250ZXh0IjoicGkuY29udHJhY3Quc2lnbmF0dXJlLnYxIiwic2lnbmVkQXQiOiIyMDI2LTA5LTA1VDA4OjAxOjAwWiJ9"
+    },
+    {
+      "id": "pos-no-artifacts",
+      "kind": "positive",
+      "expectedSchemaValid": true,
+      "note": "无产物（空清单）",
+      "expectedError": null,
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.node",
+        "terminalEnvelopeId": "643383ebb6a7281c89aefd740ec1b2b4",
+        "taskId": "0123456789abcdef",
+        "attemptId": "1010101010101010",
+        "runId": "2020202020202020",
+        "stepIndex": 1,
+        "outcomeClass": "FAILURE_PLATFORM_PROOF",
+        "status": "FAILED",
+        "stopReason": "budget exhausted",
+        "runtimeObserved": {
+          "platform": "single-node-local",
+          "reportedBy": "pi.worker",
+          "missingEvidenceReasons": [
+            "node-telemetry-unavailable"
+          ]
+        },
+        "resultArtifacts": [],
+        "unacknowledgedSideEffects": [],
+        "payloadDigest": "sha256:4b511d5a4396b6ed539bffcb256b652dfdc90af5297090d90e078d997ba11d31",
+        "signature": {
+          "objectType": "attempt_terminal_envelope",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-terminal-vector",
+          "issuer": "terminal-test",
+          "issuerWorkloadIdentity": "pi.node",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-05T08:01:00Z",
+          "payloadDigest": "sha256:4b511d5a4396b6ed539bffcb256b652dfdc90af5297090d90e078d997ba11d31",
+          "value": "tC0J/T1II/y5kn/Ni0rPbFg2zJQZTbQUFvCnG20auJfpOjOR9R9ieuA1c4QbW1IFxvwklg04p17UCS5G4ImiDw=="
+        }
+      },
+      "calculateOnLoad": true,
+      "canonicalPayloadB64": "eyJhdHRlbXB0SWQiOiIxMDEwMTAxMDEwMTAxMDEwIiwiY29udHJhY3RWZXJzaW9uIjoiMiIsIm91dGNvbWVDbGFzcyI6IkZBSUxVUkVfUExBVEZPUk1fUFJPT0YiLCJyZXN1bHRBcnRpZmFjdHMiOltdLCJydW5JZCI6IjIwMjAyMDIwMjAyMDIwMjAiLCJydW50aW1lT2JzZXJ2ZWQvbWlzc2luZ0V2aWRlbmNlUmVhc29ucyI6WyJub2RlLXRlbGVtZXRyeS11bmF2YWlsYWJsZSJdLCJydW50aW1lT2JzZXJ2ZWQvcGxhdGZvcm0iOiJzaW5nbGUtbm9kZS1sb2NhbCIsInJ1bnRpbWVPYnNlcnZlZC9yZXBvcnRlZEJ5IjoicGkud29ya2VyIiwic3RhdHVzIjoiRkFJTEVEIiwic3RlcEluZGV4IjoxLCJzdG9wUmVhc29uIjoiYnVkZ2V0IGV4aGF1c3RlZCIsInRhc2tJZCI6IjAxMjM0NTY3ODlhYmNkZWYiLCJ0ZXJtaW5hbEVudmVsb3BlSWQiOiI2NDMzODNlYmI2YTcyODFjODlhZWZkNzQwZWMxYjJiNCIsInVuYWNrbm93bGVkZ2VkU2lkZUVmZmVjdHMiOltdLCJ3b3JrbG9hZElkZW50aXR5IjoicGkubm9kZSJ9",
+      "payloadDigest": "sha256:4b511d5a4396b6ed539bffcb256b652dfdc90af5297090d90e078d997ba11d31",
+      "signatureInputB64": "eyJhdWRpZW5jZSI6InBpLnBsYXRmb3JtIiwiY29udHJvbFBsYW5lRXBvY2giOjAsImlzc3VlciI6InRlcm1pbmFsLXRlc3QiLCJpc3N1ZXJXb3JrbG9hZElkZW50aXR5IjoicGkubm9kZSIsImtleUlkIjoic2stdGVybWluYWwtdmVjdG9yIiwib2JqZWN0VHlwZSI6ImF0dGVtcHRfdGVybWluYWxfZW52ZWxvcGUiLCJwYXlsb2FkRGlnZXN0Ijoic2hhMjU2OjRiNTExZDVhNDM5NmI2ZWQ1MzliZmZjYjI1NmI2NTJkZmRjOTBhZjUyOTcwOTBkOTBlMDc4ZDk5N2JhMTFkMzEiLCJzY2hlbWFWZXJzaW9uIjoiMiIsInNpZ25hdHVyZUFsZ29yaXRobSI6IkVkMjU1MTkiLCJzaWduYXR1cmVDb250ZXh0IjoicGkuY29udHJhY3Quc2lnbmF0dXJlLnYxIiwic2lnbmVkQXQiOiIyMDI2LTA5LTA1VDA4OjAxOjAwWiJ9"
+    },
+    {
+      "id": "pos-signed",
+      "kind": "positive",
+      "expectedSchemaValid": true,
+      "note": "含 §9.4 签名信封（确定性测试密钥真实签名；乱序传入验证集合归一化）",
+      "expectedError": null,
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.node",
+        "terminalEnvelopeId": "0ea47989df863708e54d5b3bb781e0c3",
+        "taskId": "0123456789abcdef",
+        "attemptId": "1010101010101010",
+        "runId": "2020202020202020",
+        "stepIndex": 1,
+        "outcomeClass": "SUCCESS_COMPLETE",
+        "status": "SUCCESS",
+        "stopReason": null,
+        "runtimeObserved": {
+          "platform": "single-node-local",
+          "reportedBy": "pi.worker",
+          "missingEvidenceReasons": []
+        },
+        "resultArtifacts": [
+          {
+            "path": "out/SUMMARY.md",
+            "digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "size": 7,
+            "kind": "file"
+          },
+          {
+            "path": "out/data.json",
+            "digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "size": 128,
+            "kind": "file"
+          },
+          {
+            "path": "out/report.md",
+            "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "size": 42,
+            "kind": "file"
+          }
+        ],
+        "unacknowledgedSideEffects": [],
+        "payloadDigest": "sha256:34ef134a18e637b04bfaa552b9421b4f8b2429bce8c1402e0eaf4687b973a649",
+        "signature": {
+          "objectType": "attempt_terminal_envelope",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-terminal-vector",
+          "issuer": "terminal-test",
+          "issuerWorkloadIdentity": "pi.node",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-05T08:01:00Z",
+          "payloadDigest": "sha256:34ef134a18e637b04bfaa552b9421b4f8b2429bce8c1402e0eaf4687b973a649",
+          "value": "EJho28ER3QqiM40tI7TY7okVIv5VlYbXTT+RHxShs7BihWqf0UtbutifrpotT3dSeeFSuxWzk+ntBxYJHhC6Dg=="
+        }
+      },
+      "calculateOnLoad": true,
+      "canonicalPayloadB64": "eyJhdHRlbXB0SWQiOiIxMDEwMTAxMDEwMTAxMDEwIiwiY29udHJhY3RWZXJzaW9uIjoiMiIsIm91dGNvbWVDbGFzcyI6IlNVQ0NFU1NfQ09NUExFVEUiLCJyZXN1bHRBcnRpZmFjdHMiOlt7ImRpZ2VzdCI6InNoYTI1NjpjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjIiwia2luZCI6ImZpbGUiLCJwYXRoIjoib3V0L1NVTU1BUlkubWQiLCJzaXplIjo3fSx7ImRpZ2VzdCI6InNoYTI1NjpiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiIiwia2luZCI6ImZpbGUiLCJwYXRoIjoib3V0L2RhdGEuanNvbiIsInNpemUiOjEyOH0seyJkaWdlc3QiOiJzaGEyNTY6YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYSIsImtpbmQiOiJmaWxlIiwicGF0aCI6Im91dC9yZXBvcnQubWQiLCJzaXplIjo0Mn1dLCJydW5JZCI6IjIwMjAyMDIwMjAyMDIwMjAiLCJydW50aW1lT2JzZXJ2ZWQvbWlzc2luZ0V2aWRlbmNlUmVhc29ucyI6W10sInJ1bnRpbWVPYnNlcnZlZC9wbGF0Zm9ybSI6InNpbmdsZS1ub2RlLWxvY2FsIiwicnVudGltZU9ic2VydmVkL3JlcG9ydGVkQnkiOiJwaS53b3JrZXIiLCJzdGF0dXMiOiJTVUNDRVNTIiwic3RlcEluZGV4IjoxLCJzdG9wUmVhc29uIjpudWxsLCJ0YXNrSWQiOiIwMTIzNDU2Nzg5YWJjZGVmIiwidGVybWluYWxFbnZlbG9wZUlkIjoiMGVhNDc5ODlkZjg2MzcwOGU1NGQ1YjNiYjc4MWUwYzMiLCJ1bmFja25vd2xlZGdlZFNpZGVFZmZlY3RzIjpbXSwid29ya2xvYWRJZGVudGl0eSI6InBpLm5vZGUifQ==",
+      "payloadDigest": "sha256:34ef134a18e637b04bfaa552b9421b4f8b2429bce8c1402e0eaf4687b973a649",
+      "signatureInputB64": "eyJhdWRpZW5jZSI6InBpLnBsYXRmb3JtIiwiY29udHJvbFBsYW5lRXBvY2giOjAsImlzc3VlciI6InRlcm1pbmFsLXRlc3QiLCJpc3N1ZXJXb3JrbG9hZElkZW50aXR5IjoicGkubm9kZSIsImtleUlkIjoic2stdGVybWluYWwtdmVjdG9yIiwib2JqZWN0VHlwZSI6ImF0dGVtcHRfdGVybWluYWxfZW52ZWxvcGUiLCJwYXlsb2FkRGlnZXN0Ijoic2hhMjU2OjM0ZWYxMzRhMThlNjM3YjA0YmZhYTU1MmI5NDIxYjRmOGIyNDI5YmNlOGMxNDAyZTBlYWY0Njg3Yjk3M2E2NDkiLCJzY2hlbWFWZXJzaW9uIjoiMiIsInNpZ25hdHVyZUFsZ29yaXRobSI6IkVkMjU1MTkiLCJzaWduYXR1cmVDb250ZXh0IjoicGkuY29udHJhY3Quc2lnbmF0dXJlLnYxIiwic2lnbmVkQXQiOiIyMDI2LTA5LTA1VDA4OjAxOjAwWiJ9"
+    },
+    {
+      "id": "neg-outcome-enum",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "outcomeClass 枚举外必须拒绝",
+      "expectedError": "enum",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.node",
+        "terminalEnvelopeId": "b26f45ef7c3695e0bcf18fcadcbfd02c",
+        "taskId": "0123456789abcdef",
+        "attemptId": "1010101010101010",
+        "runId": "2020202020202020",
+        "stepIndex": 1,
+        "outcomeClass": "MAYBE",
+        "status": "SUCCESS",
+        "stopReason": null,
+        "runtimeObserved": {
+          "platform": "single-node-local",
+          "reportedBy": "pi.worker",
+          "missingEvidenceReasons": []
+        },
+        "resultArtifacts": [],
+        "unacknowledgedSideEffects": [],
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "signature": {
+          "objectType": "attempt_terminal_envelope",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-terminal-vector",
+          "issuer": "terminal-test",
+          "issuerWorkloadIdentity": "pi.node",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-05T08:01:00Z",
+          "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "value": "B9GXzSyYHwC89zdj45GTeIRHRywZunA151k1s9+9tgoDYa9CnVJgX2mH/XbXuRGYzbiGF38CdARhTQTIHo5UDA=="
+        }
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "enum"
+    },
+    {
+      "id": "neg-dup-artifact-path",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "resultArtifacts 全同元素重复必须拒绝（uniqueItems）",
+      "expectedError": "uniqueItems",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.node",
+        "terminalEnvelopeId": "f40d582a1b94a3389f8c7b314037fe96",
+        "taskId": "0123456789abcdef",
+        "attemptId": "1010101010101010",
+        "runId": "2020202020202020",
+        "stepIndex": 1,
+        "outcomeClass": "SUCCESS_COMPLETE",
+        "status": "SUCCESS",
+        "stopReason": null,
+        "runtimeObserved": {
+          "platform": "single-node-local",
+          "reportedBy": "pi.worker",
+          "missingEvidenceReasons": []
+        },
+        "resultArtifacts": [
+          {
+            "path": "out/report.md",
+            "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "size": 42,
+            "kind": "file"
+          },
+          {
+            "path": "out/report.md",
+            "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "size": 42,
+            "kind": "file"
+          }
+        ],
+        "unacknowledgedSideEffects": [],
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "signature": {
+          "objectType": "attempt_terminal_envelope",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-terminal-vector",
+          "issuer": "terminal-test",
+          "issuerWorkloadIdentity": "pi.node",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-05T08:01:00Z",
+          "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "value": "B9GXzSyYHwC89zdj45GTeIRHRywZunA151k1s9+9tgoDYa9CnVJgX2mH/XbXuRGYzbiGF38CdARhTQTIHo5UDA=="
+        }
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "uniqueItems"
+    },
+    {
+      "id": "neg-missing-required",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "缺 required 字段（status）必须拒绝",
+      "expectedError": "required",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.node",
+        "terminalEnvelopeId": "bd3d60e88940ebe07e71298e3d1e0671",
+        "taskId": "0123456789abcdef",
+        "attemptId": "1010101010101010",
+        "runId": "2020202020202020",
+        "stepIndex": 1,
+        "outcomeClass": "CANCELLED_CONFIRMED",
+        "stopReason": null,
+        "runtimeObserved": {
+          "platform": "single-node-local",
+          "reportedBy": "pi.worker",
+          "missingEvidenceReasons": []
+        },
+        "resultArtifacts": [],
+        "unacknowledgedSideEffects": [],
+        "payloadDigest": "sha256:4053e5471e3357a4e390390afdbf09687010050d3dac907c806edf155997b9a1",
+        "signature": {
+          "objectType": "attempt_terminal_envelope",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-terminal-vector",
+          "issuer": "terminal-test",
+          "issuerWorkloadIdentity": "pi.node",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-05T08:01:00Z",
+          "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "value": "B9GXzSyYHwC89zdj45GTeIRHRywZunA151k1s9+9tgoDYa9CnVJgX2mH/XbXuRGYzbiGF38CdARhTQTIHo5UDA=="
+        }
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "required"
+    },
+    {
+      "id": "neg-bad-digest",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "产物 digest 非 sha256:64hex 必须拒绝",
+      "expectedError": "pattern",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.node",
+        "terminalEnvelopeId": "ee5ecd6047eb2ea2bf0c524f1fed8298",
+        "taskId": "0123456789abcdef",
+        "attemptId": "1010101010101010",
+        "runId": "2020202020202020",
+        "stepIndex": 1,
+        "outcomeClass": "SUCCESS_COMPLETE",
+        "status": "SUCCESS",
+        "stopReason": null,
+        "runtimeObserved": {
+          "platform": "single-node-local",
+          "reportedBy": "pi.worker",
+          "missingEvidenceReasons": []
+        },
+        "resultArtifacts": [
+          {
+            "path": "out/report.md",
+            "digest": "sha256:zz",
+            "size": 42,
+            "kind": "file"
+          }
+        ],
+        "unacknowledgedSideEffects": [],
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "signature": {
+          "objectType": "attempt_terminal_envelope",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-terminal-vector",
+          "issuer": "terminal-test",
+          "issuerWorkloadIdentity": "pi.node",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-05T08:01:00Z",
+          "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "value": "B9GXzSyYHwC89zdj45GTeIRHRywZunA151k1s9+9tgoDYa9CnVJgX2mH/XbXuRGYzbiGF38CdARhTQTIHo5UDA=="
+        }
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "pattern"
+    },
+    {
+      "id": "neg-unknown-field",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "未知字段必须拒绝",
+      "expectedError": "unknown field",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.node",
+        "terminalEnvelopeId": "08e984697383a8e3df4e22b0e6a2a2d7",
+        "taskId": "0123456789abcdef",
+        "attemptId": "1010101010101010",
+        "runId": "2020202020202020",
+        "stepIndex": 1,
+        "outcomeClass": "SUCCESS_COMPLETE",
+        "status": "SUCCESS",
+        "stopReason": null,
+        "runtimeObserved": {
+          "platform": "single-node-local",
+          "reportedBy": "pi.worker",
+          "missingEvidenceReasons": []
+        },
+        "resultArtifacts": [],
+        "unacknowledgedSideEffects": [],
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "bogusField": "x",
+        "signature": {
+          "objectType": "attempt_terminal_envelope",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-terminal-vector",
+          "issuer": "terminal-test",
+          "issuerWorkloadIdentity": "pi.node",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-05T08:01:00Z",
+          "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "value": "B9GXzSyYHwC89zdj45GTeIRHRywZunA151k1s9+9tgoDYa9CnVJgX2mH/XbXuRGYzbiGF38CdARhTQTIHo5UDA=="
+        }
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "unknown field"
+    }
+  ]
+}

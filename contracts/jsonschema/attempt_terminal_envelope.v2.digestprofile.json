@@ -1,0 +1,33 @@
+{
+  "$id": "https://pi.local/contracts/jsonschema/attempt_terminal_envelope/v2/digestprofile",
+  "schemaVersion": "2",
+  "objectType": "attempt_terminal_envelope",
+  "digestAlgorithm": "sha256",
+  "canonicalEncoding": "RFC8785-JCS-lite",
+  "immutablePayloadPointers": [
+    "/contractVersion",
+    "/workloadIdentity",
+    "/terminalEnvelopeId",
+    "/taskId",
+    "/attemptId",
+    "/runId",
+    "/stepIndex",
+    "/outcomeClass",
+    "/status",
+    "/stopReason",
+    "/runtimeObserved/platform",
+    "/runtimeObserved/reportedBy",
+    "/runtimeObserved/missingEvidenceReasons",
+    "/resultArtifacts",
+    "/unacknowledgedSideEffects"
+  ],
+  "optionalImmutablePointers": ["/stopReason"],
+  "canonicalSortKeys": {
+    "/resultArtifacts": { "by": "key", "key": "path" },
+    "/runtimeObserved/missingEvidenceReasons": { "by": "value" },
+    "/unacknowledgedSideEffects": { "by": "value" }
+  },
+  "selfDigestPointer": "/payloadDigest",
+  "signatureEnvelopePointers": ["/signature"],
+  "notes": "AttemptTerminalEnvelope（蓝图 §11.1 单机子集）：worker 收敛 Attempt 时签发的 Node 来源终态信封——报告 runtimeObserved（平台/报告者/缺失证据原因）、输出 resultArtifacts（CAS 摘要+尺寸）、stopReason 与未确认副作用，不含权威 PASS（不覆盖控制面取消/预算/撤销事实）。resultArtifacts 为对象集合数组按 path 排序、语义层按该键拒绝重复；missingEvidenceReasons/sideEffects 为字符串集合按值排序；payloadDigest 为 self-digest。"
+}

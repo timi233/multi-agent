@@ -112,6 +112,16 @@
       "privateKeyFile": "SEED-DERIVED（无文件，确定性派生）",
       "publicKeyFile": "SEED-DERIVED（无文件，确定性派生）"
     },
+    "sk-terminal-vector": {
+      "purpose": "AttemptTerminalEnvelope 契约向量测试签名（确定性 seed 派生，非生产；scripts/gen_terminal_envelope_vectors.py TEST_KEY_SEED）",
+      "issuer": "terminal-test",
+      "allowedObjectTypes": [
+        "attempt_terminal_envelopes"
+      ],
+      "pubFingerprintSha256": "0dcba72c979878274619992eec4c4b2ecb9ff727321b2714ced5b08ff5c52424",
+      "privateKeyFile": "SEED-DERIVED（无文件，确定性派生）",
+      "publicKeyFile": "SEED-DERIVED（无文件，确定性派生）"
+    },
     "sk-skill": {
       "purpose": "Skill Signer",
       "issuer": "skill-governance",

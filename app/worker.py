@@ -34,6 +34,48 @@ class _StepFailure(Exception):
         self.error = error
 
 
+class _Cancelled(Exception):
+    """步骤收尾发现 Task 已被取消：中止后续步骤（Task 已终态，无需再收敛）。"""
+
+
+def _task_state_locked(conn, task_id: str) -> str:
+    """SELECT FOR UPDATE 锁读 Task 权威状态（评审 block：步骤终态信封与
+    任务终态原子判定，阻塞并发 cancel 的 UPDATE 直至本步提交）。"""
+    with conn.cursor() as cur:
+        cur.execute("SELECT status FROM pi_tasks WHERE id=%s FOR UPDATE", (task_id,))
+        row = cur.fetchone()
+        return row["status"] if row else "UNKNOWN"
+
+
+def _converge_cancelled_step(conn, *, task_id: str, attempt_id: str, run_id: str,
+                             step_index: int, workspace_dir: Path,
+                             budget, stop_reason: str | None,
+                             note: str) -> None:
+    """取消获胜的统一收尾（评审 block：成功与业务失败共用）：幂等收敛
+    Run→CANCELLED（兼容 API 已收敛）、Attempt→TERMINAL_REPORTED、
+    Grant→SETTLED、发 ATTEMPT_CANCELLED、签 CANCELLED_CONFIRMED 信封；
+    同事务（调用方 commit 后 raise _Cancelled）。"""
+    with conn.cursor() as cur:
+        cur.execute(
+            "UPDATE pi_runs SET status='CANCELLED', finished_at=now() "
+            "WHERE run_id=%s AND status IN ('EXECUTING','OUTPUT_STAGED',"
+            "'VERIFYING')", (run_id,))
+        cur.execute(
+            "UPDATE pi_attempts SET status='TERMINAL_REPORTED', "
+            "finished_at=now() WHERE id=%s AND status='CLAIMED'",
+            (attempt_id,),
+        )
+    budget.settle_grant(conn)
+    _emit_event(conn, task_id, attempt_id, "ATTEMPT_CANCELLED",
+                {"summary": note[:4000], "stepIndex": step_index, "runId": run_id})
+    from .runtime.evidence import ingest_step_evidence  # G3
+    ingest_step_evidence(
+        conn, task_id=task_id, attempt_id=attempt_id, run_id=run_id,
+        step_index=step_index, workspace_dir=workspace_dir,
+        outcome_class="CANCELLED_CONFIRMED", status="CANCELLED",
+        stop_reason=stop_reason)
+
+
 def _emit_event(conn, task_id: str, attempt_id: str, event_type: str, payload: dict) -> None:
     with conn.cursor() as cur:
         cur.execute(
@@ -63,6 +105,57 @@ def _converge_attempt(conn, task_id: str, attempt_id: str, task_state: str,
             "WHERE task_id=%s AND status='ACTIVE'", (task_id,))
         _emit_event(conn, task_id, attempt_id, event_type,
                     {"status": task_state, "note": note})
+
+
+def _workspace_dir_for(task: dict | None) -> Path | None:
+    """异常路径中安全取工作区路径（task 可能未成功读取）。"""
+    try:
+        if task and task.get("workspace"):
+            return (settings.workspaces_dir / task["workspace"]).resolve()
+    except Exception:
+        pass
+    return None
+
+
+def _ingest_evidence_isolated(task_id: str, attempt_id: str | None,
+                              run_id: str | None, step_index: int | None,
+                              workspace_dir: Path | None,
+                              status: str, stop_reason: str) -> None:
+    """独立连接收存终态证据（预算/异常路径：原事务已 aborted）。步骤未真正
+    开始（无 run/无 attempt/无工作区）则跳过；收存失败不影响任务收敛。
+    评审 block-4：先读真实 Task/Run 终态——取消竞争下任务已 CANCELLED 时
+    签发 CANCELLED_CONFIRMED 信封，避免'取消状态 vs 失败信封'矛盾。"""
+    if not run_id or not step_index or not workspace_dir or not attempt_id:
+        return
+    from .runtime.evidence import ingest_step_evidence
+    conn = connect()
+    try:
+        # 评审 block-3：先持任务行锁（SELECT FOR UPDATE）原子判定终态——
+        # 阻塞并发的 cancel UPDATE；判定与证据写入同一事务提交，杜绝
+        # '读 RUNNING → API 取消 → 落 FAILURE 信封' 的 TOCTOU。
+        with conn.cursor() as cur:
+            cur.execute("SELECT status FROM pi_tasks WHERE id=%s FOR UPDATE",
+                        (task_id,))
+            row = cur.fetchone()
+            task_state = row["status"] if row else "UNKNOWN"
+        if task_state == "CANCELLED":
+            outcome, status = "CANCELLED_CONFIRMED", "CANCELLED"
+        else:
+            outcome = "FAILURE_PLATFORM_PROOF"
+        ingest_step_evidence(
+            conn, task_id=task_id, attempt_id=attempt_id, run_id=run_id,
+            step_index=step_index, workspace_dir=workspace_dir,
+            outcome_class=outcome, status=status,
+            stop_reason=stop_reason)
+        conn.commit()
+    except Exception as exc:  # 证据收存为尽力而为：不覆盖任务终态收敛
+        print(f"[worker] evidence ingest skipped: {exc}")
+        try:
+            conn.rollback()
+        except Exception:
+            pass
+    finally:
+        conn.close()
 
 
 def _fail_run_isolated(run_id: str, status: str, error_code: str) -> None:
@@ -220,6 +313,7 @@ def _run_task(conn, task_id: str) -> None:
     """
     attempt_id: str | None = None
     current_run_id: str | None = None
+    current_step_index: int | None = None
     try:
         with conn.cursor() as cur:
             cur.execute("SELECT * FROM pi_tasks WHERE id=%s AND status=%s", (task_id, _RUNNING))
@@ -262,6 +356,7 @@ def _run_task(conn, task_id: str) -> None:
                 execution_plan_snapshot_id=plan["executionPlanSnapshotId"],
                 plan_digest=plan["payloadDigest"], plan_payload=plan)
             current_run_id = run_id
+            current_step_index = step_index
             with conn.cursor() as cur:
                 _emit_event(conn, task_id, None, "RUN_CREATED",
                             {"runId": run_id, "stepIndex": step_index,
@@ -306,7 +401,16 @@ def _run_task(conn, task_id: str) -> None:
                 _fail_run_isolated(run_id, "BUDGET_EXHAUSTED", str(exc)[:200])
                 raise
 
-            if not ok:  # 步骤业务失败：Run/Attempt/Grant 在当前事务收敛后中断
+            if not ok:  # 步骤业务失败：锁读 Task 权威状态后同事务收敛
+                task_state = _task_state_locked(conn, task_id)
+                if task_state == "CANCELLED":  # 取消已获胜：统一取消收尾
+                    _converge_cancelled_step(
+                        conn, task_id=task_id, attempt_id=attempt_id, run_id=run_id,
+                        step_index=step_index, workspace_dir=workspace_dir,
+                        budget=budget, stop_reason=(error or "cancelled"),
+                        note=f"failed-late-after-cancel: {(error or '')[:300]}")
+                    conn.commit()
+                    raise _Cancelled()
                 with conn.cursor() as cur:
                     transition_run(conn, run_id, "FAILED", attempt_id=attempt_id,
                                    error_code=(error or "STEP_FAILED")[:200])
@@ -319,11 +423,36 @@ def _run_task(conn, task_id: str) -> None:
                     _emit_event(conn, task_id, attempt_id, "ATTEMPT_FINISHED",
                                 {"status": "FAILED", "summary": (summary or "")[:4000],
                                  "stepIndex": step_index, "runId": run_id})
+                    # 评审 block：步骤终态信封与任务终态 FAILED 同事务原子提交，
+                    # 提交后并发 cancel 因 Task 已终态而失效
+                    cur.execute(
+                        "UPDATE pi_tasks SET status='FAILED', finished_at=now(), "
+                        "updated_at=now(), error=%s WHERE id=%s AND status=%s",
+                        (f"步骤 {step_index} ({step['workflowNodeId']}) 失败: "
+                         f"{(error or 'attempt failed')[:300]}", task_id, _RUNNING))
+                from .runtime.evidence import ingest_step_evidence  # G3 终态证据收存
+                ingest_step_evidence(
+                    conn, task_id=task_id, attempt_id=attempt_id, run_id=run_id,
+                    step_index=step_index, workspace_dir=workspace_dir,
+                    outcome_class="FAILURE_PLATFORM_PROOF", status="FAILED",
+                    stop_reason=(error or "step failed"))
                 conn.commit()
                 raise _StepFailure(
                     f"步骤 {step_index} ({step['workflowNodeId']}) 失败: "
                     f"{(error or 'attempt failed')[:300]}")
 
+            # 评审 block：先锁读 Task 权威状态（持有行锁），再 atomic 收敛步骤终态：
+            # 取消获胜 → Run/Attempt/信封按 CANCELLED（EXECUTING→CANCELLED 合法）；
+            # 未取消 → 正常 SUCCESS 收敛（锁保持至 commit，cancel 被阻塞）。
+            task_state = _task_state_locked(conn, task_id)
+            if task_state == "CANCELLED":
+                _converge_cancelled_step(
+                    conn, task_id=task_id, attempt_id=attempt_id, run_id=run_id,
+                    step_index=step_index, workspace_dir=workspace_dir,
+                    budget=budget, stop_reason=None,
+                    note="completed-late-after-cancel")
+                conn.commit()
+                raise _Cancelled()
             with conn.cursor() as cur:
                 transition_run(conn, run_id, "OUTPUT_STAGED", attempt_id=attempt_id)
                 transition_run(conn, run_id, "VERIFYING")
@@ -337,27 +466,42 @@ def _run_task(conn, task_id: str) -> None:
                 _emit_event(conn, task_id, attempt_id, "ATTEMPT_FINISHED",
                             {"status": "SUCCESS", "summary": (summary or "")[:4000],
                              "stepIndex": step_index, "runId": run_id})
+            from .runtime.evidence import ingest_step_evidence  # G3 终态证据收存
+            ingest_step_evidence(
+                conn, task_id=task_id, attempt_id=attempt_id, run_id=run_id,
+                step_index=step_index, workspace_dir=workspace_dir,
+                outcome_class="SUCCESS_COMPLETE", status="SUCCESS",
+                stop_reason=None)
+            if step_index == len(plan["plannedAttemptInputs"]):
+                # 最后一步：任务 SUCCESS 与信封同事务原子提交（关闭 cancel 窗口）
+                with conn.cursor() as cur:
+                    cur.execute(
+                        "UPDATE pi_tasks SET status='SUCCESS', finished_at=now(), "
+                        "updated_at=now(), error=NULL WHERE id=%s AND status=%s "
+                        "RETURNING id", (task_id, _RUNNING))
+                    finalized = cur.fetchone() is not None
+            else:
+                finalized = False
             conn.commit()
             last_attempt_id = attempt_id
 
-        final = "SUCCESS"
-        with conn.cursor() as cur:
-            cur.execute(
-                "UPDATE pi_tasks SET status=%s, finished_at=now(), updated_at=now(), "
-                "error=NULL WHERE id=%s AND status=%s RETURNING id",
-                (final, task_id, _RUNNING),
-            )
-            finalized = cur.fetchone() is not None
-            if not finalized:
+        if not finalized and last_attempt_id:
+            # 多步任务非最后一步完成但任务仍未终态（下一步循环会重新锁判定）；
+            # 维持原语义：此处仅清理遗留（正常路径不可达，防未来回归）
+            with conn.cursor() as cur:
                 cur.execute("SELECT status FROM pi_tasks WHERE id=%s", (task_id,))
                 row = cur.fetchone()
                 task_state = row["status"] if row else "UNKNOWN"
-        conn.commit()
-        if not finalized:
             if task_state in _TERMINAL:
                 _converge_attempt(conn, task_id, last_attempt_id, task_state,
                                   note="completed-late-after-state-change")
                 conn.commit()
+    except _Cancelled:  # 步骤收尾发现 Task 已取消：静默返回（任务已终态，不再收敛）
+        try:
+            conn.rollback()
+        except Exception:
+            pass
+        return
     except _StepFailure as exc:  # 步骤业务失败：任务 FAILED（steps 已各自收敛）
         try:
             conn.rollback()
@@ -369,8 +513,17 @@ def _run_task(conn, task_id: str) -> None:
             conn.rollback()
         except Exception:
             pass
-        _emit_budget_exhausted(task_id, attempt_id, str(exc))
+        if current_run_id:
+            _fail_run_isolated(current_run_id, "BUDGET_EXHAUSTED", str(exc)[:200])
+        # 评审 block：先提交权威 Task 终态（_fail_task_isolated 仅覆盖
+        # QUEUED/RUNNING，不覆盖已 CANCELLED），再按持久化终态签发信封——
+        # 信封写入锁内读取的最新终态与任务最终状态必一致。
         _fail_task_isolated(task_id, f"BUDGET_EXHAUSTED: {exc}", attempt_id)
+        if current_run_id:
+            _ingest_evidence_isolated(          # G3：预算终态证据（独立连接）
+                task_id, attempt_id, current_run_id, current_step_index,
+                _workspace_dir_for(task), "BUDGET_EXHAUSTED", str(exc))
+        _emit_budget_exhausted(task_id, attempt_id, str(exc))
     except Exception as exc:  # 平台层兜底：先 rollback 释放行锁，再独立连接统一收敛（防自阻塞）
         try:
             conn.rollback()
@@ -380,6 +533,10 @@ def _run_task(conn, task_id: str) -> None:
             _fail_run_isolated(current_run_id, "FAILED",
                                f"PLATFORM:{type(exc).__name__}")
         _fail_task_isolated(task_id, f"{type(exc).__name__}: {exc}", attempt_id)
+        if current_run_id:
+            _ingest_evidence_isolated(          # G3：异常终态证据（独立连接）
+                task_id, attempt_id, current_run_id, current_step_index,
+                _workspace_dir_for(task), "FAILED", f"{type(exc).__name__}: {exc}")
 
 
 class Worker:

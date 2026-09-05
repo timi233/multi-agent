@@ -70,10 +70,14 @@ class Settings:
 
     # 运行时
     workspaces_dir: Path = WORKSPACES_DIR
+    cas_dir: Path = field(default_factory=lambda: BASE_DIR / "data" / "cas")  # G3：内容寻址 Blob 目录（gitignore 已排除 data/）
     max_turns: int = int(os.environ.get("PI_MAX_TURNS", "40"))
     max_tool_output_chars: int = int(os.environ.get("PI_MAX_TOOL_OUTPUT", "6000"))
     command_timeout_seconds: int = int(os.environ.get("PI_CMD_TIMEOUT", "60"))
     worker_threads: int = int(os.environ.get("PI_WORKER_THREADS", "2"))
+    # G3：产物快照上限（防超大工作区拖垮收存）
+    max_artifact_files: int = int(os.environ.get("PI_MAX_ARTIFACT_FILES", "200"))
+    max_artifact_bytes: int = int(os.environ.get("PI_MAX_ARTIFACT_BYTES", str(10 * 1024 * 1024)))
 
     @property
     def db_dsn(self) -> str:

@@ -118,8 +118,82 @@ def test_worker_cancel_during_run(monkeypatch):
     ev_types = [e["event_type"] for e in execute("SELECT event_type FROM pi_events WHERE task_id=%s", (tid,))]
     assert "TASK_CANCELLED" in ev_types, f"缺 TASK_CANCELLED 事件: {ev_types}"
     assert "ATTEMPT_CANCELLED" in ev_types, f"缺 ATTEMPT_CANCELLED 事件: {ev_types}"
+    # G3：迟到成功不得留 SUCCESS 信封——取消获胜则信封为 CANCELLED_CONFIRMED
+    env = execute("SELECT outcome_class, status FROM pi_terminal_envelopes "
+                  "WHERE task_id=%s", (tid,))
+    assert env, "取消竞争下必须有终态信封"
+    assert env[0]["outcome_class"] == "CANCELLED_CONFIRMED"
+    assert env[0]["status"] == "CANCELLED"
+    execute("DELETE FROM pi_terminal_envelopes WHERE task_id=%s", (tid,))
     execute("DELETE FROM pi_events WHERE task_id=%s", (tid,))
     execute("DELETE FROM pi_attempts WHERE task_id=%s", (tid,))
+    execute("DELETE FROM pi_tasks WHERE id=%s", (tid,))
+
+
+def test_worker_cancel_during_run_business_failure(monkeypatch):
+    """评审 block：run_attempt 业务失败迟到 × 真实 API 取消并发——统一取消
+    收尾：Run/Attempt/Grant/事件/信封全按 CANCELLED 收敛，不得留失败信封。"""
+    import threading
+    import uuid
+
+    from fastapi.testclient import TestClient
+
+    from app.db import connect, execute
+    from app import worker as worker_mod
+    from app.main import create_app
+
+    tid = uuid.uuid4().hex[:16]
+    ws = f"task-{tid}"
+    execute(
+        "INSERT INTO pi_tasks (id, title, prompt, workspace, status, model) "
+        "VALUES (%s,'race-fail','prompt',%s,'RUNNING','m')",
+        (tid, ws),
+    )
+    from pathlib import Path as P
+    (P("workspaces") / ws).mkdir(parents=True, exist_ok=True)
+    started = threading.Event()
+    release = threading.Event()
+
+    def fake_run_attempt(**kw):
+        started.set()
+        assert release.wait(timeout=10), "release not set"
+        return False, "", "tool denied late"
+
+    monkeypatch.setattr("app.runtime.agent.run_attempt", fake_run_attempt)
+
+    def run_in_thread():
+        conn = connect()
+        try:
+            worker_mod._run_task(conn, tid)
+        finally:
+            conn.close()
+
+    t = threading.Thread(target=run_in_thread)
+    t.start()
+    assert started.wait(timeout=10), "run_attempt 未启动"
+    client = TestClient(create_app(enable_worker=False))
+    with client:
+        assert client.post(f"/api/v1/tasks/{tid}/cancel").status_code == 200
+    release.set()
+    t.join(timeout=15)
+
+    row = execute("SELECT status FROM pi_tasks WHERE id=%s", (tid,))[0]
+    assert row["status"] == "CANCELLED"
+    runs = execute("SELECT status FROM pi_runs WHERE task_id=%s", (tid,))
+    assert runs and runs[0]["status"] == "CANCELLED", "Run 必须收敛为 CANCELLED"
+    att = execute("SELECT status FROM pi_attempts WHERE task_id=%s", (tid,))[0]
+    assert att["status"] == "TERMINAL_REPORTED"
+    ev_types = [e["event_type"] for e in
+                execute("SELECT event_type FROM pi_events WHERE task_id=%s", (tid,))]
+    assert "ATTEMPT_CANCELLED" in ev_types, ev_types
+    env = execute("SELECT outcome_class, status FROM pi_terminal_envelopes "
+                  "WHERE task_id=%s", (tid,))
+    assert env and env[0]["outcome_class"] == "CANCELLED_CONFIRMED"
+    assert env[0]["status"] == "CANCELLED"
+    execute("DELETE FROM pi_terminal_envelopes WHERE task_id=%s", (tid,))
+    execute("DELETE FROM pi_events WHERE task_id=%s", (tid,))
+    execute("DELETE FROM pi_attempts WHERE task_id=%s", (tid,))
+    execute("DELETE FROM pi_runs WHERE task_id=%s", (tid,))
     execute("DELETE FROM pi_tasks WHERE id=%s", (tid,))
 
 

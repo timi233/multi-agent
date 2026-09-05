@@ -280,7 +280,14 @@ def test_cancel_between_steps_prevents_further_runs():
     assert calls == ["stepA"]  # stepB 未执行
     with connect() as conn:
         runs = list_runs(conn, TID)
-    assert [r["status"] for r in runs] == ["VERIFIED"]  # 无第二个 Run 创建
+    # G3 取消获胜语义：该步骤 Run 与 Task 一致收敛为 CANCELLED（无第二个 Run）
+    assert [r["status"] for r in runs] == ["CANCELLED"]
+    env = execute_one(
+        "SELECT envelope_id, outcome_class, status FROM pi_terminal_envelopes "
+        "WHERE task_id=%s ORDER BY step_index", (TID,))
+    assert env is not None
+    assert env["outcome_class"] == "CANCELLED_CONFIRMED"
+    assert env["status"] == "CANCELLED"
 
 
 def test_plan_empty_list_rejected_by_compile():

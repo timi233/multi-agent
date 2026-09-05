@@ -140,6 +140,35 @@ def list_runs(task_id: str):
     return [models.RunOut(**r) for r in rows]
 
 
+# ---------- Artifact / Evidence（蓝图 §6.9/§11.1，G3） ----------
+
+@router.get("/tasks/{task_id}/artifacts", response_model=list[models.ArtifactOut])
+def list_artifacts(task_id: str):
+    if not execute_one("SELECT 1 FROM pi_tasks WHERE id=%s", (task_id,)):
+        raise HTTPException(404, f"task {task_id} not found")
+    rows = execute(
+        "SELECT artifact_id, task_id, run_id, step_index, path, digest, size, "
+        "kind, created_at FROM pi_artifacts WHERE task_id=%s "
+        "ORDER BY step_index, path",
+        (task_id,),
+    )
+    return [models.ArtifactOut(**r) for r in rows]
+
+
+@router.get("/tasks/{task_id}/terminal-envelopes",
+            response_model=list[models.TerminalEnvelopeOut])
+def list_terminal_envelopes(task_id: str):
+    if not execute_one("SELECT 1 FROM pi_tasks WHERE id=%s", (task_id,)):
+        raise HTTPException(404, f"task {task_id} not found")
+    rows = execute(
+        "SELECT envelope_id, task_id, attempt_id, run_id, step_index, "
+        "outcome_class, status, verified_ok, created_at "
+        "FROM pi_terminal_envelopes WHERE task_id=%s ORDER BY step_index",
+        (task_id,),
+    )
+    return [models.TerminalEnvelopeOut(**r) for r in rows]
+
+
 # ---------- 事件 ----------
 
 @router.get("/tasks/{task_id}/events", response_model=list[models.EventOut])
