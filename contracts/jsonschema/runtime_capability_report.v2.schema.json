@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pi.local/contracts/jsonschema/runtime_capability_report/v2",
+  "title": "RuntimeCapabilityReport v2（引擎事实基线，蓝图 §8.2 六问 / RT 评审建议）",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "contractId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{32}$",
+      "description": "确定性事实锚 = sha256(JCS(核心事实，不含 generatedAt)) 前缀 32（任何事实变化即变）"
+    },
+    "contractVersion": { "const": "2" },
+    "workloadIdentity": { "const": "pi.node" },
+    "runtimeType": { "const": "pi-single-node" },
+    "runtimeVersion": { "type": "string", "minLength": 1 },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "provider": { "type": "string", "enum": ["cliproxy-local"] },
+        "name": { "type": "string", "minLength": 1 }
+      },
+      "required": ["provider", "name"]
+    },
+    "resourceDefaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "maxTurns": { "type": "integer", "minimum": 1, "maximum": 200 },
+        "maxBudgetTokens": { "type": "integer", "minimum": 0 },
+        "budgetReserveTokens": { "type": "integer", "minimum": 1 },
+        "maxToolOutputChars": { "type": "integer", "minimum": 256, "maximum": 1048576 },
+        "llmAttempts": { "type": "integer", "minimum": 1, "maximum": 10 }
+      },
+      "required": ["maxTurns", "maxBudgetTokens", "budgetReserveTokens", "maxToolOutputChars", "llmAttempts"]
+    },
+    "isolation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sandbox": { "type": "string", "enum": ["workspace-root-limit"] },
+        "workspacesRoot": { "type": "string", "minLength": 1 },
+        "readOnlyDirs": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "networkEnabledForTools": { "type": "boolean" },
+        "processExecutionForTools": { "type": "boolean" }
+      },
+      "required": ["sandbox", "workspacesRoot", "readOnlyDirs", "networkEnabledForTools", "processExecutionForTools"]
+    },
+    "toolCapabilities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "requiresApproval": { "type": "boolean" }
+        },
+        "required": ["name", "requiresApproval"]
+      },
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "knownGaps": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "generatedAt": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$",
+      "description": "UTC ISO8601（进程内缓存：生命周期内不变）"
+    },
+    "signature": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "signatureAlgorithm": { "const": "Ed25519" },
+        "payloadDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+      },
+      "required": ["signatureAlgorithm", "payloadDigest"]
+    }
+  },
+  "required": [
+    "contractId", "contractVersion", "workloadIdentity", "runtimeType",
+    "runtimeVersion", "model", "resourceDefaults", "isolation",
+    "toolCapabilities", "knownGaps", "generatedAt"
+  ]
+}

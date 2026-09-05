@@ -9,6 +9,7 @@ from fastapi import APIRouter, HTTPException, Query
 
 from ..config import settings
 from ..db import connect, execute, execute_one
+from ..runtime.capabilities import build_cached_report
 from . import models
 
 router = APIRouter(prefix="/api/v1")
@@ -16,6 +17,14 @@ router = APIRouter(prefix="/api/v1")
 
 def _row_to_task(row: dict) -> models.TaskOut:
     return models.TaskOut(**row)
+
+
+# ---------- Runtime ----------
+
+@router.get("/runtime/capabilities")
+def runtime_capabilities() -> dict:
+    """Runtime 能力报告（RT）：签名可验证的引擎事实基线（进程内缓存，幂等）。"""
+    return build_cached_report()
 
 
 # ---------- 任务 ----------

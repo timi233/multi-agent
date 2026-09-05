@@ -43,6 +43,12 @@
 - 结果：**无违规**。SM-01 白名单穷举（25 对 + 套件全查）PASS；SM-02 终态闭合 PASS；SM-03 每个可达非终态存在 StateDeadlinePolicy 出口且在白名单内 PASS；SM-08 终态转移事件同事务 PASS；死枚举审计：Attempt `RUNNING`/`FAILED` 为声明未用（基线固化）。
 - 已知差距（不并入通过判定）：SM-08 `Task QUEUED->RUNNING` 的事件（`ATTEMPT_STARTED`）在后续初始化事务写入，跨事务（1 项，`tests/test_sm_model.py::test_run_all_ok` 锁定）；运行时 deadline 定时留待 Gateway 预算层。
 
+## Runtime 能力报告（RT，蓝图 §8.2 六问 / 手册 RT-xx 简化版）
+
+- 产物：`contracts/jsonschema/runtime_capability_report.v2.{schema,digestprofile}.json`、`app/runtime/capabilities.py`、`GET /api/v1/runtime/capabilities`、`tests/test_runtime_capabilities.py`（7 项）。
+- 语义：引擎事实基线（工具集/模型路由/资源默认参数/隔离边界/已知差距）；**进程内缓存生成一次**（缓存幂等，`generatedAt` 固定）；`contractId = sha256(JCS(核心事实，不含 generatedAt))[:32]` 事实变化即变；签名信封复用 Phase 0 codec（蓝图 §9.4 十字段，payloadDigest 独立重算可验证）。工具集为集合数组（canonicalSortKeys by=name），供准入/Gateway 身份绑定引用。
+- RT-xx 对照（差距已入报告 `knownGaps`，随实现移除）：RT-01 无沙箱故不适用（进程启动正常）；RT-02/03/04/05/07 未达（沙箱/管道/驱动幂等）；RT-06 真实模型链路可跑但证据无 RouteAttestation；RT-08 未达。另含 GW-08（撤销新鲜度）、GW-10（热路径 PG）两项。
+
 ## Gateway 预算与 Journal（蓝图 §18.2/§18.3、手册 GW-xx）
 
 - 产物：`migrations/002_gateway_budget.sql`（`gw_budget_grants` + `gw_journal` 链式表）、`app/runtime/budget.py`（`BudgetDomain`）、`tests/test_budget.py`（15 项）。

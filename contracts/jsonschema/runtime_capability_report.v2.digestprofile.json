@@ -1,0 +1,35 @@
+{
+  "$id": "https://pi.local/contracts/jsonschema/runtime_capability_report/v2/digestprofile",
+  "schemaVersion": "2",
+  "objectType": "runtime_capability_report",
+  "digestAlgorithm": "sha256",
+  "canonicalEncoding": "RFC8785-JCS-lite",
+  "immutablePayloadPointers": [
+    "/contractVersion",
+    "/workloadIdentity",
+    "/runtimeType",
+    "/runtimeVersion",
+    "/model/provider",
+    "/model/name",
+    "/resourceDefaults/maxTurns",
+    "/resourceDefaults/maxBudgetTokens",
+    "/resourceDefaults/budgetReserveTokens",
+    "/resourceDefaults/maxToolOutputChars",
+    "/resourceDefaults/llmAttempts",
+    "/isolation/sandbox",
+    "/isolation/workspacesRoot",
+    "/isolation/readOnlyDirs",
+    "/isolation/networkEnabledForTools",
+    "/isolation/processExecutionForTools",
+    "/toolCapabilities",
+    "/knownGaps",
+    "/generatedAt"
+  ],
+  "signatureEnvelopePointers": ["/signature"],
+  "canonicalSortKeys": {
+    "/toolCapabilities": { "by": "key", "key": "name" },
+    "/isolation/readOnlyDirs": { "by": "value" },
+    "/knownGaps": { "by": "value" }
+  },
+  "notes": "RuntimeCapabilityReport：能力自述事实基线——工具集/模型路由/资源参数/隔离边界/已知差距，运行前生成一次（进程内缓存、generatedAt 固定），供准入与 Gateway 身份绑定引用。canonicalPayload = immutable 白名单投影；toolCapabilities 为对象集合数组按 name 排序；knownGaps/readOnlyDirs 为字符串集合数组按值排序（蓝图 §12：JCS 不替数组排序）。"
+}
