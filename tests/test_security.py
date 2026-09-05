@@ -146,6 +146,56 @@ def test_recover_stale_running_new_task_timeout():
     execute("DELETE FROM pi_tasks WHERE id=%s", (tid,))
 
 
+def test_recover_stale_with_claimed_attempt():
+    """启动恢复：RUNNING + CLAIMED attempt（崩溃于 attempt 已建后）也要完整收敛。"""
+    import uuid
+
+    from app.db import execute
+    from app import worker as worker_mod
+
+    tid = uuid.uuid4().hex[:16]
+    att_id = uuid.uuid4().hex[:16]
+    execute(
+        "INSERT INTO pi_tasks (id, title, prompt, workspace, status, model) "
+        "VALUES (%s,'stale2','p',%s,'RUNNING','m')",
+        (tid, f"task-{tid}"),
+    )
+    execute(
+        "INSERT INTO pi_attempts (id, task_id, number, status, trace_id) "
+        "VALUES (%s,%s,1,'CLAIMED',%s)",
+        (att_id, tid, uuid.uuid4().hex),
+    )
+    recovered = worker_mod.recover_stale()
+    assert tid in recovered
+    assert execute("SELECT status FROM pi_tasks WHERE id=%s", (tid,))[0]["status"] == "FAILED"
+    assert execute("SELECT status FROM pi_attempts WHERE id=%s", (att_id,))[0]["status"] == "TERMINAL_REPORTED"
+    ev = execute("SELECT event_type FROM pi_events WHERE task_id=%s", (tid,))[0]
+    assert ev["event_type"] == "ATTEMPT_RECOVERED"
+    execute("DELETE FROM pi_events WHERE task_id=%s", (tid,))
+    execute("DELETE FROM pi_attempts WHERE id=%s", (att_id,))
+    execute("DELETE FROM pi_tasks WHERE id=%s", (tid,))
+
+
+def test_fail_isolated_skips_cancelled():
+    """补偿收敛仅命中 RUNNING；已 CANCELLED 任务不写错误事件。"""
+    import uuid
+
+    from app.db import execute
+    from app.worker import _fail_task_isolated
+
+    tid = uuid.uuid4().hex[:16]
+    execute(
+        "INSERT INTO pi_tasks (id, title, prompt, workspace, status, model) "
+        "VALUES (%s,'canceled','p',%s,'CANCELLED','m')",
+        (tid, f"task-{tid}"),
+    )
+    assert _fail_task_isolated(tid, "late-failure", event_type="TASK_COMPENSATED") is False
+    assert execute("SELECT status FROM pi_tasks WHERE id=%s", (tid,))[0]["status"] == "CANCELLED"
+    evs = execute("SELECT event_type FROM pi_events WHERE task_id=%s", (tid,))
+    assert evs == [], f"取消任务不应产生补偿事件: {evs}"
+    execute("DELETE FROM pi_tasks WHERE id=%s", (tid,))
+
+
 def test_worker_capacity_limits_claim(monkeypatch):
     """容量控制：线程池满时不再领取（不会把所有 QUEUED 标 RUNNING）。"""
     import uuid

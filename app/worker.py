@@ -82,24 +82,74 @@ def recover_stale() -> list[str]:
     return stale
 
 
-def _run_task(conn, task_id: str) -> None:
-    """执行一个已处于 RUNNING 的任务；任务可能被 cancel 抢占。"""
-    with conn.cursor() as cur:
-        cur.execute("SELECT * FROM pi_tasks WHERE id=%s AND status=%s", (task_id, _RUNNING))
-        task = cur.fetchone()
-    if not task:
-        return  # 已被取消或已终态
+def _fail_task_isolated(task_id: str, error: str, attempt_id: str | None = None,
+                        event_type: str = "ATTEMPT_FAILED") -> bool:
+    """用**独立连接**把 RUNNING 任务收敛为 FAILED（含 attempt 收敛与事件）。
 
-    attempt_id = uuid.uuid4().hex[:16]
-    trace_id = uuid.uuid4().hex
-    with conn.cursor() as cur:
-        cur.execute(
-            "INSERT INTO pi_attempts (id, task_id, number, status, trace_id) VALUES (%s,%s,1,'CLAIMED',%s)",
-            (attempt_id, task_id, trace_id),
-        )
-        _emit_event(conn, task_id, attempt_id, "ATTEMPT_STARTED",
-                    {"traceId": trace_id, "model": task["model"]})
-    conn.commit()
+    独立连接避免 aborted transaction；条件 UPDATE 仅在状态仍为 RUNNING（未被 cancel
+    抢占）时生效，cancel 抢占时不写任何事件（评审 fix-4）。
+    """
+    conn = connect()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                "UPDATE pi_tasks SET status='FAILED', finished_at=now(), updated_at=now(), "
+                "error=%s WHERE id=%s AND status='RUNNING' RETURNING id",
+                (error, task_id),
+            )
+            if cur.fetchone() is None:
+                return False
+            if attempt_id:
+                cur.execute(
+                    "UPDATE pi_attempts SET status='TERMINAL_REPORTED', finished_at=now() "
+                    "WHERE id=%s AND status='CLAIMED'",
+                    (attempt_id,),
+                )
+            payload = {"error": error} if event_type == "ATTEMPT_FAILED" else {"reason": error}
+            cur.execute(
+                "INSERT INTO pi_events (task_id, attempt_id, seq, event_type, payload) "
+                "VALUES (%s, %s, (SELECT COALESCE(MAX(seq),0)+1 FROM pi_events WHERE task_id=%s), "
+                "%s, %s::jsonb)",
+                (task_id, attempt_id, task_id, event_type, json.dumps(payload, ensure_ascii=False)),
+            )
+        conn.commit()
+        return True
+    finally:
+        conn.close()
+
+
+def _run_task(conn, task_id: str) -> None:
+    """执行一个已处于 RUNNING 的任务；任务可能被 cancel 抢占。
+
+    初始化（查询/attempt/事件/首 commit）与主执行都在统一异常边界内；
+    任何失败都经独立连接补偿收敛，任务不会停在 RUNNING（评审 fix-3/4）。
+    """
+    attempt_id: str | None = None
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT * FROM pi_tasks WHERE id=%s AND status=%s", (task_id, _RUNNING))
+            task = cur.fetchone()
+        if not task:
+            return  # 已被取消或已终态
+
+        attempt_id = uuid.uuid4().hex[:16]
+        trace_id = uuid.uuid4().hex
+        with conn.cursor() as cur:
+            cur.execute(
+                "INSERT INTO pi_attempts (id, task_id, number, status, trace_id) "
+                "VALUES (%s,%s,1,'CLAIMED',%s)",
+                (attempt_id, task_id, trace_id),
+            )
+            _emit_event(conn, task_id, attempt_id, "ATTEMPT_STARTED",
+                        {"traceId": trace_id, "model": task["model"]})
+        conn.commit()
+    except Exception as exc:  # 初始化失败：独立连接补偿，不悬挂
+        _fail_task_isolated(task_id, f"INIT: {type(exc).__name__}: {exc}", attempt_id)
+        try:
+            conn.rollback()
+        except Exception:
+            pass
+        return
 
     try:
         workspace_dir = (settings.workspaces_dir / task["workspace"]).resolve()
@@ -130,7 +180,6 @@ def _run_task(conn, task_id: str) -> None:
                 _emit_event(conn, task_id, attempt_id, "ATTEMPT_FINISHED",
                             {"status": final, "summary": (summary or "")[:4000]})
             else:
-                # 任务被 cancel 抢占：attempt 按实际终态收敛
                 cur.execute("SELECT status FROM pi_tasks WHERE id=%s", (task_id,))
                 row = cur.fetchone()
                 task_state = row["status"] if row else "UNKNOWN"
@@ -140,32 +189,12 @@ def _run_task(conn, task_id: str) -> None:
                 _converge_attempt(conn, task_id, attempt_id, task_state,
                                   note="completed-late-after-state-change")
                 conn.commit()
-    except Exception as exc:  # 平台层兜底：task/attempt/事件统一收敛，不悬挂
-        with conn.cursor() as cur:
-            cur.execute(
-                "UPDATE pi_tasks SET status='FAILED', finished_at=now(), updated_at=now(), "
-                "error=%s WHERE id=%s AND status=%s RETURNING id",
-                (f"{type(exc).__name__}: {exc}", task_id, _RUNNING),
-            )
-            finalized = cur.fetchone() is not None
-            if finalized:
-                cur.execute(
-                    "UPDATE pi_attempts SET status='TERMINAL_REPORTED', finished_at=now() WHERE id=%s",
-                    (attempt_id,),
-                )
-            else:
-                cur.execute("SELECT status FROM pi_tasks WHERE id=%s", (task_id,))
-                row = cur.fetchone()
-                task_state = row["status"] if row else "UNKNOWN"
-        conn.commit()
-        if finalized:
-            _emit_event(conn, task_id, attempt_id, "ATTEMPT_FAILED",
-                        {"error": f"{type(exc).__name__}: {exc}"})
-            conn.commit()
-        elif task_state in _TERMINAL:
-            _converge_attempt(conn, task_id, attempt_id, task_state,
-                              note="errored-late-after-state-change")
-            conn.commit()
+    except Exception as exc:  # 平台层兜底：独立连接统一收敛，不悬挂
+        _fail_task_isolated(task_id, f"{type(exc).__name__}: {exc}", attempt_id)
+        try:
+            conn.rollback()
+        except Exception:
+            pass
 
 
 class Worker:
@@ -234,25 +263,9 @@ class Worker:
         return submitted
 
     def _compensate_failed(self, tids: list[str], reason: str = "SUBMIT_FAILED") -> None:
-        """把已领取（RUNNING）但未实际投递执行的任务收敛为 FAILED，避免悬挂。"""
-        conn = connect()
-        try:
-            with conn.cursor() as cur:
-                for tid in tids:
-                    cur.execute(
-                        "UPDATE pi_tasks SET status='FAILED', finished_at=now(), "
-                        "updated_at=now(), error=%s WHERE id=%s AND status='RUNNING'",
-                        (reason, tid),
-                    )
-                    cur.execute(
-                        "INSERT INTO pi_events (task_id, seq, event_type, payload) "
-                        "VALUES (%s, (SELECT COALESCE(MAX(seq),0)+1 FROM pi_events WHERE task_id=%s), "
-                        "'TASK_COMPENSATED', %s::jsonb)",
-                        (tid, tid, json.dumps({"reason": reason}, ensure_ascii=False)),
-                    )
-            conn.commit()
-        finally:
-            conn.close()
+        """把已领取（RUNNING）但未实际投递执行的任务收敛为 FAILED（条件命中才写事件）。"""
+        for tid in tids:
+            _fail_task_isolated(tid, reason, event_type="TASK_COMPENSATED")
 
     def _run_guarded(self, task_id: str) -> None:
         conn = connect()

@@ -84,9 +84,10 @@ def cancel_task(task_id: str):
                 raise HTTPException(409, f"cannot cancel task in status {old}")
             cur.execute(
                 "UPDATE pi_tasks SET status='CANCELLED', finished_at=now(), updated_at=now() "
-                "WHERE id=%s",
+                "WHERE id=%s RETURNING *",
                 (task_id,),
             )
+            row = cur.fetchone()
             cur.execute(
                 "INSERT INTO pi_events (task_id, seq, event_type, payload) "
                 "VALUES (%s, (SELECT COALESCE(MAX(seq),0)+1 FROM pi_events WHERE task_id=%s), "
@@ -96,8 +97,6 @@ def cancel_task(task_id: str):
         conn.commit()
     finally:
         conn.close()
-    row["status"] = "CANCELLED"
-    row["finished_at"] = row["updated_at"]
     return _row_to_task(row)
 
 
