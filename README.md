@@ -63,7 +63,7 @@
 ## 测试
 
 ```bash
-./scripts/run.sh test   # pytest：状态机、API、工具安全边界、worker 并发/恢复/竞争（32 项）
+./scripts/run.sh test   # pytest：状态机、契约/向量、工具安全边界、CAS/证据、worker 并发/恢复/竞争（202 项）
 ```
 
 ## 与蓝图的关系（有意简化，供后续演进）
@@ -73,8 +73,10 @@
 | 控制面/Lease/Fencing | 简化 | 状态机白名单 + 领取互斥（SKIP LOCKED）；Lease TTK、撤销、预算未实现 |
 | Runtime 工具 | 有 | 文件操作工具集（工作区 root 约束） |
 | 沙箱隔离 | 简化 | 目录级 root 约束 + 命令 deny list（特权/系统变更/网络外联/全局包管）+ setuid 拒绝 + 超时/进程组终止 + 最小 env 白名单 + READ_ONLY 只读工具集；**未做**完全断网/namespace/用户隔离 |
-| 契约/digest/签名 | 未做 | 实验配置阶段不强制（`deploy/keys/` 仅作 Key Registry 登记） |
-| Gateway 预算/Journal | 未做 | 直连 cliproxy；计费/预留未实现 |
+| 契约/digest/签名 | 简化 | 7 类对象 Schema+digestprofile+确定性向量+verified（attempt_contract/task_spec/event_envelope/budget_grant/runtime_capability_report/execution_plan_snapshot/attempt_terminal_envelope）；§9.4 其余对象（node_state/lease/route 等）未覆盖去中心生成——json 契约双实现 |
+| 事件序列 | 简化（Outbox 未接） | `pi_events` 表 + 轮询 API |
+| Artifact/Evidence | 部分 | **本地 CAS**（`data/cas`，sha256 内容寻址，替代 MinIO）+ `attempt_terminal_envelope.v2` 终态信封（Node 来源、CAS 摘要、`pi_artifacts`/`pi_terminal_envelopes` 归档、`GET /api/v1/tasks/{id}/artifacts`、`/terminal-envelopes`）；OutputArtifactManifest/EvidenceManifest/EvaluationVerdict 未实现（G4/G5） |
+| Gateway 预算/Journal | 简化 | 每尝试 BudgetGrant 预留/结算；Journal 未实现 |
 | 交付 | 本地工作区 | 产物在 `workspaces/task-<id>/`；Git 交付未接 |
 | 观测 | 事件表 + 日志 | 未接 OTel 链路（S1 的 collector 可后续接） |
 
