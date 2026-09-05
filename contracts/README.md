@@ -43,6 +43,13 @@
 - 结果：**无违规**。SM-01 白名单穷举（25 对 + 套件全查）PASS；SM-02 终态闭合 PASS；SM-03 每个可达非终态存在 StateDeadlinePolicy 出口且在白名单内 PASS；SM-08 终态转移事件同事务 PASS；死枚举审计：Attempt `RUNNING`/`FAILED` 为声明未用（基线固化）。
 - 已知差距（不并入通过判定）：SM-08 `Task QUEUED->RUNNING` 的事件（`ATTEMPT_STARTED`）在后续初始化事务写入，跨事务（1 项，`tests/test_sm_model.py::test_run_all_ok` 锁定）；运行时 deadline 定时留待 Gateway 预算层。
 
+## Gateway 预算与 Journal（蓝图 §18.2/§18.3、手册 GW-xx）
+
+- 产物：`migrations/002_gateway_budget.sql`（`gw_budget_grants` + `gw_journal` 链式表）、`app/runtime/budget.py`（`BudgetDomain`）、`tests/test_budget.py`（12 项）。
+- 流程（对齐蓝图"预算具有跨崩溃的消费所有权"）：attempt 初始化创建一份 BudgetGrant；每轮 LLM 调用**调用前持久化预留**（RESERVED）→ 发送意图（SENT）→ 响应后结算（SETTLED，累加 consumed）/异常失败（FAILED，释放预留）；每次操作独立提交；结算只经 settle 更新。
+- 验收对齐：GW-07 预算达到上限后新调用 100% 阻断（含 0 预算任务不触达 LLM，worker 映射 `BUDGET_EXHAUSTED`）；GW-03 精神每笔预留先记账后发送；GW-04 链式 `previousEntryDigest/entryDigest` + `reconcile()` consumed↔ΣSETTLED 对账（纯 Hash 链无法检出删行，由对账补位）；GW-06 同 invocationId 不同 requestDigest 拒绝；GW-09 每次调用生成 Journal 事实（近似 RouteAttestation）。
+- 简化差距（记录）：GW-10"热路径不查询 PostgreSQL"未达（每预算操作一次 PG 往返，单实例可接受）；单实例单代次、无 Ledger Service 分片对账、预算为全局每 attempt（`PI_MAX_BUDGET_TOKENS`/`PI_BUDGET_RESERVE_TOKENS`）、Grant 轮换/故障转移未实现。
+
 ## 兼容性边界（CT-03 语义变更，如实披露）
 
 - 启用 `canonicalSortKeys` 后，`attempt_contract`（schemaVersion="2"）的 `toolAllowlist` 语义由"有序（元素顺序即声明顺序，JCS 不重排）"改为"**集合（无序）**——投影前按元素值字节序 canonical sort，乱序传入 digest 稳定"。

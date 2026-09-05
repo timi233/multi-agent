@@ -25,6 +25,20 @@ class Gateway:
         retries: int = 2,
         tool_choice: str | dict | None = None,
     ) -> dict:
+        choice, _ = self.chat_with_usage(
+            messages, tools=tools, max_tokens=max_tokens,
+            retries=retries, tool_choice=tool_choice)
+        return choice
+
+    def chat_with_usage(
+        self,
+        messages: list[dict],
+        tools: list[dict] | None = None,
+        max_tokens: int = 4096,
+        retries: int = 2,
+        tool_choice: str | dict | None = None,
+    ) -> tuple[dict, dict | None]:
+        """OpenAI 兼容调用，返回 (choice, usage)。usage 供预算结算（GW 层用量事实）。"""
         payload: dict = {
             "model": self.model,
             "messages": messages,
@@ -51,7 +65,7 @@ class Gateway:
                 choice = data["choices"][0]
                 if choice.get("finish_reason") == "content_filter":
                     raise GatewayError("LLM response content filtered")
-                return choice
+                return choice, data.get("usage")
             except (httpx.HTTPError, GatewayError, KeyError, ValueError) as exc:
                 last_err = exc
                 if attempt < retries:

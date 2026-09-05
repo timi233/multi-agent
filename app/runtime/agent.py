@@ -1,7 +1,9 @@
 """agent 主循环：LLM 推理 ↔ 工作区工具，直到 finish() 或 LLM 产出最终文本。"""
 from __future__ import annotations
 
+import hashlib
 import json
+import uuid
 from pathlib import Path
 from typing import Callable
 
@@ -32,8 +34,16 @@ def run_attempt(
     emit_event: Callable[[str, dict], None],
     max_turns: int = MAX_TURNS,
     gateway: Gateway | None = None,
+    budget=None,
+    budget_conn=None,
 ) -> tuple[bool, str, str | None]:
-    """执行一次 attempt。返回 (ok, summary, error)。"""
+    """执行一次 attempt。返回 (ok, summary, error)。
+
+    budget/budget_conn（可选）：BudgetDomain 与连接。启用后每轮 LLM 调用
+    按蓝图 GW-xx 记账：调用前持久化预留（RESERVED）→ 发送意图（SENT）→
+    响应后结算（SETTLED）/异常失败（FAILED）；每次操作独立 commit。
+    预算超限抛 BudgetExceeded（由 worker 映射 BUDGET_EXHAUSTED）。
+    """
     gw = gateway or Gateway(
         base_url=settings.cliproxy_base_url,
         api_key=settings.cliproxy_api_key,
@@ -50,11 +60,30 @@ def run_attempt(
 
     for turn in range(1, max_turns + 1):
         emit_event("AGENT_TURN", {"turn": turn, "traceId": trace_id})
+        invocation_id = uuid.uuid4().hex[:16]
+        request_digest = hashlib.sha256(
+            json.dumps(messages, ensure_ascii=False,
+                       separators=(",", ":")).encode("utf-8")
+        ).hexdigest()[:32]
+        if budget is not None:
+            budget.reserve(budget_conn, invocation_id, request_digest,
+                           settings.budget_reserve_tokens)
+            budget_conn.commit()
+            budget.sent(budget_conn, invocation_id)
+            budget_conn.commit()
         try:
-            choice = gw.chat(messages, tools=TOOL_DEFINITIONS)
+            choice, usage = gw.chat_with_usage(messages, tools=TOOL_DEFINITIONS)
         except GatewayError as exc:
+            if budget is not None:
+                budget.fail(budget_conn, invocation_id)
+                budget_conn.commit()
             error = str(exc)
             return False, "", error
+        if budget is not None:
+            actual = (usage or {}).get("total_tokens")
+            budget.settle(budget_conn, invocation_id,
+                          int(actual) if actual is not None else 0)
+            budget_conn.commit()
 
         message = choice.get("message") or {}
         content = message.get("content") or ""

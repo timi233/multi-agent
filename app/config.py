@@ -63,6 +63,9 @@ class Settings:
     cliproxy_base_url: str = os.environ.get("CLIPROXY_BASE_URL", "http://127.0.0.1:8317/v1")
     cliproxy_api_key: str = field(default_factory=_cliproxy_api_key)
     cliproxy_model: str = os.environ.get("CLIPROXY_MODEL", "deepseek-v4-flash")
+    # Gateway 预算（蓝图 §18.2 GW-07：超限 100% 阻断；每 attempt 一份 BudgetGrant）
+    max_budget_tokens: int = int(os.environ.get("PI_MAX_BUDGET_TOKENS", "200000"))
+    budget_reserve_tokens: int = int(os.environ.get("PI_BUDGET_RESERVE_TOKENS", "4096"))
 
     # 运行时
     workspaces_dir: Path = WORKSPACES_DIR

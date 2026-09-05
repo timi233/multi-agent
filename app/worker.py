@@ -18,6 +18,7 @@ from pathlib import Path
 
 from .config import settings
 from .db import connect
+from .runtime.budget import BudgetDomain, BudgetExceeded
 
 _RUNNING = "RUNNING"
 _TERMINAL = ("SUCCESS", "FAILED", "CANCELLED")
@@ -158,6 +159,11 @@ def _run_task(conn, task_id: str) -> None:
             _emit_event(conn, task_id, attempt_id, "ATTEMPT_STARTED",
                         {"traceId": trace_id, "model": task["model"]})
         conn.commit()
+
+        # Gateway 预算：attempt 级 BudgetGrant（蓝图 §18.2；GW-07 超限阻断）
+        budget = BudgetDomain.create(conn, task_id, attempt_id,
+                                     settings.max_budget_tokens)
+        conn.commit()
     except Exception as exc:  # 初始化失败：先释放已持锁再独立连接补偿，不悬挂
         try:
             conn.rollback()
@@ -170,7 +176,7 @@ def _run_task(conn, task_id: str) -> None:
         workspace_dir = (settings.workspaces_dir / task["workspace"]).resolve()
         workspace_dir.mkdir(parents=True, exist_ok=True)
 
-        from .runtime.agent import run_attempt
+        from .runtime.agent import run_attempt  # 延迟导入：测试 monkeypatch agent.run_attempt
 
         ok, summary, error = run_attempt(
             task=task,
@@ -178,6 +184,8 @@ def _run_task(conn, task_id: str) -> None:
             trace_id=trace_id,
             emit_event=lambda t, p: _emit_event(conn, task_id, attempt_id, t, p),
             max_turns=settings.max_turns,
+            budget=budget,
+            budget_conn=conn,
         )
         final = "SUCCESS" if ok else "FAILED"
         with conn.cursor() as cur:
@@ -204,6 +212,12 @@ def _run_task(conn, task_id: str) -> None:
                 _converge_attempt(conn, task_id, attempt_id, task_state,
                                   note="completed-late-after-state-change")
                 conn.commit()
+    except BudgetExceeded as exc:  # 预算超限：GW-07 100% 阻断，任务 FAILED(BUDGET_EXHAUSTED)
+        try:
+            conn.rollback()
+        except Exception:
+            pass
+        _fail_task_isolated(task_id, f"BUDGET_EXHAUSTED: {exc}", attempt_id)
     except Exception as exc:  # 平台层兜底：先 rollback 释放行锁，再独立连接统一收敛（防自阻塞）
         try:
             conn.rollback()
