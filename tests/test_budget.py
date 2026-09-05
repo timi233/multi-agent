@@ -245,6 +245,72 @@ def test_worker_budget_exhausted_mapping(conn, task, monkeypatch):
     assert ev["event_type"] == "BUDGET_EXHAUSTED"  # 结构化 stopReason 事件
 
 
+def test_concurrent_reserve_no_overrun(conn, task):
+    """并发预留不会超过总预算（FOR UPDATE 串行化；评审 fix-blocking-2）。"""
+    import threading
+
+    from app.db import connect as db_connect
+
+    b = _g(conn, task, total=100)
+    results: list[str] = []
+    barrier = threading.Barrier(2)
+
+    def voter(offset: int):
+        c = db_connect()
+        try:
+            barrier.wait(timeout=10)
+            try:
+                b.reserve(c, f"inv-c{offset}", f"d{offset}", 60)
+                c.commit()
+                results.append("ok")
+            except BudgetExceeded:
+                results.append("blocked")
+        finally:
+            c.close()
+
+    threads = [threading.Thread(target=voter, args=(i,)) for i in (1, 2)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join(timeout=15)
+    assert sorted(results) == ["blocked", "ok"]  # 恰一个成功、一个被阻
+    assert b.balance(conn)["outstanding"] == 60  # 总额未超 100
+
+
+def test_agent_missing_usage_keeps_reservation(conn, task):
+    """Provider 成功但无 usage：agent 以 UNKNOWN 保守占额，不按 0 消费释放
+    （评审 fix-blocking：否则不返回 usage 的实现可无限绕过预算）。"""
+    import tempfile
+    from pathlib import Path
+
+    from app.runtime.agent import run_attempt
+
+    class FakeGW:
+        def chat_with_usage(self, messages, tools=None, max_tokens=4096,
+                            retries=0, tool_choice=None):
+            return ({"message": {"content": "final answer", "tool_calls": []}},
+                    None)  # 无 usage 事实
+
+    b = BudgetDomain.create(conn, task, "att-u", 100_000)
+    conn.commit()
+    reserve = 4096  # 默认 budget_reserve_tokens
+    with tempfile.TemporaryDirectory() as tmp:
+        ok, summary, error = run_attempt(
+            task={"prompt": "do it", "model": "m"},
+            workspace_dir=Path(tmp), trace_id="t-u",
+            emit_event=lambda *a: None, max_turns=1,
+            gateway=FakeGW(), budget=b, budget_conn=conn)
+    assert ok and "final answer" in summary
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT entry_type FROM gw_journal WHERE grant_id=%s "
+            "AND entry_type='UNKNOWN'", (b.grant_id,))
+        assert cur.fetchone() is not None, "缺失用量必须落 UNKNOWN"
+    bal = b.balance(conn)
+    assert bal["outstanding"] == reserve   # 占额保留，不释放
+    assert bal["consumed"] == 0
+
+
 def test_worker_budget_grant_chain_clean(conn, task, monkeypatch):
     """正常预算任务完成路径（fake run_attempt 成功）：grant SETTLED、链完整。"""
     import app.runtime.agent as agent_mod

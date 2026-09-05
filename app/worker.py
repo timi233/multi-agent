@@ -39,7 +39,8 @@ def _emit_event(conn, task_id: str, attempt_id: str, event_type: str, payload: d
 
 def _converge_attempt(conn, task_id: str, attempt_id: str, task_state: str,
                       note: str = "") -> None:
-    """按任务实际终态收敛 attempt（CLAIMED -> TERMINAL_REPORTED）并记录事件。"""
+    """按任务实际终态收敛 attempt（CLAIMED -> TERMINAL_REPORTED）并记录事件；
+    任务终态即结算 BudgetGrant（幂等，覆盖 cancel 竞争/lazy 终态路径）。"""
     event_type = "ATTEMPT_CANCELLED" if task_state == "CANCELLED" else "ATTEMPT_FINISHED"
     with conn.cursor() as cur:
         cur.execute(
@@ -47,6 +48,9 @@ def _converge_attempt(conn, task_id: str, attempt_id: str, task_state: str,
             "WHERE id=%s AND status='CLAIMED'",
             (attempt_id,),
         )
+        cur.execute(
+            "UPDATE gw_budget_grants SET status='SETTLED', settled_at=now() "
+            "WHERE task_id=%s AND status='ACTIVE'", (task_id,))
         _emit_event(conn, task_id, attempt_id, event_type,
                     {"status": task_state, "note": note})
 
@@ -69,6 +73,11 @@ def recover_stale() -> list[str]:
                 cur.execute(
                     "UPDATE pi_attempts SET status='TERMINAL_REPORTED', finished_at=now() "
                     "WHERE task_id=%s AND status='CLAIMED'",
+                    (tid,),
+                )
+                cur.execute(
+                    "UPDATE gw_budget_grants SET status='SETTLED', settled_at=now() "
+                    "WHERE task_id=%s AND status='ACTIVE'",
                     (tid,),
                 )
                 cur.execute(
@@ -134,6 +143,9 @@ def _fail_task_isolated(task_id: str, error: str, attempt_id: str | None = None,
                             "WHERE id=%s AND status='CLAIMED'",
                             (attempt_id,),
                         )
+                        cur.execute(
+                            "UPDATE gw_budget_grants SET status='SETTLED', settled_at=now() "
+                            "WHERE task_id=%s AND status='ACTIVE'", (task_id,))
                         _emit_event(conn, task_id, attempt_id, "ATTEMPT_CANCELLED",
                                     {"note": "errored-late-after-cancel"})
                 conn.commit()

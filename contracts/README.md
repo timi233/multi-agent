@@ -49,7 +49,9 @@
 - **账目恒等式**（不双计、不泄漏）：`outstanding = Σ(RESERVED.reserved) − Σ((SETTLED|FAILED).reserved)`；`available = total − consumed − outstanding`。SETTLED 完整释放该 invocation 的预留并单独以 `actual_tokens` 累加 consumed（实耗可超预留，超出由后续 reserve 按余额拦截）——预留 30/实耗 25 后 `available = total − 25`。
 - 流程（预算跨崩溃所有权）：attempt 初始化创建 BudgetGrant；每轮 LLM 调用**调用前持久化预留**（RESERVED）→ 发送意图（SENT，不重复占额）→ 响应后结算（SETTLED）/结果不确定（UNKNOWN，保守占额不释放——Provider 可能已执行）/确定未发生（FAILED，释放预留）；每次操作独立提交；结算只经 settle 更新。
 - 重试语义：gateway 隐式重试关闭（`retries=0`），agent 层每轮最多 `PI_LLM_ATTEMPTS`（默认 3）次 Provider 物理请求，**每次物理请求独立 invocation + 独立预留**（预算内）。
-- 验收对齐：GW-07 预算达到上限后新调用 100% 阻断（0 预算任务不触达 LLM，worker 映射 `BUDGET_EXHAUSTED` 并落结构化 `BUDGET_EXHAUSTED` 事件）；GW-03 精神每笔预留先记账后发送；GW-04 Hash 链 + `journal_entries` 权威计数锚点 + consumed↔ΣSETTLED 对账（行删除/篡改均检出）；GW-06 同 invocationId 不同 requestDigest 拒绝；GW-09 每次调用生成 Journal 事实。
+- 验收对齐：GW-07 预算达到上限后新调用 100% 阻断（0 预算任务不触达 LLM，worker 映射 `BUDGET_EXHAUSTED` 并落结构化 `BUDGET_EXHAUSTED` 事件）；GW-03 精神每笔预留先记账后发送；GW-04 Hash 链 + `journal_entries` 权威计数锚点 + consumed↔ΣSETTLED 对账；GW-06 同 invocationId 不同 requestDigest 拒绝；GW-09 每次调用生成 Journal 事实。
+- 威胁边界（如实）：链/计数锚点检出**非协同删行与普通损坏**；恶意协同篡改（删行 + 同步改计数 + 重算无密钥 hash）不在当前威胁模型内（需 DB 权限收紧/触发器/WORM 锚点，见简化差距）。
+- 并发与用量：`reserve()` 对 grant 行 `FOR UPDATE` 串行化（并发预留不超总额）；Provider 成功但无 usage 时以 UNKNOWN 保守占额（不按 0 消费释放，防绕过预算）；每次物理请求独立 invocation + 独立预留。
 - Grant 生命周期：任务收敛（成功/失败/预算耗尽）在终态事务中 `settle_grant`（SETTLED）。
 - 简化差距（记录）：GW-10"热路径不查询 PostgreSQL"未达（每预算操作一次 PG 往返，单实例可接受）；单实例单代次、无 Ledger Service 分片对账、预算为全局每 attempt（`PI_MAX_BUDGET_TOKENS`/`PI_BUDGET_RESERVE_TOKENS`）、Grant 轮换/故障转移未实现。
 

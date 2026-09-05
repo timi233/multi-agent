@@ -98,23 +98,41 @@ class BudgetDomain:
         不同 requestDigest 拒绝（GW-06）。"""
         if tokens <= 0:
             raise BudgetError("reserve tokens must be > 0")
-        bal = self.balance(conn)
-        if bal["status"] != "ACTIVE":
-            raise BudgetExceeded(needed=tokens, available=0)
-        if bal["consumed"] + bal["outstanding"] + tokens > bal["total"]:
-            raise BudgetExceeded(
-                needed=tokens + bal["outstanding"],
-                available=bal["available"])
         with conn.cursor() as cur:
+            cur.execute(
+                "SELECT total_budget_tokens, consumed_tokens, status "
+                "FROM gw_budget_grants WHERE id=%s FOR UPDATE",
+                (self.grant_id,))
+            row = cur.fetchone()
+            if not row:
+                raise BudgetError(f"grant not found: {self.grant_id}")
+            total = row["total_budget_tokens"]
+            consumed = row["consumed_tokens"]
+            status = row["status"]
+            cur.execute(
+                "SELECT "
+                " COALESCE(SUM(CASE WHEN entry_type='RESERVED' "
+                "   THEN reserved_tokens END), 0) AS reserved_sum, "
+                " COALESCE(SUM(CASE WHEN entry_type IN ('SETTLED','FAILED') "
+                "   THEN reserved_tokens END), 0) AS released_sum "
+                "FROM gw_journal WHERE grant_id=%s", (self.grant_id,))
+            sums = cur.fetchone()
             cur.execute(
                 "SELECT request_digest FROM gw_journal "
                 "WHERE grant_id=%s AND invocation_id=%s LIMIT 1",
                 (self.grant_id, invocation_id))
             existing = cur.fetchone()
-            if existing is not None and existing["request_digest"] != request_digest:
-                raise BudgetError(
-                    f"INVOCATION_DIGEST_MISMATCH: {invocation_id} "
-                    f"existing={existing['request_digest']!r} new={request_digest!r}")
+        outstanding = max(0, sums["reserved_sum"] - sums["released_sum"])
+        available = max(0, total - consumed - outstanding)
+        if status != "ACTIVE":
+            raise BudgetExceeded(needed=tokens, available=0)
+        if consumed + outstanding + tokens > total:
+            raise BudgetExceeded(needed=tokens + outstanding,
+                                 available=available)
+        if existing is not None and existing["request_digest"] != request_digest:
+            raise BudgetError(
+                f"INVOCATION_DIGEST_MISMATCH: {invocation_id} "
+                f"existing={existing['request_digest']!r} new={request_digest!r}")
         self._append(conn, "RESERVED", invocation_id, request_digest,
                      tokens, None)
 

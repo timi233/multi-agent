@@ -88,8 +88,13 @@ def run_attempt(
                 continue
             if budget is not None:
                 actual = (usage or {}).get("total_tokens")
-                budget.settle(budget_conn, invocation_id,
-                              int(actual) if actual is not None else 0)
+                if actual is None:
+                    # Provider 成功但未返回用量事实：不能按 0 消费释放预留
+                    # （评审 fix-blocking：不返回 usage 的实现会无限绕过预算），
+                    # 以 UNKNOWN 保守占额；choice 仍可用于 agent 流程。
+                    budget.unknown(budget_conn, invocation_id)
+                else:
+                    budget.settle(budget_conn, invocation_id, int(actual))
                 budget_conn.commit()
             break
         else:
