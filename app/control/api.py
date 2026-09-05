@@ -8,9 +8,8 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException, Query
 
 from ..config import settings
-from ..db import execute, execute_one
+from ..db import connect, execute, execute_one
 from . import models
-from .lifecycle import assert_transition
 
 router = APIRouter(prefix="/api/v1")
 
@@ -23,21 +22,32 @@ def _row_to_task(row: dict) -> models.TaskOut:
 
 @router.post("/tasks", response_model=models.TaskOut, status_code=201)
 def create_task(body: models.TaskCreate):
+    import json
+    import uuid
+
     task_id = uuid.uuid4().hex[:16]
     workspace = f"task-{task_id}"
-    rows = execute(
-        """
-        INSERT INTO pi_tasks (id, title, prompt, workspace, status, model)
-        VALUES (%s, %s, %s, %s, 'QUEUED', %s)
-        RETURNING *
-        """,
-        (task_id, body.title, body.prompt, workspace, body.model or settings.cliproxy_model),
-    )
-    row = rows[0]
-    execute(
-        "INSERT INTO pi_events (task_id, seq, event_type, payload) VALUES (%s, 1, 'TASK_CREATED', %s::jsonb)",
-        (task_id, '{"title": "' + str(body.title).replace('"', '\\"') + '"}'),
-    )
+    # task 与 TASK_CREATED 事件在同事务写入，payload 由 json.dumps 生成（评审 fix-3）
+    conn = connect()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO pi_tasks (id, title, prompt, workspace, status, model)
+                VALUES (%s, %s, %s, %s, 'QUEUED', %s)
+                RETURNING *
+                """,
+                (task_id, body.title, body.prompt, workspace, body.model or settings.cliproxy_model),
+            )
+            row = cur.fetchone()
+            cur.execute(
+                "INSERT INTO pi_events (task_id, seq, event_type, payload) "
+                "VALUES (%s, 1, 'TASK_CREATED', %s::jsonb)",
+                (task_id, json.dumps({"title": body.title}, ensure_ascii=False)),
+            )
+        conn.commit()
+    finally:
+        conn.close()
     return _row_to_task(row)
 
 
@@ -59,21 +69,34 @@ def get_task(task_id: str):
 
 @router.post("/tasks/{task_id}/cancel", response_model=models.TaskOut)
 def cancel_task(task_id: str):
+    import json
+
     row = execute_one("SELECT * FROM pi_tasks WHERE id = %s", (task_id,))
     if not row:
         raise HTTPException(404, f"task {task_id} not found")
     old = row["status"]
     if old not in ("QUEUED", "RUNNING"):
         raise HTTPException(409, f"cannot cancel task in status {old}")
-    assert_transition(old, "CANCELLED")
+    # 条件更新：仅 QUEUED/RUNNING 可取消，避免与 worker 终态竞争回退
     rows = execute(
-        "UPDATE pi_tasks SET status='CANCELLED', finished_at=now(), updated_at=now() WHERE id=%s RETURNING *",
+        "UPDATE pi_tasks SET status='CANCELLED', finished_at=now(), updated_at=now() "
+        "WHERE id=%s AND status IN ('QUEUED','RUNNING') RETURNING *",
         (task_id,),
     )
-    execute(
-        "INSERT INTO pi_events (task_id, seq, event_type, payload) VALUES (%s, (SELECT COALESCE(MAX(seq),0)+1 FROM pi_events WHERE task_id=%s), 'TASK_CANCELLED', '{}'::jsonb)",
-        (task_id, task_id),
-    )
+    if not rows:
+        raise HTTPException(409, f"task {task_id} no longer cancellable")
+    conn = connect()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                "INSERT INTO pi_events (task_id, seq, event_type, payload) "
+                "VALUES (%s, (SELECT COALESCE(MAX(seq),0)+1 FROM pi_events WHERE task_id=%s), "
+                "'TASK_CANCELLED', %s::jsonb)",
+                (task_id, task_id, json.dumps({"from": old}, ensure_ascii=False)),
+            )
+        conn.commit()
+    finally:
+        conn.close()
     return _row_to_task(rows[0])
 
 
@@ -97,14 +120,14 @@ def _workspace_root(task_id: str) -> Path:
         raise HTTPException(404, f"task {task_id} not found")
     root = (settings.workspaces_dir / row["workspace"]).resolve()
     # 工作区根必须位于 workspaces 之下（防路径逃逸）
-    if not str(root).startswith(str(settings.workspaces_dir.resolve())):
+    if not root.is_relative_to(settings.workspaces_dir.resolve()):
         raise HTTPException(500, "workspace path escape detected")
     return root
 
 
 def _safe_join(root: Path, rel: str) -> Path:
     target = (root / rel).resolve()
-    if not str(target).startswith(str(root)):
+    if not target.is_relative_to(root):
         raise HTTPException(400, "path escapes workspace root")
     return target
 

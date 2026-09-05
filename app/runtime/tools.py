@@ -26,9 +26,14 @@ class ToolError(Exception):
 
 def _resolve(root: Path, rel: str) -> Path:
     target = (root / rel).resolve()
-    if target != root and not str(target).startswith(str(root) + os.sep):
+    if target != root and not target.is_relative_to(root):
         raise ToolError(f"path escapes workspace root: {rel}")
     return target
+
+
+def _inside(root: Path, target: Path) -> bool:
+    """resolve 后的 target 是否位于 root 内（symlink 感知）。"""
+    return target == root or target.is_relative_to(root)
 
 
 def _clip(text: str, limit: int = MAX_OUTPUT) -> str:
@@ -115,15 +120,19 @@ def _grep(root: Path, rel: str, pattern: str, max_results: int = 100) -> dict:
         raise ToolError(f"not found: {rel}")
     regex = re.compile(pattern)
     hits: list[dict] = []
-    files = [target] if target.is_file() else [
+    candidates = [target] if target.is_file() else [
         p for p in target.rglob("*") if p.is_file()
         and not any(part.startswith(".") or part in ("__pycache__", ".venv", "node_modules") for part in p.parts)
     ]
-    for p in files:
+    for p in candidates:
+        # symlink 感知：每个候选文件 resolve 后必须仍位于工作区内
+        real = p.resolve()
+        if not _inside(root, real):
+            continue
         try:
-            for i, line in enumerate(p.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
+            for i, line in enumerate(real.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
                 if regex.search(line):
-                    hits.append({"file": str(p.relative_to(root)), "line": i, "text": _clip(line, 300)})
+                    hits.append({"file": str(real.relative_to(root)), "line": i, "text": _clip(line, 300)})
                     if len(hits) >= max_results:
                         return {"path": rel, "pattern": pattern, "matches": hits, "truncated": True}
         except OSError:
@@ -138,10 +147,13 @@ def _run_command(root: Path, command: str) -> dict:
         raise ToolError(f"bad command: {exc}") from exc
     if not argv:
         raise ToolError("empty command")
+    # 环境清洗：只保留最小 PATH，不继承宿主环境（防进程凭据/API key 泄露）
+    clean_env = {"PATH": "/usr/local/bin:/usr/bin:/bin", "LANG": "C.UTF-8", "HOME": str(root)}
     try:
         proc = subprocess.run(
             argv,
             cwd=root,
+            env=clean_env,
             capture_output=True,
             text=True,
             timeout=settings.command_timeout_seconds,
