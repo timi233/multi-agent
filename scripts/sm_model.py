@@ -233,7 +233,8 @@ if __name__ == "__main__":
             lines.append(line)
         lines.append("")
     ok = all_ok(results)
-    n_find = sum(len(c.findings) for checks in results.values() for c in checks)
+    n_find = sum(len(c.findings) for checks in results.values()
+                 for c in checks if not c.ok)  # 仅违规（ok=False）计为违规数
     n_warn = count_warnings(results)
     verdict = "PASS" if ok else "FAIL"
     lines.append(
@@ -255,6 +256,6 @@ if __name__ == "__main__":
             warn = "; ".join(c.warnings)
             print(f"  {tag}: {detail}" + (f"  ⚠ {warn}" if warn else ""))
     print("\n总体:", "PASS" if ok else "FAIL",
-          f"（违规 {sum(len(c.findings) for checks in results.values() for c in checks)} 项；"
+          f"（违规 {sum(len(c.findings) for checks in results.values() for c in checks if not c.ok)} 项；"
           f"已知差距 {count_warnings(results)} 项）")
     print("报告已写入:", out_dir / "report.md")

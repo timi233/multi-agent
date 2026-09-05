@@ -45,6 +45,14 @@ def test_sm01_task_real_matrix():
             assert actual == expected, f"{old} -> {new}"
 
 
+def test_report_consistency_ok_implies_zero_findings():
+    """通过判定（all_ok）时违规计数必须为 0（报告与判定一致，nit-2 回归锁）。"""
+    results = run_all()
+    assert all_ok(results)
+    assert sum(len(c.findings) for checks in results.values()
+               for c in checks if not c.ok) == 0
+
+
 def test_sm01_illegal_transitions_rejected():
     """代表性非法迁移必须抛 INVALID_STATE_TRANSITION（SM-01）。"""
     for old, new in [("QUEUED", "SUCCESS"), ("RUNNING", "QUEUED"),
