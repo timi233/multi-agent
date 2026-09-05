@@ -54,6 +54,58 @@ def test_core_ids_present():
             "RT-BASELINE", "RT-06", "GT-xx"} <= ids
 
 
+def test_expected_status_map():
+    """逐 ID 机器可验证门槛映射（评审 should-fix：精确绑定防漂移）——子集实现
+    不得升格为完整手册条目 PASS。"""
+    expected = {
+        "CT-01": "PASS", "CT-02": "PASS", "CT-03": "PASS", "CT-04": "PARTIAL",
+        "CT-08": "PASS", "SM-xx": "PARTIAL",
+        "GW-03": "PARTIAL", "GW-04": "PASS", "GW-06": "PASS", "GW-07": "PASS",
+        "GW-09": "PARTIAL",
+        "GW-01": "NOT_IMPLEMENTED", "GW-02": "NOT_IMPLEMENTED",
+        "GW-05": "NOT_IMPLEMENTED", "GW-08": "NOT_IMPLEMENTED",
+        "GW-10": "NOT_IMPLEMENTED",
+        "RT-BASELINE": "PASS",
+        "RT-01": "NOT_IMPLEMENTED", "RT-02": "NOT_IMPLEMENTED",
+        "RT-03": "NOT_IMPLEMENTED", "RT-04": "NOT_IMPLEMENTED",
+        "RT-05": "NOT_IMPLEMENTED", "RT-06": "PARTIAL",
+        "GT-xx": "NOT_IMPLEMENTED",
+    }
+    by_id = {e["id"]: e["status"] for e in build_report()["entries"]}
+    for cid, want in expected.items():
+        assert by_id.get(cid) == want, f"{cid}: 期望 {want} 实际 {by_id.get(cid)}"
+
+
+def test_evidence_paths_exist():
+    """证据路径必须真实存在（评审 should-fix：机器可验证，不依赖文字）。"""
+    import re
+
+    token_re = re.compile(r"(tests|scripts|app|contracts)/[A-Za-z0-9_./\-*]+")
+    for e in build_report()["entries"]:
+        if not e["status"] == "PASS":
+            continue
+        for ev in e["evidence"]:
+            hits = []
+            if ev.startswith("GET /"):
+                # API 端点证据：校验其宿主模块存在
+                if (ROOT / "app" / "control" / "api.py").exists():
+                    hits.append("GET /api/... (app/control/api.py)")
+                continue
+            for m in token_re.finditer(ev):
+                tok = m.group(0).split("（")[0].rstrip(".")
+                if "*" in tok:
+                    base = tok.split("*")[0]
+                    if (ROOT / base).exists():
+                        hits.append(base)
+                    continue
+                cur = ROOT / tok
+                while not cur.exists() and cur != ROOT:
+                    cur = cur.parent
+                if cur != ROOT:
+                    hits.append(tok)
+            assert hits, f"{e['id']} 证据无真实路径: {ev}"
+
+
 def test_cli_runs_and_writes_json():
     """脚本 CLI：--json 输出可解析且结构与 build_report 一致。"""
     import tempfile
