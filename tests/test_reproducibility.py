@@ -151,3 +151,20 @@ def test_profile_consistency(object_type):
     schema = load_schema(object_type, "2")
     profile = load_digest_profile(object_type, "2")
     assert validate_profile_consistency(schema, profile) == []
+
+
+def test_profile_consistency_rejects_drift():
+    """duplicateConsistencyPointers 防漂移（评审 nit-3）：错误指针/键必须报问题。"""
+    schema = load_schema("event_envelope", "2")
+    profile = dict(load_digest_profile("event_envelope", "2"))
+    profile["duplicateConsistencyPointers"] = {
+        "/controlPlaneEopch": "controlPlaneEpoch",   # 对象指针拼写错误
+        "/controlPlaneEpoch": "controlPlaneEpoch",
+    }
+    problems = validate_profile_consistency(schema, profile)
+    assert any("controlPlaneEopch" in p for p in problems)
+    profile2 = dict(profile, duplicateConsistencyPointers={
+        "/controlPlaneEpoch": "controlPlaneEpochValue",  # 信封键拼写错误
+    })
+    problems2 = validate_profile_consistency(schema, profile2)
+    assert any("controlPlaneEpochValue" in p for p in problems2)

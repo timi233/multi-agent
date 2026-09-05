@@ -168,6 +168,15 @@ def validate_profile_consistency(schema: dict, profile: dict) -> list[str]:
         req = parent.get("required") if isinstance(parent, dict) else None
         if isinstance(req, list) and leaf in req:
             problems.append(f"optional pointer 实为 Schema 必需字段（不可选）: {p}")
+    # duplicateConsistencyPointers 防漂移（评审 nit-3）：对象指针必须存在于
+    # Schema；信封键必须属于 §9.4 信封键集合——防止拼写错误静默关闭绑定。
+    dup = profile.get("duplicateConsistencyPointers") or {}
+    for obj_ptr, env_key in dup.items():
+        if schema_at(obj_ptr) is None:
+            problems.append(f"duplicateConsistencyPointers 对象指针在 Schema 中不存在: {obj_ptr}")
+        if env_key not in SIGNATURE_ENVELOPE_KEYS:
+            problems.append(
+                f"duplicateConsistencyPointers 信封键不在 §9.4 键集中: {env_key}")
     return problems
 
 
