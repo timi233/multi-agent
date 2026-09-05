@@ -77,17 +77,18 @@ def cancel_task(task_id: str):
     old = row["status"]
     if old not in ("QUEUED", "RUNNING"):
         raise HTTPException(409, f"cannot cancel task in status {old}")
-    # 条件更新：仅 QUEUED/RUNNING 可取消，避免与 worker 终态竞争回退
-    rows = execute(
-        "UPDATE pi_tasks SET status='CANCELLED', finished_at=now(), updated_at=now() "
-        "WHERE id=%s AND status IN ('QUEUED','RUNNING') RETURNING *",
-        (task_id,),
-    )
-    if not rows:
-        raise HTTPException(409, f"task {task_id} no longer cancellable")
+    # 状态条件更新 + 事件写入在同一连接同一事务（评审 fix-2）
     conn = connect()
     try:
         with conn.cursor() as cur:
+            cur.execute(
+                "UPDATE pi_tasks SET status='CANCELLED', finished_at=now(), updated_at=now() "
+                "WHERE id=%s AND status IN ('QUEUED','RUNNING') RETURNING *",
+                (task_id,),
+            )
+            rows = cur.fetchall()
+            if not rows:
+                raise HTTPException(409, f"task {task_id} no longer cancellable")
             cur.execute(
                 "INSERT INTO pi_events (task_id, seq, event_type, payload) "
                 "VALUES (%s, (SELECT COALESCE(MAX(seq),0)+1 FROM pi_events WHERE task_id=%s), "

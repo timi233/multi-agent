@@ -1,10 +1,11 @@
 """后台 worker：原子领取 QUEUED 任务、推进状态机、运转 runtime、记录事件与终态。
 
-并发正确性：
-- scheduler 在**一个事务**内 FOR UPDATE SKIP LOCKED + QUEUED->RUNNING，提交后才投递线程池，
-  避免重复调度同一任务（评审 fix-1）。
-- attempt 创建与 ATTEMPT_STARTED 事件与领取同事务（评审 fix-2）。
-- 终态写入使用条件更新（仅 RUNNING 可收敛为 SUCCESS/FAILED），cancel 竞争不产生回退。
+并发正确性（经两轮独立评审修订）：
+- scheduler 在**一个事务**内 FOR UPDATE SKIP LOCKED + QUEUED->RUNNING，提交后才投递线程池。
+- 领取数量受线程池 in-flight 容量约束，不会把队列一次性全部标为 RUNNING。
+- attempt 创建与 ATTEMPT_STARTED 事件与领取同事务；终态条件更新（仅 RUNNING 可收敛）。
+- 启动时 recover_stale()：把崩溃遗留的「RUNNING 且无 attempt」任务收敛为 FAILED（不悬挂）。
+- attempt 总是收敛：任务未被本线程收敛（被 cancel 抢占）时按任务实际终态收敛 attempt 并记录事件。
 """
 from __future__ import annotations
 
@@ -35,8 +36,55 @@ def _emit_event(conn, task_id: str, attempt_id: str, event_type: str, payload: d
         )
 
 
+def _converge_attempt(conn, task_id: str, attempt_id: str, task_state: str,
+                      note: str = "") -> None:
+    """按任务实际终态收敛 attempt（CLAIMED -> TERMINAL_REPORTED）并记录事件。"""
+    event_type = "ATTEMPT_CANCELLED" if task_state == "CANCELLED" else "ATTEMPT_FINISHED"
+    with conn.cursor() as cur:
+        cur.execute(
+            "UPDATE pi_attempts SET status='TERMINAL_REPORTED', finished_at=now() "
+            "WHERE id=%s AND status='CLAIMED'",
+            (attempt_id,),
+        )
+        _emit_event(conn, task_id, attempt_id, event_type,
+                    {"status": task_state, "note": note})
+
+
+def recover_stale() -> list[str]:
+    """启动恢复：把崩溃遗留的 RUNNING 且无 attempt 的任务收敛为 FAILED。"""
+    conn = connect()
+    stale: list[str] = []
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT t.id FROM pi_tasks t
+                LEFT JOIN pi_attempts a ON a.task_id = t.id
+                WHERE t.status='RUNNING' AND a.id IS NULL
+                """
+            )
+            stale = [r["id"] for r in cur.fetchall()]
+            for tid in stale:
+                cur.execute(
+                    "UPDATE pi_tasks SET status='FAILED', finished_at=now(), "
+                    "updated_at=now(), error='PLATFORM_RESTART: RUNNING without attempt' "
+                    "WHERE id=%s AND status='RUNNING'",
+                    (tid,),
+                )
+                cur.execute(
+                    "INSERT INTO pi_events (task_id, seq, event_type, payload) "
+                    "VALUES (%s, (SELECT COALESCE(MAX(seq),0)+1 FROM pi_events WHERE task_id=%s), "
+                    "'ATTEMPT_RECOVERED', %s::jsonb)",
+                    (tid, tid, json.dumps({"reason": "running-without-attempt"}, ensure_ascii=False)),
+                )
+        conn.commit()
+    finally:
+        conn.close()
+    return stale
+
+
 def _run_task(conn, task_id: str) -> None:
-    """执行一个已处于 RUNNING 的任务（试图在 RUNNING 竞争条件下收敛）。"""
+    """执行一个已处于 RUNNING 的任务；任务可能被 cancel 抢占。"""
     with conn.cursor() as cur:
         cur.execute("SELECT * FROM pi_tasks WHERE id=%s AND status=%s", (task_id, _RUNNING))
         task = cur.fetchone()
@@ -69,7 +117,6 @@ def _run_task(conn, task_id: str) -> None:
         )
         final = "SUCCESS" if ok else "FAILED"
         with conn.cursor() as cur:
-            # 条件更新：仅 RUNNING 可收敛（防 cancel 竞争回退）
             cur.execute(
                 "UPDATE pi_tasks SET status=%s, finished_at=now(), updated_at=now(), error=%s "
                 "WHERE id=%s AND status=%s RETURNING id",
@@ -83,22 +130,42 @@ def _run_task(conn, task_id: str) -> None:
                 )
                 _emit_event(conn, task_id, attempt_id, "ATTEMPT_FINISHED",
                             {"status": final, "summary": (summary or "")[:4000]})
+            else:
+                # 任务被 cancel 抢占：attempt 按实际终态收敛
+                cur.execute("SELECT status FROM pi_tasks WHERE id=%s", (task_id,))
+                row = cur.fetchone()
+                task_state = row["status"] if row else "UNKNOWN"
         conn.commit()
-    except Exception as exc:  # 平台层兜底：异常也收敛为 FAILED（不悬挂）
+        if not finalized:
+            if task_state in _TERMINAL:
+                _converge_attempt(conn, task_id, attempt_id, task_state,
+                                  note="completed-late-after-state-change")
+                conn.commit()
+    except Exception as exc:  # 平台层兜底：异常也收敛为 FAILED，不悬挂
         with conn.cursor() as cur:
             cur.execute(
                 "UPDATE pi_tasks SET status='FAILED', finished_at=now(), updated_at=now(), "
-                "error=%s WHERE id=%s AND status=%s",
+                "error=%s WHERE id=%s AND status=%s RETURNING id",
                 (f"{type(exc).__name__}: {exc}", task_id, _RUNNING),
             )
+            finalized = cur.fetchone() is not None
+            if not finalized:
+                cur.execute("SELECT status FROM pi_tasks WHERE id=%s", (task_id,))
+                row = cur.fetchone()
+                task_state = row["status"] if row else "UNKNOWN"
         conn.commit()
-        _emit_event(conn, task_id, attempt_id, "ATTEMPT_FAILED",
-                    {"error": f"{type(exc).__name__}: {exc}"})
-        conn.commit()
+        if finalized:
+            _emit_event(conn, task_id, attempt_id, "ATTEMPT_FAILED",
+                        {"error": f"{type(exc).__name__}: {exc}"})
+            conn.commit()
+        elif task_state in _TERMINAL:
+            _converge_attempt(conn, task_id, attempt_id, task_state,
+                              note="errored-late-after-state-change")
+            conn.commit()
 
 
 class Worker:
-    """单机 worker：事务内原子领取（SKIP LOCKED + 状态变更）+ 线程池执行。"""
+    """单机 worker：事务内原子领取（SKIP LOCKED + 状态变更）+ 有界线程池执行。"""
 
     def __init__(self, threads: int | None = None):
         self._threads = threads or settings.worker_threads
@@ -107,40 +174,52 @@ class Worker:
         self._thread = threading.Thread(target=self._loop, name="pi-worker-scheduler", daemon=True)
 
     def start(self) -> None:
+        stale = recover_stale()
+        if stale:
+            print(f"[worker] recovered {len(stale)} stale RUNNING task(s): {stale}")
         self._thread.start()
 
     def stop(self) -> None:
         self._stop.set()
 
     def _loop(self) -> None:
+        inflight: set = set()
         while not self._stop.is_set():
-            submitted = 0
-            conn = connect()
-            try:
-                with conn.cursor() as cur:
-                    # 同事务：加锁后立即领取（QUEUED->RUNNING），提交后才投递执行
-                    cur.execute(
-                        "SELECT id FROM pi_tasks WHERE status='QUEUED' ORDER BY created_at "
-                        "LIMIT %s FOR UPDATE SKIP LOCKED",
-                        (self._threads,),
-                    )
-                    locked = [r["id"] for r in cur.fetchall()]
-                    for tid in locked:
-                        cur.execute(
-                            "UPDATE pi_tasks SET status='RUNNING', started_at=now(), updated_at=now() "
-                            "WHERE id=%s AND status='QUEUED'",
-                            (tid,),
-                        )
-                conn.commit()
-                for tid in locked:
-                    self._pool.submit(self._run_guarded, tid)
-                    submitted += 1
-            except Exception as exc:  # 领取阶段异常不致命
-                print(f"[worker] claim error: {exc}")
-            finally:
-                conn.close()
-            if submitted == 0:
+            inflight = {f for f in inflight if not f.done()}
+            if self._claim_batch(inflight) == 0:
                 self._stop.wait(1.0)
+
+    def _claim_batch(self, inflight: set) -> int:
+        """按真实空闲槽位领取一轮任务，返回领取数（可测试）。"""
+        capacity = max(0, self._threads - len(inflight))
+        if capacity == 0:
+            return 0
+        submitted = 0
+        conn = connect()
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT id FROM pi_tasks WHERE status='QUEUED' ORDER BY created_at "
+                    "LIMIT %s FOR UPDATE SKIP LOCKED",
+                    (capacity,),
+                )
+                locked = [r["id"] for r in cur.fetchall()]
+                for tid in locked:
+                    cur.execute(
+                        "UPDATE pi_tasks SET status='RUNNING', started_at=now(), updated_at=now() "
+                        "WHERE id=%s AND status='QUEUED'",
+                        (tid,),
+                    )
+            conn.commit()
+            for tid in locked:
+                fut = self._pool.submit(self._run_guarded, tid)
+                inflight.add(fut)
+                submitted += 1
+        except Exception as exc:  # 领取阶段异常不致命
+            print(f"[worker] claim error: {exc}")
+        finally:
+            conn.close()
+        return submitted
 
     def _run_guarded(self, task_id: str) -> None:
         conn = connect()

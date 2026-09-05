@@ -59,11 +59,11 @@ def test_run_command_cleans_env(tmp_path):
         os.environ.pop("PI_TEST_SECRET", None)
 
 
-def test_worker_finish_after_cancel_no_rollback(monkeypatch):
-    """竞争场景：任务先被 CANCELLED，worker 迟到完成不得回退为 SUCCESS/FAILED。"""
+def test_worker_cancel_during_run(monkeypatch):
+    """真实竞争：run_attempt 已启动执行后 cancel，worker 迟到收敛不得回退且 attempt 收敛。"""
+    import threading
     import uuid
 
-    from app.config import settings
     from app.db import connect, execute
     from app import worker as worker_mod
 
@@ -74,21 +74,128 @@ def test_worker_finish_after_cancel_no_rollback(monkeypatch):
         "VALUES (%s,'race','prompt',%s,'RUNNING','m')",
         (tid, ws),
     )
-    # 模拟 cancel：条件更新为 CANCELLED
-    execute(
-        "UPDATE pi_tasks SET status='CANCELLED', finished_at=now(), updated_at=now() "
-        "WHERE id=%s AND status IN ('QUEUED','RUNNING')",
-        (tid,),
-    )
-    monkeypatch.setattr(
-        "app.runtime.agent.run_attempt",
-        lambda **kw: (True, "late success", None),
-    )
+    started = threading.Event()
+    release = threading.Event()
+    outcome = {}
+
+    def fake_run_attempt(**kw):
+        started.set()
+        assert release.wait(timeout=10), "release not set"
+        outcome["summary"] = kw.get("task", {}).get("id")
+        return True, "late success", None
+
+    monkeypatch.setattr("app.runtime.agent.run_attempt", fake_run_attempt)
+
+    results = {}
+
+    def run_in_thread():
+        conn = connect()
+        try:
+            worker_mod._run_task(conn, tid)
+        finally:
+            conn.close()
+
+    t = threading.Thread(target=run_in_thread)
+    t.start()
+    assert started.wait(timeout=10), "run_attempt 未启动"
+    # run_attempt 执行中被 cancel（条件更新 + 事件同事务）
     conn = connect()
-    try:
-        worker_mod._run_task(conn, tid)  # worker 迟到收敛
-    finally:
-        conn.close()
+    with conn.cursor() as cur:
+        cur.execute(
+            "UPDATE pi_tasks SET status='CANCELLED', finished_at=now(), updated_at=now() "
+            "WHERE id=%s AND status IN ('QUEUED','RUNNING') RETURNING id",
+            (tid,),
+        )
+        results["cancel_affected"] = cur.fetchone() is not None
+    conn.commit()
+    conn.close()
+    release.set()
+    t.join(timeout=15)
+
     row = execute("SELECT status, error FROM pi_tasks WHERE id=%s", (tid,))[0]
-    assert row["status"] == "CANCELLED", "已取消任务不得被回退"
+    assert results["cancel_affected"] is True
+    assert row["status"] == "CANCELLED", "已取消任务不得被 worker 回退为 SUCCESS/FAILED"
+    assert row["error"] is None
+    # attempt 必须收敛，不得停在 CLAIMED
+    att = execute("SELECT status FROM pi_attempts WHERE task_id=%s", (tid,))[0]
+    assert att["status"] == "TERMINAL_REPORTED"
+    ev_types = [e["event_type"] for e in execute("SELECT event_type FROM pi_events WHERE task_id=%s", (tid,))]
+    assert "ATTEMPT_CANCELLED" in ev_types, f"缺 ATTEMPT_CANCELLED: {ev_types}"
+    execute("DELETE FROM pi_events WHERE task_id=%s", (tid,))
+    execute("DELETE FROM pi_attempts WHERE task_id=%s", (tid,))
     execute("DELETE FROM pi_tasks WHERE id=%s", (tid,))
+
+
+def test_recover_stale_running_new_task_timeout():
+    """启动恢复：RUNNING 且无 attempt 的任务被收敛为 FAILED 并产生恢复事件。"""
+    import uuid
+
+    from app.db import execute
+    from app import worker as worker_mod
+
+    tid = uuid.uuid4().hex[:16]
+    execute(
+        "INSERT INTO pi_tasks (id, title, prompt, workspace, status, model) "
+        "VALUES (%s,'stale','p',%s,'RUNNING','m')",
+        (tid, f"task-{tid}"),
+    )
+    recovered = worker_mod.recover_stale()
+    assert tid in recovered
+    row = execute("SELECT status, error FROM pi_tasks WHERE id=%s", (tid,))[0]
+    assert row["status"] == "FAILED" and "PLATFORM_RESTART" in (row["error"] or "")
+    ev = execute("SELECT event_type FROM pi_events WHERE task_id=%s", (tid,))[0]
+    assert ev["event_type"] == "ATTEMPT_RECOVERED"
+    execute("DELETE FROM pi_events WHERE task_id=%s", (tid,))
+    execute("DELETE FROM pi_tasks WHERE id=%s", (tid,))
+
+
+def test_worker_capacity_limits_claim(monkeypatch):
+    """容量控制：线程池满时不再领取（不会把所有 QUEUED 标 RUNNING）。"""
+    import uuid
+    from concurrent.futures import Future
+
+    from app.db import execute
+    from app.worker import Worker
+
+    # 测试共享 PG：先清空任务表避免其他测试残留干扰
+    execute("DELETE FROM pi_tasks")
+
+    def make_task():
+        tid = uuid.uuid4().hex[:16]
+        execute(
+            "INSERT INTO pi_tasks (id, title, prompt, workspace, status, model) "
+            "VALUES (%s,'cap','p',%s,'QUEUED','m')",
+            (tid, f"task-{tid}"),
+        )
+        return tid
+
+    tids = [make_task() for _ in range(4)]
+
+    class FakePool:
+        def submit(self, fn, tid):
+            fut = Future()
+            inflight_done.add(fut)  # 记录但不完成：模拟一直运行
+            return fut
+
+    w = Worker(threads=2)
+    inflight_done = set()
+    w._pool = FakePool()
+    inflight: set = set()
+    try:
+        first = w._claim_batch(inflight)
+        second = w._claim_batch(inflight)
+        assert first == 2, "首轮应按容量领取 2 个"
+        assert second == 0, "在途未完成时不得再领取"
+        # 模拟一个完成：min 清理后应恢复容量
+        done = inflight.pop()
+        inflight_done.discard(done)
+        third = w._claim_batch(inflight)
+        assert third == 1, f"释放一个槽位后应再领 1 个，实际 {third}"
+        running = {r["id"] for r in execute("SELECT id FROM pi_tasks WHERE status='RUNNING'")}
+        queued = {r["id"] for r in execute("SELECT id FROM pi_tasks WHERE status='QUEUED'")}
+        assert len(running & set(tids)) == 3, f"RUNNING 应恰为 3: {running & set(tids)}"
+        assert len(queued & set(tids)) == 1, "剩余 1 个保持 QUEUED"
+    finally:
+        for tid in tids:
+            execute("DELETE FROM pi_events WHERE task_id=%s", (tid,))
+            execute("DELETE FROM pi_tasks WHERE id=%s", (tid,))
