@@ -9,7 +9,7 @@ from typing import Callable
 
 from ..config import settings
 from .gateway import Gateway, GatewayError
-from .tools import FINISH_TOOL_NAME, TOOL_DEFINITIONS, run_tool
+from .tools import FINISH_TOOL_NAME, run_tool, tool_definitions
 
 SYSTEM_PROMPT_TEMPLATE = """你是运行在 Pi 单机平台上的软件代理（agent）。
 你的任务工作区在：{workspace}
@@ -36,6 +36,7 @@ def run_attempt(
     gateway: Gateway | None = None,
     budget=None,
     budget_conn=None,
+    read_only: bool = False,
 ) -> tuple[bool, str, str | None]:
     """执行一次 attempt。返回 (ok, summary, error)。
 
@@ -43,12 +44,16 @@ def run_attempt(
     按蓝图 GW-xx 记账：调用前持久化预留（RESERVED）→ 发送意图（SENT）→
     响应后结算（SETTLED）/异常失败（FAILED）；每次操作独立 commit。
     预算超限抛 BudgetExceeded（由 worker 映射 BUDGET_EXHAUSTED）。
+    read_only=True：G2 沙箱——只暴露只读工具集（list/read/find/grep/finish），
+    剔除 write/edit/run_command（REVIEW/READ_ONLY run 步骤）。
     """
     gw = gateway or Gateway(
         base_url=settings.cliproxy_base_url,
         api_key=settings.cliproxy_api_key,
         model=task.get("model") or settings.cliproxy_model,
     )
+    tools = tool_definitions(read_only=read_only)
+    allowed_tool_names = {t["function"]["name"] for t in tools}  # 服务端授权白名单
     messages: list[dict] = [
         {"role": "system", "content": build_system_prompt(str(workspace_dir))},
         {"role": "user", "content": task["prompt"]},
@@ -77,7 +82,7 @@ def run_attempt(
                 budget_conn.commit()
             try:
                 choice, usage = gw.chat_with_usage(messages,
-                                                   tools=TOOL_DEFINITIONS)
+                                                   tools=tools)
             except GatewayError as exc:
                 # 发送后不确定结果（超时/断连）：UNKNOWN 保守占额，不释放
                 # （评审 fix-blocking-2），预算内重试或终止。
@@ -112,7 +117,11 @@ def run_attempt(
                 name = fn.get("name", "")
                 raw_args = fn.get("arguments", "{}")
                 emit_event("TOOL_CALL", {"turn": turn, "tool": name, "args": raw_args[:2000]})
-                result = run_tool(name, raw_args, workspace_dir)
+                if name not in allowed_tool_names:  # G2 评审 block-1：服务端授权强制
+                    result = {"ok": False, "error": (
+                        f"tool not authorized in this run mode: {name}")}
+                else:
+                    result = run_tool(name, raw_args, workspace_dir)
                 result_text = json.dumps(result, ensure_ascii=False)
                 emit_event("TOOL_RESULT", {
                     "turn": turn, "tool": name,

@@ -109,9 +109,10 @@ ENTRIES: list[dict] = [
      "phase": "Phase 0", "status": "NOT_IMPLEMENTED",
      "evidence": [], "note": ""},
     {"id": "RT-04", "label": "仓库工具子进程控制管道/ptrace/proc 旁路全部阻止",
-     "phase": "Phase 0", "status": "NOT_IMPLEMENTED",
-     "evidence": ["tests/test_security.py（路径/symlink/环境清洗防护）"],
-     "note": "目录级防护已测；沙箱级未实现（networkEnabledForTools=true 如实）"},
+     "phase": "Phase 0", "status": "PARTIAL",
+     "evidence": ["tests/test_security.py（路径/symlink/环境清洗防护）", "tests/test_sandbox.py（G2 沙箱硬化）"],
+     "note": "G2 已落地：命令 deny list（特权/系统变更/全局包管理/网络外联客户端）+ setuid 拒绝 + 命令长度上限 + 超时整组终止 + 最小环境白名单 + READ_ONLY 只读工具集；"
+             "沙箱级进程/网络隔离（netns/cgroup）未实现（networkEnabledForTools=true、networkIsolation=none-host-network 如实）——PARTIAL 而非 PASS"},
     {"id": "RT-05", "label": "恢复/消息/计划任务/扩展发现/Skill 装载禁用边界",
      "phase": "Phase 0", "status": "NOT_IMPLEMENTED",
      "evidence": [], "note": "相关设施不存在即不加载"},

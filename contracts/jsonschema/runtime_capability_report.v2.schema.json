@@ -43,9 +43,39 @@
         "workspacesRoot": { "type": "string", "minLength": 1 },
         "readOnlyDirs": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
         "networkEnabledForTools": { "type": "boolean" },
-        "processExecutionForTools": { "type": "boolean" }
+        "processExecutionForTools": { "type": "boolean" },
+        "sandboxProfile": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": { "type": "string", "enum": ["workspace-root-limit"] },
+            "commandPolicy": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "shellEnabled": { "type": "boolean" },
+                "setuidRejected": { "type": "boolean" },
+                "deniedCommands": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+                "deniedGitSubcommands": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+              },
+              "required": ["shellEnabled", "setuidRejected", "deniedCommands", "deniedGitSubcommands"]
+            },
+            "process": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "commandTimeoutSeconds": { "type": "integer", "minimum": 1 },
+                "envWhitelist": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+              },
+              "required": ["commandTimeoutSeconds", "envWhitelist"]
+            },
+            "networkIsolation": { "type": "string", "enum": ["none-host-network"] },
+            "readOnlyToolsForReadOnlyRuns": { "type": "boolean" }
+          },
+          "required": ["type", "commandPolicy", "process", "networkIsolation", "readOnlyToolsForReadOnlyRuns"]
+        }
       },
-      "required": ["sandbox", "workspacesRoot", "readOnlyDirs", "networkEnabledForTools", "processExecutionForTools"]
+      "required": ["sandbox", "workspacesRoot", "readOnlyDirs", "networkEnabledForTools", "processExecutionForTools", "sandboxProfile"]
     },
     "toolCapabilities": {
       "type": "array",

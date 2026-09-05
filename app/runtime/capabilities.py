@@ -28,15 +28,19 @@ from ..contracts import (
     load_schema,
 )
 from ..security import keys as node_keys
-from .tools import TOOL_DEFINITIONS
+from .tools import (
+    DENIED_COMMANDS,
+    GIT_NETWORK_SUBCOMMANDS,
+    TOOL_DEFINITIONS,
+)
 
-PI_RUNTIME_VERSION = "0.3.0"
+PI_RUNTIME_VERSION = "0.3.1"
 
 # 已知差距（如实披露，属于事实的一部分；随功能演进移除）
 RT_KNOWN_GAPS = [
     "RT-02: 流式响应/上下文压缩/管道化 ModelCallIntent 未实现（直连 OpenAI 兼容 HTTP）",
     "RT-03: 畸形/超大/乱序协议注入的 NO_VERDICT 拒绝未系统验证",
-    "RT-04: 沙箱级进程/网络隔离未实现（当前为工作区目录级限额）",
+    "RT-04: 沙箱级进程/网络隔离未实现（当前为命令 deny list + 超时 + 工作区目录级限额；networkIsolation=none-host-network 如实）",
     "RT-05: 扩展发现/计划任务/RLM 未实现（不存在即不加载）",
     "RT-07: Runtime Driver 幂等 API 未实现",
     "GW-08: 撤销 checkpoint 新鲜度未实现",
@@ -86,7 +90,22 @@ def core_facts() -> dict:
             "workspacesRoot": str(settings.workspaces_dir),
             "readOnlyDirs": [],
             "networkEnabledForTools": True,   # 如实：run_command 子进程可触网（无网络隔离，见 knownGaps RT-04）
-            "processExecutionForTools": True,  # run_command 受限执行（超时+截断）
+            "processExecutionForTools": True,  # run_command 受限执行（超时+截断+deny list）
+            "sandboxProfile": {
+                "type": "workspace-root-limit",
+                "commandPolicy": {
+                    "shellEnabled": False,       # shlex.split -> argv 直传，无 shell
+                    "setuidRejected": True,      # chmod u+s / 4755 / 04755 等拒绝
+                    "deniedCommands": sorted(DENIED_COMMANDS),
+                    "deniedGitSubcommands": sorted(GIT_NETWORK_SUBCOMMANDS),
+                },
+                "process": {
+                    "commandTimeoutSeconds": settings.command_timeout_seconds,
+                    "envWhitelist": ["PATH", "LANG", "HOME"],
+                },
+                "networkIsolation": "none-host-network",  # 主网络无 netns，如实
+                "readOnlyToolsForReadOnlyRuns": True,     # READ_ONLY run 只读工具集
+            },
         },
         "toolCapabilities": tools,
         "knownGaps": list(RT_KNOWN_GAPS),
@@ -103,6 +122,18 @@ def _contract_id(facts: dict) -> str:
     norm["knownGaps"] = sorted(facts.get("knownGaps") or [])
     iso = dict(facts.get("isolation") or {})
     iso["readOnlyDirs"] = sorted((facts.get("isolation") or {}).get("readOnlyDirs") or [])
+    profile = dict(iso.get("sandboxProfile") or {})
+    policy = dict(profile.get("commandPolicy") or {})
+    if "deniedCommands" in policy:
+        policy["deniedCommands"] = sorted(policy["deniedCommands"])
+    if "deniedGitSubcommands" in policy:
+        policy["deniedGitSubcommands"] = sorted(policy["deniedGitSubcommands"])
+    profile["commandPolicy"] = policy
+    proc = dict(profile.get("process") or {})  # 评审 should-fix-2：envWhitelist 亦为集合
+    if "envWhitelist" in proc:
+        proc["envWhitelist"] = sorted(proc["envWhitelist"])
+    profile["process"] = proc
+    iso["sandboxProfile"] = profile
     norm["isolation"] = iso
     return hashlib.sha256(jcs(norm)).hexdigest()[:32]
 

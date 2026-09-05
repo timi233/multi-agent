@@ -103,6 +103,19 @@ def test_contract_id_deterministic_across_generatedAt():
     iso5 = dict(f1["isolation"], readOnlyDirs=["b", "a"])
     assert _contract_id(dict(f1, isolation=iso4)) == _contract_id(
         dict(f1, isolation=iso5))
+    # G2 集合归一化：sandboxProfile 内 deniedCommands/envWhitelist 乱序不改 ID
+    import copy
+    iso6 = copy.deepcopy(f1["isolation"])
+    iso6b = copy.deepcopy(iso6)
+    iso6b["sandboxProfile"]["commandPolicy"]["deniedCommands"] = list(
+        reversed(iso6b["sandboxProfile"]["commandPolicy"]["deniedCommands"]))
+    assert _contract_id(dict(f1, isolation=iso6b)) == _contract_id(
+        dict(f1, isolation=iso6))
+    iso6c = copy.deepcopy(iso6)
+    iso6c["sandboxProfile"]["process"]["envWhitelist"] = list(
+        reversed(iso6c["sandboxProfile"]["process"]["envWhitelist"]))
+    assert _contract_id(dict(f1, isolation=iso6c)) == _contract_id(
+        dict(f1, isolation=iso6))
     assert _contract_id(f1) != _contract_id(
         dict(f1, knownGaps=list(f1["knownGaps"]) + ["RT-99: 新增差距"]))
 

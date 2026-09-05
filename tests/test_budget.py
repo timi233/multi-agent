@@ -339,7 +339,7 @@ def test_worker_budget_grant_chain_clean(conn, task, monkeypatch):
     def fake_ok(**kw):
         return True, "ok-summary", None
 
-    agent_mod.run_attempt = fake_ok  # 延迟导入从 agent 模块取，patch 需落在 agent
+    monkeypatch.setattr(agent_mod, "run_attempt", fake_ok)  # 自动恢复，避免污染后续用例
     with conn.cursor() as cur:
         cur.execute("UPDATE pi_tasks SET status='RUNNING' WHERE id=%s", (TASK_ID,))
     conn.commit()

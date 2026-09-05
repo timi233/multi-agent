@@ -296,6 +296,7 @@ def _run_task(conn, task_id: str) -> None:
                     max_turns=settings.max_turns,
                     budget=budget,
                     budget_conn=conn,
+                    read_only=step["runKind"] == "READ_ONLY",  # G2：只读运行只暴露只读工具
                 )
             except BudgetExceeded as exc:  # 该步预算耗尽：先收敛 Run 再抛给外层收敛 Task
                 try:

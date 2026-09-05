@@ -21,6 +21,15 @@
     "/isolation/readOnlyDirs",
     "/isolation/networkEnabledForTools",
     "/isolation/processExecutionForTools",
+    "/isolation/sandboxProfile/type",
+    "/isolation/sandboxProfile/commandPolicy/shellEnabled",
+    "/isolation/sandboxProfile/commandPolicy/setuidRejected",
+    "/isolation/sandboxProfile/commandPolicy/deniedCommands",
+    "/isolation/sandboxProfile/commandPolicy/deniedGitSubcommands",
+    "/isolation/sandboxProfile/process/commandTimeoutSeconds",
+    "/isolation/sandboxProfile/process/envWhitelist",
+    "/isolation/sandboxProfile/networkIsolation",
+    "/isolation/sandboxProfile/readOnlyToolsForReadOnlyRuns",
     "/toolCapabilities",
     "/knownGaps",
     "/generatedAt"
@@ -29,7 +38,10 @@
   "canonicalSortKeys": {
     "/toolCapabilities": { "by": "key", "key": "name" },
     "/isolation/readOnlyDirs": { "by": "value" },
+    "/isolation/sandboxProfile/commandPolicy/deniedCommands": { "by": "value" },
+    "/isolation/sandboxProfile/commandPolicy/deniedGitSubcommands": { "by": "value" },
+    "/isolation/sandboxProfile/process/envWhitelist": { "by": "value" },
     "/knownGaps": { "by": "value" }
   },
-  "notes": "RuntimeCapabilityReport：能力自述事实基线——工具集/模型路由/资源参数/隔离边界/已知差距，运行前生成一次（进程内缓存、generatedAt 固定），供准入与 Gateway 身份绑定引用。canonicalPayload = immutable 白名单投影；toolCapabilities 为对象集合数组按 name 排序；knownGaps/readOnlyDirs 为字符串集合数组按值排序（蓝图 §12：JCS 不替数组排序）。"
+  "notes": "RuntimeCapabilityReport：能力自述事实基线——工具集/模型路由/资源参数/隔离边界/已知差距，运行前生成一次（进程内缓存、generatedAt 固定），供准入与 Gateway 身份绑定引用。canonicalPayload = immutable 白名单投影（G2 起含 /isolation/sandboxProfile 完整策略：deniedCommands 为字符串集合按值排序，与 contractId 归一化一致——策略枚举顺序变化不改摘要，策略内容变化必改）；toolCapabilities 为对象集合数组按 name 排序；knownGaps/readOnlyDirs 为字符串集合数组按值排序（蓝图 §12：JCS 不替数组排序）。"
 }

@@ -67,7 +67,7 @@ def test_expected_status_map():
         "GW-10": "NOT_IMPLEMENTED",
         "RT-BASELINE": "PASS",
         "RT-01": "NOT_IMPLEMENTED", "RT-02": "NOT_IMPLEMENTED",
-        "RT-03": "NOT_IMPLEMENTED", "RT-04": "NOT_IMPLEMENTED",
+        "RT-03": "NOT_IMPLEMENTED", "RT-04": "PARTIAL",
         "RT-05": "NOT_IMPLEMENTED", "RT-06": "PARTIAL",
         "GT-xx": "NOT_IMPLEMENTED",
     }

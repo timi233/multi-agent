@@ -83,6 +83,15 @@
 - Grant 生命周期：任务收敛（成功/失败/预算耗尽）在终态事务中 `settle_grant`（SETTLED）。
 - 简化差距（记录）：GW-10"热路径不查询 PostgreSQL"未达（每预算操作一次 PG 往返，单实例可接受）；单实例单代次、无 Ledger Service 分片对账、预算为全局每 attempt（`PI_MAX_BUDGET_TOKENS`/`PI_BUDGET_RESERVE_TOKENS`）、Grant 轮换/故障转移未实现。
 
+## G2 沙箱硬化（蓝图 §3.4/§6.6、手册 SB/RT-04 单机子集）
+
+- 产物：`app/runtime/tools.py`（`DENIED_COMMANDS` + `assert_command_permitted` + `tool_definitions(read_only)`）、`app/runtime/agent.py::run_attempt(read_only=)`、`app/runtime/capabilities.py`（RT 0.3.1 `isolation.sandboxProfile`）、RT schema `sandboxProfile` 段、`tests/test_sandbox.py`（13 项）。
+- **命令策略**（subprocess argv 直传，无 shell）：deny list 拒绝特权/系统变更（sudo/su/chown/mount/iptables/systemctl…）、全局包管理（apt/dpkg/yum…）、网络外联客户端（curl/wget/ssh/git/ping…）、调试/跟踪（strace/tcpdump…）；`chmod +s`/`4755` 等 setuid/setgid 标志拒绝；命令长度 ≤2000；超时（`PI_CMD_TIMEOUT`，默认 60s）整组 SIGKILL（`start_new_session` + `killpg`）。
+- **最小环境白名单**：子进程仅继承 `PATH/LANG/HOME`（HOME=工作区），宿主代理/密钥等凭据不继承。
+- **只读运行**：READ_ONLY（REVIEW/验收）步骤由 worker 传 `read_only=True`，工具集剔除 write/edit/run_command（只读证据不可改工作区）。
+- **RT 事实基线**：`runtime_capability_report` isolation 新增 `sandboxProfile`（type/commandPolicy{shellEnabled:false, setuidRejected, deniedCommands}/process{timeoutSeconds, envWhitelist}/networkIsolation{none-host-network}/readOnlyToolsForReadOnlyRuns）——报告与实现一致（RT-04 NOT_IMPLEMENTED→PARTIAL，验收报告同步）。
+- 简化差距（记录）：沙箱级进程/网络隔离（netns/cgroup/用户降权）未实现——`networkEnabledForTools=true`、`networkIsolation=none-host-network` 如实；SB-xx 全量（仅 lo/无路由/无 DNS）需容器运行（G 后续在单机容器部署可达成，当前单进程主机运行不伪造）。
+
 ## G1 编排与 Run 状态机（蓝图 §6.3/6.4/§8.2/§10.5.1 单机子集）
 
 - 产物：`migrations/003_run_state_machine.sql`（`pi_runs` 表 + `pi_tasks.plan` 列）、`app/orchestrator.py`（`compile_plan`）、`app/runtime/run_state.py`（白名单 + 表操作）、worker 逐步执行接线、`GET /api/v1/tasks/{id}/runs`（RunOut）、`tests/test_run_state.py`（5 项）+ `tests/test_orchestrator.py`（8 项）。
