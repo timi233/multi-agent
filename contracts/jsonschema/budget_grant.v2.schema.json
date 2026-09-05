@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pi.local/contracts/jsonschema/budget_grant/v2",
+  "title": "BudgetGrant v2（Gateway 预算 Grant + 链式消费 Journal，蓝图 §18.2/§18.3）",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "contractId": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{32}$",
+      "description": "确定性 ID（sha256 前缀）"
+    },
+    "contractVersion": { "const": "2" },
+    "workloadIdentity": { "const": "pi.gate" },
+    "grantId": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+    "taskId": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+    "attemptId": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+    "totalBudgetTokens": { "type": "integer", "minimum": 0 },
+    "consumedTokens": { "type": "integer", "minimum": 0 },
+    "status": { "type": "string", "enum": ["ACTIVE", "EXHAUSTED", "SETTLED"] },
+    "journal": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "seq": { "type": "integer", "minimum": 1 },
+          "entryType": { "type": "string", "enum": ["RESERVED", "SENT", "SETTLED", "FAILED", "UNKNOWN"] },
+          "invocationId": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+          "requestDigest": { "type": ["string", "null"], "pattern": "^[a-f0-9]{32}$" },
+          "reservedTokens": { "type": "integer", "minimum": 0 },
+          "actualTokens": { "type": ["integer", "null"], "minimum": 0 },
+          "previousEntryDigest": { "type": "string", "pattern": "^(pi-budget-root-v1|[a-f0-9]{64})$" },
+          "entryDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+        },
+        "required": ["seq", "entryType", "invocationId", "reservedTokens", "previousEntryDigest", "entryDigest"]
+      }
+    },
+    "createdAt": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$" },
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "objectType": { "const": "budget_grant" },
+        "schemaVersion": { "const": "2" },
+        "signatureAlgorithm": { "const": "Ed25519" },
+        "keyId": { "type": "string", "minLength": 1 },
+        "issuer": { "type": "string", "minLength": 1 },
+        "issuerWorkloadIdentity": { "const": "pi.gate" },
+        "audience": { "type": "string" },
+        "controlPlaneEpoch": { "type": "integer", "minimum": 0 },
+        "signedAt": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T" },
+        "payloadDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "value": { "type": "string", "pattern": "^[A-Za-z0-9+/]{86}==$" }
+      },
+      "required": [
+        "objectType", "schemaVersion", "signatureAlgorithm", "keyId",
+        "issuer", "issuerWorkloadIdentity", "audience", "controlPlaneEpoch",
+        "signedAt", "payloadDigest", "value"
+      ]
+    }
+  },
+  "required": [
+    "contractId", "contractVersion", "workloadIdentity", "grantId", "taskId",
+    "attemptId", "totalBudgetTokens", "consumedTokens", "status", "journal",
+    "createdAt"
+  ]
+}

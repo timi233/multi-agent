@@ -49,6 +49,12 @@
 - 语义：引擎事实基线（工具集/模型路由/资源默认参数/隔离边界/已知差距）；**进程内缓存生成一次**（缓存幂等且返回 deepcopy，外部不污染内部事实；`generatedAt` 固定）；`contractId = sha256(JCS(核心事实，不含 generatedAt))[:32]` 复用项目 canonical（jcs）、事实/集合顺序变化即变；签名信封复用 Phase 0 codec（蓝图 §9.4 十字段），**`signature.value` 为真实 Ed25519 签名**——私钥持久化于 `data/keys/runtime_ed25519.pem`（data/ 已排除 git、权限 600），`keyId`=公钥指纹（跨重启稳定），验签用 `app.security.keys.verify`；工具集为集合数组（canonicalSortKeys by=name），供准入/Gateway 身份绑定引用。
 - RT-xx 对照（差距已入报告 `knownGaps`，随实现移除）：RT-01 无沙箱故不适用（进程启动正常）；RT-02/03/04/05/07 未达（沙箱/管道/驱动幂等）；RT-06 真实模型链路可跑但证据无 RouteAttestation；RT-08 未达。另含 GW-08（撤销新鲜度）、GW-10（热路径 PG）两项。
 
+## 预算契约 budget_grant v2（② 契约对象扩展）
+
+- 产物：`contracts/jsonschema/budget_grant.v2.{schema,digestprofile}.json`、`scripts/gen_budget_vectors.py`（10 向量：空 journal/链式全生命周期/FAILED 释放/UNKNOWN/pos-signed + 5 负例）、`scripts/verify_vectors_node.js` 已含该对象、`tests/test_budget_contract.py`（7 项）。
+- 语义：Grant 声明（grantId/taskId/attemptId/totalBudgetTokens/consumedTokens/status）+ 链式消费 Journal（RESERVED/SENT/SETTLED/FAILED/UNKNOWN，`previousEntryDigest/entryDigest`、首条根锚 `pi-budget-root-v1`）；journal 为**有序语义**声明 `orderedArrays`（与 canonicalSortKeys 互斥，profile 一致性强制），乱序 journal digest 变化。
+- 双实现：Node 参考实现逐字节一致（CT-01 PASS，15 正向量 0 不一致）；digest 算法与 `app/runtime/budget._entry_digest` 同构（sha256 hex 链）。
+
 ## Gateway 预算与 Journal（蓝图 §18.2/§18.3、手册 GW-xx）
 
 - 产物：`migrations/002_gateway_budget.sql`（`gw_budget_grants` + `gw_journal` 链式表）、`app/runtime/budget.py`（`BudgetDomain`）、`tests/test_budget.py`（15 项）。

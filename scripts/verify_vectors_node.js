@@ -13,6 +13,7 @@ const OBJECTS = [
   ['attempt_contract', 'attempt_contract'],
   ['task_spec', 'task_spec'],
   ['event_envelope', 'event_envelope'],
+  ['budget_grant', 'budget_grant'],
 ];
 
 let checked = 0;

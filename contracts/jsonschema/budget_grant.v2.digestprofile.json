@@ -1,0 +1,23 @@
+{
+  "$id": "https://pi.local/contracts/jsonschema/budget_grant/v2/digestprofile",
+  "schemaVersion": "2",
+  "objectType": "budget_grant",
+  "digestAlgorithm": "sha256",
+  "canonicalEncoding": "RFC8785-JCS-lite",
+  "immutablePayloadPointers": [
+    "/contractId",
+    "/contractVersion",
+    "/workloadIdentity",
+    "/grantId",
+    "/taskId",
+    "/attemptId",
+    "/totalBudgetTokens",
+    "/consumedTokens",
+    "/status",
+    "/journal",
+    "/createdAt"
+  ],
+  "orderedArrays": ["/journal"],
+  "signatureEnvelopePointers": ["/signature"],
+  "notes": "BudgetGrant：Gateway 预算 Grant 声明 + 链式消费 Journal。journal 为**有序语义**（previousEntryDigest/entryDigest 链式追加，顺序不可重排），声明 orderedArrays（与 canonicalSortKeys 互斥，profile 一致性校验强制）——JCS 不替数组排序，投影按原序。signature 为蓝图 §9.4 十字段信封（value=Ed25519 64 字节 Base64）。"
+}
