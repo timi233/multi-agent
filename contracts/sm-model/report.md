@@ -5,23 +5,23 @@
 
 ## Task
 
-- [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>)（—）
-- [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>)（—）
-- [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>)（—）
-- [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>)（SM-08 Task 差距: QUEUED->RUNNING 事件(ATTEMPT_STARTED)跨事务——领取事务不写事件；attempt/事件在后续初始化事务（worker._run_task 153-160））
-- [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>)（（无声明枚举，跳过审计））
+- [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>, warnings: 'list[str]' = <factory>)
+- [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>, warnings: 'list[str]' = <factory>)
+- [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>, warnings: 'list[str]' = <factory>)
+- [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>, warnings: 'list[str]' = <factory>)  ⚠ 1 项差距: SM-08 已知差距: Task QUEUED->RUNNING 事件(ATTEMPT_STARTED)跨事务——领取事务不写事件；attempt/事件在后续初始化事务（worker._run_task 153-160）
+- [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>, warnings: 'list[str]' = <factory>)（（无声明枚举，跳过审计））
 
 ## Attempt
 
-- [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>)（—）
-- [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>)（—）
-- [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>)（—）
-- [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>)（—）
-- [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>)（死枚举: RUNNING, FAILED）
+- [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>, warnings: 'list[str]' = <factory>)
+- [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>, warnings: 'list[str]' = <factory>)
+- [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>, warnings: 'list[str]' = <factory>)
+- [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>, warnings: 'list[str]' = <factory>)
+- [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>, warnings: 'list[str]' = <factory>)（死枚举: RUNNING, FAILED）
 
 ## 结论
 
-**PASS**（`all_ok=True`）
+**PASS**（违规 0 项；已知差距 1 项，不计入通过判定）
 
 ## 实现差距注记（记录，不阻塞）
 

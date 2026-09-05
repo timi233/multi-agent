@@ -22,6 +22,7 @@
     "/operationIdempotencyKey",
     "/payload"
   ],
+  "selfDigestPointer": "/payloadDigest",
   "optionalImmutablePointers": [
     "/trace/traceId",
     "/trace/spanId",

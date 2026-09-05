@@ -135,6 +135,42 @@ def load_digest_profile(object_type: str, schema_version: str) -> dict:
     return profile
 
 
+def validate_profile_consistency(schema: dict, profile: dict) -> list[str]:
+    """校验 DigestProfile 与 Schema 一致（评审 fix-9）：optionalImmutablePointers
+    必须在 Schema properties 中真实存在且非 required（父对象 required 不含叶名）。"""
+    problems: list[str] = []
+
+    def schema_at(pointer: str):
+        node = schema
+        for part in pointer.lstrip("/").split("/"):
+            props = node.get("properties") if isinstance(node, dict) else None
+            if not isinstance(props, dict) or part not in props:
+                return None
+            node = props[part]
+        return node
+
+    def parent_schema(pointer: str):
+        parts = pointer.lstrip("/").split("/")
+        leaf = parts[-1]
+        node = schema
+        for part in parts[:-1]:
+            props = node.get("properties") if isinstance(node, dict) else None
+            if not isinstance(props, dict) or part not in props:
+                return None
+            node = props[part]
+        return node, leaf
+
+    for p in profile.get("optionalImmutablePointers") or []:
+        if schema_at(p) is None:
+            problems.append(f"optional pointer 在 Schema 中不存在: {p}")
+            continue
+        parent, leaf = parent_schema(p)
+        req = parent.get("required") if isinstance(parent, dict) else None
+        if isinstance(req, list) and leaf in req:
+            problems.append(f"optional pointer 实为 Schema 必需字段（不可选）: {p}")
+    return problems
+
+
 def canonical_payload(obj: dict, profile: dict) -> bytes:
     """按 DigestProfile.immutablePayloadPointers 白名单投影生成 canonicalPayload 字节。
 
@@ -205,12 +241,36 @@ SIGNATURE_ENVELOPE_KEYS = (
 
 def build_signature_envelope(obj: dict, schema: dict, profile: dict,
                              meta: dict) -> tuple[dict, bytes, str]:
-    """原子签名信封构造（fail closed，评审 fix-1）：Schema 校验 → 重算
-    payloadDigest → 组装蓝图 §9.4 十字段信封 → 签名输入。
+    """原子签名信封构造（fail closed，评审 fix-1/fix-8）：
+    Schema 校验 → 重算 payloadDigest → 组装蓝图 §9.4 十字段信封 → 签名输入。
 
-    信封内的 payloadDigest 必然来自本对象重算，杜绝为无关对象/伪造 digest 签名。
+    强制约束：
+    - meta.objectType / meta.schemaVersion 必须等于 profile 的对象类型/版本
+      （防止为错误对象域构造签名）；
+    - 若 profile 声明 selfDigestPointer（对象顶层含 payloadDigest 派生字段，
+      如事件信封），其值必须等于重算结果（防止自指 digest 冲突/不一致对象被签）。
+    信封内的 payloadDigest 必然来自本对象重算，杜绝伪造 digest 签名。
     返回 (envelope, signature_input_bytes, payload_digest_str)。"""
+    if meta.get("objectType") != profile.get("objectType"):
+        raise ContractError(
+            f"signature envelope objectType mismatch: "
+            f"{meta.get('objectType')} != {profile.get('objectType')}")
+    if meta.get("schemaVersion") != str(profile.get("schemaVersion")):
+        raise ContractError(
+            f"signature envelope schemaVersion mismatch: "
+            f"{meta.get('schemaVersion')} != {profile.get('schemaVersion')}")
     digest = verified_payload_digest(obj, schema, profile)
+    self_ptr = profile.get("selfDigestPointer")
+    if self_ptr:
+        try:
+            self_digest = _resolve_pointer(obj, self_ptr)
+        except ContractError:
+            raise ContractError(
+                f"selfDigestPointer {self_ptr} missing in object")
+        if self_digest != digest:
+            raise ContractError(
+                f"self-digest mismatch at {self_ptr}: object={self_digest}, "
+                f"recomputed={digest}")
     missing = [k for k in SIGNATURE_ENVELOPE_KEYS if k not in meta]
     if missing:
         raise ContractError(f"signature envelope meta missing fields: {missing}")

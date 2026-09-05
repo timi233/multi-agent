@@ -7,6 +7,7 @@
 import base64
 import json
 import sys
+import os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -20,6 +21,8 @@ from app.contracts.codec import (  # noqa: E402
 )
 
 OUT = ROOT / "contracts" / "test-vectors"
+if os.environ.get("PI_VEC_OUT"):  # 可复现性测试：覆盖输出目录
+    OUT = Path(os.environ["PI_VEC_OUT"])
 
 D64 = "sha256:" + "0" * 64
 TID = "0123456789abcdef"

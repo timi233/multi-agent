@@ -7,6 +7,7 @@
    object, canonicalPayloadB64, payloadDigest, signatureInputB64,
    invalidReason?}
 """
+import os
 import base64
 import json
 import sys
@@ -26,6 +27,8 @@ from app.contracts.codec import (
 )
 
 OUT = Path(__file__).resolve().parent.parent / "contracts" / "test-vectors" / "attempt_contract" / "v2"
+if os.environ.get("PI_VEC_OUT"):  # 可复现性测试：覆盖输出目录
+    OUT = Path(os.environ["PI_VEC_OUT"])
 SCHEMA = load_schema("attempt_contract", "2")
 PROFILE = load_digest_profile("attempt_contract", "2")
 VALIDATOR = Draft202012Validator(SCHEMA)

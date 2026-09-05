@@ -78,6 +78,7 @@ DEADLINE_POLICY = {
 class CheckResult:
     ok: bool
     findings: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)  # 已知差距（不判违规，但计入报告）
 
 
 def check_sm01_whitelist(machine: StateMachine, use_real: bool) -> CheckResult:
@@ -139,8 +140,8 @@ def check_sm08_event_binding(machine: StateMachine, event_points: dict) -> Check
     """转移与事件写入的事务绑定（SM-08 精神；蓝图为 TransitionRecorded.v2）。
 
     event_points: {转移: {"event": 事件名, "sameTxn": bool, "note": ...}}
-    规则：终态出口转移必须与事件同事务（fail）；非终态转移跨事务记录为差距
-    （不判失败，避免假 PASS —— 评审 fix-7）。"""
+    规则：终态出口转移必须与事件同事务（violation, ok=False）；非终态转移
+    跨事务为已知差距（warning，不并入 PASS——评审 fix-7/fix-10）。"""
     r = CheckResult(True)
     for old, outs in machine.transitions.items():
         for out in outs:
@@ -155,8 +156,9 @@ def check_sm08_event_binding(machine: StateMachine, event_points: dict) -> Check
                 r.findings.append(
                     f"SM-08 {machine.name} 终态转移 {key} 事件({spec['event']})必须同事务")
             elif not spec["sameTxn"]:
-                r.findings.append(
-                    f"SM-08 {machine.name} 差距: {key} 事件({spec['event']})跨事务——{spec.get('note', '')}")
+                r.warnings.append(
+                    f"SM-08 已知差距: {machine.name} {key} 事件({spec['event']})"
+                    f"跨事务——{spec.get('note', '')}")
     return r
 
 
@@ -204,7 +206,12 @@ def run_all() -> dict:
 
 
 def all_ok(results: dict) -> bool:
+    """无违规（violation-free）；已知差距放入 warnings，不计入 ok。"""
     return all(c.ok for checks in results.values() for c in checks)
+
+
+def count_warnings(results: dict) -> int:
+    return sum(len(c.warnings) for checks in results.values() for c in checks)
 
 
 if __name__ == "__main__":
@@ -218,10 +225,18 @@ if __name__ == "__main__":
         for i, c in enumerate(checks, 1):
             tag = "PASS" if c.ok else "FAIL"
             detail = "; ".join(c.findings) if c.findings else "—"
-            lines.append(f"- [{tag}] {c.__doc__ or 'detail'}（{detail}）")
+            line = f"- [{tag}] {c.__doc__ or 'detail'}"
+            if c.findings:
+                line += f"（{detail}）"
+            if c.warnings:
+                line += f"  ⚠ {len(c.warnings)} 项差距: {'; '.join(c.warnings)}"
+            lines.append(line)
         lines.append("")
     ok = all_ok(results)
-    lines.append(f"## 结论\n\n**{'PASS' if ok else 'FAIL'}**（`all_ok={ok}`）\n")
+    n_warn = count_warnings(results)
+    verdict = "PASS" if ok else "FAIL"
+    lines.append(
+        f"## 结论\n\n**{verdict}**（违规 0 项；已知差距 {n_warn} 项，不计入通过判定）\n")
     lines.append("## 实现差距注记（记录，不阻塞）\n")
     lines.append("""- SM-03：StateDeadlinePolicy 出口动作真实存在（用户 `CANCELLED`、worker 失败收敛、启动恢复 `FAILED`/`TERMINAL_REPORTED`），但触发时机为调用/启动时，**无常驻定时器**；运行时 deadline 定时留待调度/Gateway 预算层（蓝图 Gateway Journal/Budget）。
 - Attempt 声明枚举 `RUNNING`/`FAILED` 为死枚举（`migrations/001_init.sql` 注释声明，worker 从未使用）；审计基线固化于 `tests/test_sm_model.py::test_dead_enum_audit_attempt`。对齐蓝图 Attempt 状态矩阵（CLAIMED/RUNNING/…/TERMINAL_REPORTED）时需扩充迁移点。
@@ -233,6 +248,9 @@ if __name__ == "__main__":
     for name, checks in results.items():
         print(f"== {name} ==")
         for c in checks:
-            print(f"  {'PASS' if c.ok else 'FAIL'}: {'; '.join(c.findings) if c.findings else '—'}")
-    print("\n总体:", "PASS" if ok else "FAIL")
+            tag = "PASS" if c.ok else "FAIL"
+            detail = "; ".join(c.findings) if c.findings else ""
+            warn = "; ".join(c.warnings)
+            print(f"  {tag}: {detail}" + (f"  ⚠ {warn}" if warn else ""))
+    print("\n总体:", "PASS" if ok else "FAIL", f"（已知差距 {count_warnings(results)} 项）")
     print("报告已写入:", out_dir / "report.md")

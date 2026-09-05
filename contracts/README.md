@@ -40,8 +40,8 @@
 
 - 模型与检查器：`scripts/sm_model.py`（Task 白名单直接取自 `app/control/lifecycle.py`；Attempt 模型从 `app/worker.py` 条件 UPDATE 提取）；报告 `contracts/sm-model/report.md`（可复现）。
 - 固化断言：`tests/test_sm_model.py`（11 项）。
-- 结果：SM-01 白名单穷举（25 对 + 套件全查）PASS；SM-02 终态闭合 PASS；SM-03 每个可达非终态存在 StateDeadlinePolicy 出口且在白名单内 PASS；SM-08 转移-事件同事务绑定 PASS；死枚举审计：Attempt `RUNNING`/`FAILED` 为声明未用（基线固化）。
-- 差距注记：deadline 出口触发为非定时（调用/启动收敛），运行时时限留待 Gateway 预算层。
+- 结果：**无违规**。SM-01 白名单穷举（25 对 + 套件全查）PASS；SM-02 终态闭合 PASS；SM-03 每个可达非终态存在 StateDeadlinePolicy 出口且在白名单内 PASS；SM-08 终态转移事件同事务 PASS；死枚举审计：Attempt `RUNNING`/`FAILED` 为声明未用（基线固化）。
+- 已知差距（不并入通过判定）：SM-08 `Task QUEUED->RUNNING` 的事件（`ATTEMPT_STARTED`）在后续初始化事务写入，跨事务（1 项，`tests/test_sm_model.py::test_run_all_ok` 锁定）；运行时 deadline 定时留待 Gateway 预算层。
 
 ## 已知边界（记录，不视为缺陷）
 

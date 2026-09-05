@@ -7,6 +7,7 @@
 - 正例：对象带签名信封后 schema 合法、payloadDigest 不变
 - 失败向量：篡改 payload/algorithm/keyId/issuer/signedAt/audience/epoch
 """
+import os
 import base64
 import json
 import subprocess
@@ -29,6 +30,8 @@ from app.contracts.codec import (
 ROOT = Path(__file__).resolve().parent.parent
 KEY_DIR = ROOT / "deploy" / "keys"
 OUT = ROOT / "contracts" / "test-vectors" / "attempt_contract" / "v2"
+if os.environ.get("PI_VEC_OUT"):  # 可复现性测试：覆盖输出目录
+    OUT = Path(os.environ["PI_VEC_OUT"])
 SCHEMA = load_schema("attempt_contract", "2")
 PROFILE = load_digest_profile("attempt_contract", "2")
 VALIDATOR = Draft202012Validator(SCHEMA)

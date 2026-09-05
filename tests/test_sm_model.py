@@ -17,6 +17,7 @@ from scripts.sm_model import (
     check_sm01_whitelist,
     check_sm02_terminal_closed,
     check_sm03_deadline,
+    count_warnings,
     run_all,
 )
 from app.control.lifecycle import InvalidTransition, assert_transition
@@ -83,8 +84,14 @@ def test_dead_enum_audit_attempt():
 
 
 def test_run_all_ok():
-    """全套模型检查必须全绿（SM-01/02/03 + SM-08 事件绑定 + 死枚举审计）。"""
+    """全套模型检查必须无违规（SM-01/02/03 + SM-08 事件绑定 + 死枚举审计）。
+
+    已知差距（不并入通过判定）必须稳定：Task QUEUED->RUNNING 跨事务事件（1 项）。
+    """
     results = run_all()
     assert all_ok(results)
+    assert count_warnings(results) == 1, "已知差距数量漂移（应为 QUEUED->RUNNING 跨事务 1 项）"
+    all_warns = [w for checks in results.values() for c in checks for w in c.warnings]
+    assert any("QUEUED->RUNNING" in w for w in all_warns)
     # 断言检查数量：Task 5 项（SM01/02/03/SM08/枚举审计），Attempt 5 项
     assert len(results["Task"]) == 5 and len(results["Attempt"]) == 5
