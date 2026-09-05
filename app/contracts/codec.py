@@ -252,7 +252,8 @@ def validate_signature_envelope(env: dict) -> None:
         raise ContractError("signature envelope audience must be string or null")
     if not isinstance(env.get("schemaVersion"), (str, int)):
         raise ContractError("signature envelope schemaVersion invalid")
-    if not isinstance(env.get("controlPlaneEpoch"), int) or env["controlPlaneEpoch"] < 0:
+    if isinstance(env.get("controlPlaneEpoch"), bool) or \
+            not isinstance(env.get("controlPlaneEpoch"), int) or env["controlPlaneEpoch"] < 0:
         raise ContractError("signature envelope controlPlaneEpoch must be int >= 0")
     if not isinstance(env.get("signedAt"), str) or \
             not re.match(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T", env.get("signedAt", "")):
@@ -305,5 +306,17 @@ def build_signature_envelope(obj: dict, schema: dict, profile: dict,
         raise ContractError(f"signature envelope meta missing fields: {missing}")
     envelope = {k: meta[k] for k in SIGNATURE_ENVELOPE_KEYS}
     envelope["payloadDigest"] = digest
+    # 重复安全字段绑定（评审 nit-2）：对象内与签名信封共有的字段必须一致
+    # （如事件信封顶层 controlPlaneEpoch == 签名信封 controlPlaneEpoch）
+    dup = profile.get("duplicateConsistencyPointers") or {}
+    for obj_ptr, env_key in dup.items():
+        try:
+            obj_val = _resolve_pointer(obj, obj_ptr)
+        except ContractError:
+            continue  # 对象无该可选字段则跳过
+        if obj_val != envelope.get(env_key):
+            raise ContractError(
+                f"duplicate field mismatch: object {obj_ptr}={obj_val} != "
+                f"signature envelope {env_key}={envelope.get(env_key)}")
     validate_signature_envelope(envelope)
     return envelope, signature_input(b"", envelope), digest

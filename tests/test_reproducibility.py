@@ -119,9 +119,29 @@ def test_build_envelope_rejects_bad_field_values():
     with pytest.raises(ContractError):
         build_signature_envelope(obj, schema, profile, {**meta, "controlPlaneEpoch": -1})
     with pytest.raises(ContractError):
+        build_signature_envelope(obj, schema, profile, {**meta, "controlPlaneEpoch": True})  # bool 不算 int
+    with pytest.raises(ContractError):
         build_signature_envelope(obj, schema, profile, {**meta, "keyId": ""})
     with pytest.raises(ContractError):
         build_signature_envelope(obj, schema, profile, {**meta, "signedAt": "not-a-time"})
+
+
+def test_build_envelope_rejects_duplicate_epoch_mismatch():
+    """事件信封：顶层 controlPlaneEpoch 与签名信封不一致必须拒绝（评审 nit-2）。"""
+    schema = load_schema("event_envelope", "2")
+    profile = load_digest_profile("event_envelope", "2")
+    data = json.loads((VEC / "event_envelope" / "v2" / "vectors.json").read_text(encoding="utf-8"))
+    obj = next(v for v in data["vectors"] if v["id"] == "pos-task-event")["object"]
+    meta = {"objectType": "event_envelope", "schemaVersion": "2",
+            "signatureAlgorithm": "Ed25519", "keyId": "sk-attempt",
+            "issuer": "evidence-service", "issuerWorkloadIdentity": "pi.evidence",
+            "audience": None, "controlPlaneEpoch": obj["controlPlaneEpoch"],
+            "signedAt": "2026-09-05T08:01:00Z"}
+    # 一致：可构造
+    build_signature_envelope(obj, schema, profile, meta)
+    # 不一致：拒绝
+    with pytest.raises(ContractError, match="duplicate field mismatch"):
+        build_signature_envelope(obj, schema, profile, {**meta, "controlPlaneEpoch": 41})
 
 
 @pytest.mark.parametrize("object_type", ["attempt_contract", "task_spec",

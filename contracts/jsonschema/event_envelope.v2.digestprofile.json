@@ -23,6 +23,9 @@
     "/payload"
   ],
   "selfDigestPointer": "/payloadDigest",
+  "duplicateConsistencyPointers": {
+    "/controlPlaneEpoch": "controlPlaneEpoch"
+  },
   "optionalImmutablePointers": [
     "/trace/traceId",
     "/trace/spanId",
