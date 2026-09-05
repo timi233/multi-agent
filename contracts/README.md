@@ -43,6 +43,12 @@
 - 结果：**无违规**。SM-01 白名单穷举（25 对 + 套件全查）PASS；SM-02 终态闭合 PASS；SM-03 每个可达非终态存在 StateDeadlinePolicy 出口且在白名单内 PASS；SM-08 终态转移事件同事务 PASS；死枚举审计：Attempt `RUNNING`/`FAILED` 为声明未用（基线固化）。
 - 已知差距（不并入通过判定）：SM-08 `Task QUEUED->RUNNING` 的事件（`ATTEMPT_STARTED`）在后续初始化事务写入，跨事务（1 项，`tests/test_sm_model.py::test_run_all_ok` 锁定）；运行时 deadline 定时留待 Gateway 预算层。
 
+## 验收基准与故障注入（③，手册 §18.2 Phase 0 门槛如实对照）
+
+- 产物：`scripts/acceptance_report.py`（`--json out.json` 输出结构化对照）、`tests/test_acceptance_report.py`（5 项：结构 + **不虚报约束**——PASS 必须带可定位证据、Phase 0 门槛未越必须如实）、`tests/test_fault_injection.py`（5 项崩溃边界矩阵）。
+- 门槛声明（如实）：Phase 0 `CONTRACT_VALIDATED` **未达**——手册 §18.2 要求 GT + RT-01~06 全 PASS；当前 GT 未实现、RT-01/02/03/04/05 未达、RT-06 部分（链路可跑但无 RouteAttestation）。平台实际可运行（E2E 冒烟），但不得越级声明。
+- 故障注入矩阵（最小可复现子集，对应手册"100 次崩溃"的精神）：预留后 kill 占额保留不恢复（GW-04）；SENT 后 kill 每笔只消费一次（UNIQUE 兜底）；崩溃恢复（recover_stale）结算 Grant 且链完整；aborted 事务回滚一致；UNKNOWN 占额 100% 阻断后续预留（GW-07 侧）。
+
 ## Runtime 能力报告（RT，蓝图 §8.2 六问 / 手册 RT-xx 简化版）
 
 - 产物：`contracts/jsonschema/runtime_capability_report.v2.{schema,digestprofile}.json`、`app/runtime/capabilities.py`、`GET /api/v1/runtime/capabilities`、`tests/test_runtime_capabilities.py`（7 项）。
