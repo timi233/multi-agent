@@ -143,12 +143,12 @@ def _run_task(conn, task_id: str) -> None:
             _emit_event(conn, task_id, attempt_id, "ATTEMPT_STARTED",
                         {"traceId": trace_id, "model": task["model"]})
         conn.commit()
-    except Exception as exc:  # 初始化失败：独立连接补偿，不悬挂
-        _fail_task_isolated(task_id, f"INIT: {type(exc).__name__}: {exc}", attempt_id)
+    except Exception as exc:  # 初始化失败：先释放已持锁再独立连接补偿，不悬挂
         try:
             conn.rollback()
         except Exception:
             pass
+        _fail_task_isolated(task_id, f"INIT: {type(exc).__name__}: {exc}", attempt_id)
         return
 
     try:
@@ -189,12 +189,12 @@ def _run_task(conn, task_id: str) -> None:
                 _converge_attempt(conn, task_id, attempt_id, task_state,
                                   note="completed-late-after-state-change")
                 conn.commit()
-    except Exception as exc:  # 平台层兜底：独立连接统一收敛，不悬挂
-        _fail_task_isolated(task_id, f"{type(exc).__name__}: {exc}", attempt_id)
+    except Exception as exc:  # 平台层兜底：先 rollback 释放行锁，再独立连接统一收敛（防自阻塞）
         try:
             conn.rollback()
         except Exception:
             pass
+        _fail_task_isolated(task_id, f"{type(exc).__name__}: {exc}", attempt_id)
 
 
 class Worker:

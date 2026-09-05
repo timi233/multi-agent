@@ -196,6 +196,59 @@ def test_fail_isolated_skips_cancelled():
     execute("DELETE FROM pi_tasks WHERE id=%s", (tid,))
 
 
+def test_worker_aborted_terminal_tx_converges(monkeypatch):
+    """终态事务中途失败（ATTEMPT_FINISHED 事件写入抛错，事务已持行锁）：
+    先 rollback 释放锁再独立收敛，_run_task 必须返回且任务最终 FAILED（不悬挂不死锁）。"""
+    import threading
+    import uuid
+
+    from app.db import connect, execute
+    from app import worker as worker_mod
+
+    tid = uuid.uuid4().hex[:16]
+    execute(
+        "INSERT INTO pi_tasks (id, title, prompt, workspace, status, model) "
+        "VALUES (%s,'aborted','prompt',%s,'RUNNING','m')",
+        (tid, f"task-{tid}"),
+    )
+    orig_emit = worker_mod._emit_event
+
+    def fake_emit(conn, task_id, attempt_id, event_type, payload):
+        if event_type == "ATTEMPT_FINISHED":
+            raise RuntimeError("simulated event write failure")
+        return orig_emit(conn, task_id, attempt_id, event_type, payload)
+
+    monkeypatch.setattr(worker_mod, "_emit_event", fake_emit)
+    monkeypatch.setattr(
+        "app.runtime.agent.run_attempt",
+        lambda **kw: (True, "ok", None),
+    )
+
+    done = threading.Event()
+    result = {}
+
+    def run():
+        conn = connect()
+        try:
+            worker_mod._run_task(conn, tid)
+            result["returned"] = True
+        finally:
+            conn.close()
+            done.set()
+
+    t = threading.Thread(target=run)
+    t.start()
+    assert done.wait(timeout=15), "_run_task 未在 15s 内返回（疑似行锁自阻塞）"
+    t.join(timeout=5)
+    assert result.get("returned") is True
+    row = execute("SELECT status, error FROM pi_tasks WHERE id=%s", (tid,))[0]
+    assert row["status"] == "FAILED", f"任务应收敛为 FAILED，实际 {row['status']}"
+    assert "simulated event write failure" in (row["error"] or "")
+    execute("DELETE FROM pi_events WHERE task_id=%s", (tid,))
+    execute("DELETE FROM pi_attempts WHERE task_id=%s", (tid,))
+    execute("DELETE FROM pi_tasks WHERE id=%s", (tid,))
+
+
 def test_worker_capacity_limits_claim(monkeypatch):
     """容量控制：线程池满时不再领取（不会把所有 QUEUED 标 RUNNING）。"""
     import uuid
