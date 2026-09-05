@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pi.local/contracts/jsonschema/attempt_contract/v2",
+  "title": "AttemptContract v2（Phase 0 契约基线）",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "contractId": { "type": "string", "pattern": "^[a-f0-9]{32}$", "description": "sha256 前缀的确定性 ID" },
+    "contractVersion": { "const": "2" },
+    "workloadIdentity": { "type": "string", "enum": ["pi.attempt", "pi.node", "pi.gate"] },
+    "taskId": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+    "attemptNumber": { "type": "integer", "minimum": 1 },
+    "sourceBundleDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "provider": { "type": "string", "enum": ["cliproxy-local"] },
+        "name": { "type": "string", "minLength": 1 },
+        "thinking": { "type": "string", "enum": ["off", "low", "medium", "high"] }
+      },
+      "required": ["provider", "name"]
+    },
+    "resourceLimits": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "maxTurns": { "type": "integer", "minimum": 1, "maximum": 200 },
+        "commandTimeoutSeconds": { "type": "integer", "minimum": 5, "maximum": 3600 },
+        "maxOutputBytes": { "type": "integer", "minimum": 1024, "maximum": 1048576 }
+      },
+      "required": ["maxTurns", "commandTimeoutSeconds", "maxOutputBytes"]
+    },
+    "workspaceConstraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": { "root": { "type": "string", "minLength": 1 } },
+      "required": ["root"]
+    },
+    "toolAllowlist": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["list_dir", "read_file", "write_file", "edit_file", "find_files", "grep", "run_command", "finish"] },
+      "uniqueItems": true,
+      "description": "有序语义数组（元素顺序即声明顺序，JCS 不重新排序）"
+    },
+    "createdAt": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T" },
+    "expiresAt": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T" },
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "algorithm": { "const": "Ed25519" },
+        "keyId": { "type": "string" },
+        "issuer": { "type": "string" },
+        "signedAt": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T" },
+        "value": { "type": "string", "pattern": "^[a-f0-9]{128}$" }
+      },
+      "required": ["algorithm", "keyId", "issuer", "signedAt", "value"]
+    }
+  },
+  "required": [
+    "contractId", "contractVersion", "workloadIdentity", "taskId", "attemptNumber",
+    "sourceBundleDigest", "model", "resourceLimits", "workspaceConstraints",
+    "toolAllowlist", "createdAt", "expiresAt"
+  ]
+}

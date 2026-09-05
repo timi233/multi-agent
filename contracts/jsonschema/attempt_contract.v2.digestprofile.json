@@ -1,0 +1,28 @@
+{
+  "$id": "https://pi.local/contracts/jsonschema/attempt_contract/v2/digestprofile",
+  "schemaVersion": "2",
+  "objectType": "attempt_contract",
+  "digestAlgorithm": "sha256",
+  "canonicalEncoding": "RFC8785-JCS-lite",
+  "immutablePayloadPointers": [
+    "/contractId",
+    "/contractVersion",
+    "/workloadIdentity",
+    "/taskId",
+    "/attemptNumber",
+    "/sourceBundleDigest",
+    "/model/provider",
+    "/model/name",
+    "/model/thinking",
+    "/resourceLimits/maxTurns",
+    "/resourceLimits/commandTimeoutSeconds",
+    "/resourceLimits/maxOutputBytes",
+    "/workspaceConstraints/root",
+    "/toolAllowlist",
+    "/createdAt",
+    "/expiresAt"
+  ],
+  "signatureEnvelopePointers": ["/signature"],
+  "mutableDatabasePointers": ["/rowVersion", "/state", "/updatedAt"],
+  "notes": "canonicalPayload = immutablePayloadPointers 白名单投影（未知字段拒绝于 Schema 层；signature/mutable 字段不进入投影）；payloadDigest = sha256(JCS(canonicalPayload))；toolAllowlist 为有序语义数组，JCS 不重排。"
+}

@@ -1,0 +1,70 @@
+{
+  "objectType": "attempt_contract",
+  "schemaVersion": "2",
+  "signatureInputB64": "eyJhdHRlbXB0TnVtYmVyIjoxLCJjb250cmFjdElkIjoiYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWEiLCJjb250cmFjdFZlcnNpb24iOiIyIiwiY3JlYXRlZEF0IjoiMjAyNi0wOS0wNVQwODowMDowMFoiLCJleHBpcmVzQXQiOiIyMDI2LTA5LTA1VDA5OjAwOjAwWiIsIm1vZGVsL25hbWUiOiJkZWVwc2Vlay12NC1mbGFzaCIsIm1vZGVsL3Byb3ZpZGVyIjoiY2xpcHJveHktbG9jYWwiLCJtb2RlbC90aGlua2luZyI6ImxvdyIsInJlc291cmNlTGltaXRzL2NvbW1hbmRUaW1lb3V0U2Vjb25kcyI6NjAsInJlc291cmNlTGltaXRzL21heE91dHB1dEJ5dGVzIjo2NTUzNiwicmVzb3VyY2VMaW1pdHMvbWF4VHVybnMiOjQwLCJzb3VyY2VCdW5kbGVEaWdlc3QiOiJzaGEyNTY6YmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYiIsInRhc2tJZCI6IjAxMjM0NTY3ODlhYmNkZWYiLCJ0b29sQWxsb3dsaXN0IjpbImxpc3RfZGlyIiwid3JpdGVfZmlsZSIsInJ1bl9jb21tYW5kIiwiZmluaXNoIl0sIndvcmtsb2FkSWRlbnRpdHkiOiJwaS5hdHRlbXB0Iiwid29ya3NwYWNlQ29uc3RyYWludHMvcm9vdCI6IndvcmtzcGFjZXMvdGFzay0wMTIzNDU2Nzg5YWJjZGVmIn0=",
+  "payloadDigest": "sha256:1ccff4687b261805e6b6aa0b260bede82be17194c65cafb55ffdeef6369ba255",
+  "vectors": [
+    {
+      "id": "sig-positive",
+      "kind": "positive",
+      "note": "有效 Ed25519(sk-attempt) 签名；签名信封不改变 payloadDigest",
+      "object": {
+        "contractId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "contractVersion": "2",
+        "workloadIdentity": "pi.attempt",
+        "taskId": "0123456789abcdef",
+        "attemptNumber": 1,
+        "sourceBundleDigest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "model": {
+          "provider": "cliproxy-local",
+          "name": "deepseek-v4-flash",
+          "thinking": "low"
+        },
+        "resourceLimits": {
+          "maxTurns": 40,
+          "commandTimeoutSeconds": 60,
+          "maxOutputBytes": 65536
+        },
+        "workspaceConstraints": {
+          "root": "workspaces/task-0123456789abcdef"
+        },
+        "toolAllowlist": [
+          "list_dir",
+          "write_file",
+          "run_command",
+          "finish"
+        ],
+        "createdAt": "2026-09-05T08:00:00Z",
+        "expiresAt": "2026-09-05T09:00:00Z",
+        "signature": {
+          "algorithm": "Ed25519",
+          "keyId": "sk-attempt",
+          "issuer": "attempt-service",
+          "signedAt": "2026-09-05T08:01:00Z",
+          "value": "ca7a30ba9eaa698bdb85e18a00484d64069a97af43477a03d9d619c5284c9af3e86b636f1e81cce5b3e9d32b7c8e2a2cc0679797bfec8df82e20b3dde5e8ea0b"
+        }
+      },
+      "algorithm": "Ed25519",
+      "keyId": "sk-attempt",
+      "issuer": "attempt-service",
+      "signatureHex": "ca7a30ba9eaa698bdb85e18a00484d64069a97af43477a03d9d619c5284c9af3e86b636f1e81cce5b3e9d32b7c8e2a2cc0679797bfec8df82e20b3dde5e8ea0b",
+      "schemaValid": true,
+      "digestUnchanged": true,
+      "verifyWithSelf": true
+    },
+    {
+      "id": "sig-tampered",
+      "kind": "negative",
+      "note": "篡改签名 1 字节后验证失败",
+      "signatureHex": "1a7a30ba9eaa698bdb85e18a00484d64069a97af43477a03d9d619c5284c9af3e86b636f1e81cce5b3e9d32b7c8e2a2cc0679797bfec8df82e20b3dde5e8ea0b",
+      "verifyWithSelf": false
+    },
+    {
+      "id": "sig-wrong-key",
+      "kind": "negative",
+      "note": "用 sk-node 公钥验证 sk-attempt 的签名（keyId/issuer 不匹配）",
+      "signatureHex": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "verifyWithWrongKey": false
+    }
+  ]
+}
