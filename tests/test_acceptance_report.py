@@ -87,21 +87,28 @@ def test_evidence_paths_exist():
         for ev in e["evidence"]:
             hits = []
             if ev.startswith("GET /"):
-                # API 端点证据：校验其宿主模块存在
-                if (ROOT / "app" / "control" / "api.py").exists():
-                    hits.append("GET /api/... (app/control/api.py)")
+                # API 端点证据：host 模块存在 + 路由文本存在（兼容 prefix 拆分）（评审 nit）
+                api_txt = (ROOT / "app" / "control" / "api.py").read_text(
+                    encoding="utf-8")
+                route = ev.replace("GET ", "").split("?")[0].strip("（）() ")
+                rel = route
+                if route.startswith("/api/v1"):
+                    rel = route[len("/api/v1"):]
+                assert (ROOT / "app" / "control" / "api.py").exists(), \
+                    f"{e['id']} 缺失 host 模块 app/control/api.py"
+                assert rel in api_txt, f"{e['id']} 路由未见: {route}"
+                hits.append(f"GET {route}")
                 continue
             for m in token_re.finditer(ev):
                 tok = m.group(0).split("（")[0].rstrip(".")
-                if "*" in tok:
+                if "*" in tok:  # glob：校验前缀目录存在
                     base = tok.split("*")[0]
-                    if (ROOT / base).exists():
-                        hits.append(base)
-                    continue
-                cur = ROOT / tok
-                while not cur.exists() and cur != ROOT:
-                    cur = cur.parent
-                if cur != ROOT:
+                    assert (ROOT / base).exists(), \
+                        f"{e['id']} 证据 glob 前缀不存在: {base}"
+                    hits.append(base)
+                else:  # 具体文件：必须完整存在（评审 nit：不回退父目录）
+                    assert (ROOT / tok).exists(), \
+                        f"{e['id']} 证据路径不存在: {tok}"
                     hits.append(tok)
             assert hits, f"{e['id']} 证据无真实路径: {ev}"
 

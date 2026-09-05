@@ -39,7 +39,7 @@ ENTRIES: list[dict] = [
      "phase": "Phase 0", "status": "PARTIAL",
      "evidence": ["scripts/gen_signature_vectors.py", "scripts/gen_budget_vectors.py（pos-signed 真实 Ed25519）",
                   "tests/test_runtime_capabilities.py / test_budget_contract.py（验签真/伪）"],
-     "note": "已覆盖 4 类对象（attempt_contract/task_spec/event_envelope/budget_grant+runtime_capability_report）；"
+     "note": "已覆盖 5 类对象（attempt_contract/task_spec/event_envelope/budget_grant/runtime_capability_report）；"
              "蓝图 §9.4 完整清单（node_state/execution_lease/route_attestation/commit_intent 等）未覆盖——如实 PARTIAL"},
     {"id": "CT-08", "label": "事件信封 if/then 约束（Attempt/Run/Artifact/Evidence/Budget vs Task）",
      "phase": "Phase 0", "status": "PASS",
