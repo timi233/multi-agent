@@ -30,7 +30,7 @@
         },
         "controlPlaneEpoch": 42,
         "operationIdempotencyKey": "task-submit:0123456789abcdef",
-        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "payloadDigest": "sha256:5482bb87457d6eaf467ae8ddfc4fb99c7cba4294fbe016e52c0670b510f372f1",
         "payload": {
           "taskSpecDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
         }
@@ -67,7 +67,7 @@
         },
         "controlPlaneEpoch": 42,
         "operationIdempotencyKey": "attempt-claim:0123456789abcdef:1",
-        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "payloadDigest": "sha256:26e854cfdc6568afe5ea68beb2aebe9a97d9c5f17c2882a1ae9f2754e0a3dce7",
         "payload": {
           "taskSpecDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
         }

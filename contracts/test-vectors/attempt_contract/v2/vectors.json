@@ -8,6 +8,7 @@
       "kind": "positive",
       "expectedSchemaValid": true,
       "note": "合法最小对象（无 signature）",
+      "expectedError": null,
       "object": {
         "contractId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "contractVersion": "2",
@@ -40,13 +41,14 @@
       "calculateOnLoad": true,
       "canonicalPayloadB64": "eyJhdHRlbXB0TnVtYmVyIjoxLCJjb250cmFjdElkIjoiYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWEiLCJjb250cmFjdFZlcnNpb24iOiIyIiwiY3JlYXRlZEF0IjoiMjAyNi0wOS0wNVQwODowMDowMFoiLCJleHBpcmVzQXQiOiIyMDI2LTA5LTA1VDA5OjAwOjAwWiIsIm1vZGVsL25hbWUiOiJkZWVwc2Vlay12NC1mbGFzaCIsIm1vZGVsL3Byb3ZpZGVyIjoiY2xpcHJveHktbG9jYWwiLCJtb2RlbC90aGlua2luZyI6ImxvdyIsInJlc291cmNlTGltaXRzL2NvbW1hbmRUaW1lb3V0U2Vjb25kcyI6NjAsInJlc291cmNlTGltaXRzL21heE91dHB1dEJ5dGVzIjo2NTUzNiwicmVzb3VyY2VMaW1pdHMvbWF4VHVybnMiOjQwLCJzb3VyY2VCdW5kbGVEaWdlc3QiOiJzaGEyNTY6YmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYiIsInRhc2tJZCI6IjAxMjM0NTY3ODlhYmNkZWYiLCJ0b29sQWxsb3dsaXN0IjpbImxpc3RfZGlyIiwid3JpdGVfZmlsZSIsInJ1bl9jb21tYW5kIiwiZmluaXNoIl0sIndvcmtsb2FkSWRlbnRpdHkiOiJwaS5hdHRlbXB0Iiwid29ya3NwYWNlQ29uc3RyYWludHMvcm9vdCI6IndvcmtzcGFjZXMvdGFzay0wMTIzNDU2Nzg5YWJjZGVmIn0=",
       "payloadDigest": "sha256:1ccff4687b261805e6b6aa0b260bede82be17194c65cafb55ffdeef6369ba255",
-      "signatureInputB64": "eyJhdHRlbXB0TnVtYmVyIjoxLCJjb250cmFjdElkIjoiYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWEiLCJjb250cmFjdFZlcnNpb24iOiIyIiwiY3JlYXRlZEF0IjoiMjAyNi0wOS0wNVQwODowMDowMFoiLCJleHBpcmVzQXQiOiIyMDI2LTA5LTA1VDA5OjAwOjAwWiIsIm1vZGVsL25hbWUiOiJkZWVwc2Vlay12NC1mbGFzaCIsIm1vZGVsL3Byb3ZpZGVyIjoiY2xpcHJveHktbG9jYWwiLCJtb2RlbC90aGlua2luZyI6ImxvdyIsInJlc291cmNlTGltaXRzL2NvbW1hbmRUaW1lb3V0U2Vjb25kcyI6NjAsInJlc291cmNlTGltaXRzL21heE91dHB1dEJ5dGVzIjo2NTUzNiwicmVzb3VyY2VMaW1pdHMvbWF4VHVybnMiOjQwLCJzb3VyY2VCdW5kbGVEaWdlc3QiOiJzaGEyNTY6YmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYiIsInRhc2tJZCI6IjAxMjM0NTY3ODlhYmNkZWYiLCJ0b29sQWxsb3dsaXN0IjpbImxpc3RfZGlyIiwid3JpdGVfZmlsZSIsInJ1bl9jb21tYW5kIiwiZmluaXNoIl0sIndvcmtsb2FkSWRlbnRpdHkiOiJwaS5hdHRlbXB0Iiwid29ya3NwYWNlQ29uc3RyYWludHMvcm9vdCI6IndvcmtzcGFjZXMvdGFzay0wMTIzNDU2Nzg5YWJjZGVmIn0="
+      "signatureInputB64": null
     },
     {
       "id": "pos-signed",
       "kind": "positive",
       "expectedSchemaValid": true,
       "note": "合法对象含 Ed25519 签名信封（蓝图 §9.4 十字段信封）",
+      "expectedError": null,
       "object": {
         "contractId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "contractVersion": "2",
@@ -83,7 +85,7 @@
           "audience": "pi.platform",
           "objectType": "attempt_contract",
           "schemaVersion": "2",
-          "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "payloadDigest": "sha256:1ccff4687b261805e6b6aa0b260bede82be17194c65cafb55ffdeef6369ba255",
           "controlPlaneEpoch": 0,
           "signedAt": "2026-09-05T08:01:00Z",
           "value": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
@@ -92,13 +94,14 @@
       "calculateOnLoad": true,
       "canonicalPayloadB64": "eyJhdHRlbXB0TnVtYmVyIjoxLCJjb250cmFjdElkIjoiYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWEiLCJjb250cmFjdFZlcnNpb24iOiIyIiwiY3JlYXRlZEF0IjoiMjAyNi0wOS0wNVQwODowMDowMFoiLCJleHBpcmVzQXQiOiIyMDI2LTA5LTA1VDA5OjAwOjAwWiIsIm1vZGVsL25hbWUiOiJkZWVwc2Vlay12NC1mbGFzaCIsIm1vZGVsL3Byb3ZpZGVyIjoiY2xpcHJveHktbG9jYWwiLCJtb2RlbC90aGlua2luZyI6ImxvdyIsInJlc291cmNlTGltaXRzL2NvbW1hbmRUaW1lb3V0U2Vjb25kcyI6NjAsInJlc291cmNlTGltaXRzL21heE91dHB1dEJ5dGVzIjo2NTUzNiwicmVzb3VyY2VMaW1pdHMvbWF4VHVybnMiOjQwLCJzb3VyY2VCdW5kbGVEaWdlc3QiOiJzaGEyNTY6YmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYiIsInRhc2tJZCI6IjAxMjM0NTY3ODlhYmNkZWYiLCJ0b29sQWxsb3dsaXN0IjpbImxpc3RfZGlyIiwid3JpdGVfZmlsZSIsInJ1bl9jb21tYW5kIiwiZmluaXNoIl0sIndvcmtsb2FkSWRlbnRpdHkiOiJwaS5hdHRlbXB0Iiwid29ya3NwYWNlQ29uc3RyYWludHMvcm9vdCI6IndvcmtzcGFjZXMvdGFzay0wMTIzNDU2Nzg5YWJjZGVmIn0=",
       "payloadDigest": "sha256:1ccff4687b261805e6b6aa0b260bede82be17194c65cafb55ffdeef6369ba255",
-      "signatureInputB64": "eyJhdHRlbXB0TnVtYmVyIjoxLCJjb250cmFjdElkIjoiYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWEiLCJjb250cmFjdFZlcnNpb24iOiIyIiwiY3JlYXRlZEF0IjoiMjAyNi0wOS0wNVQwODowMDowMFoiLCJleHBpcmVzQXQiOiIyMDI2LTA5LTA1VDA5OjAwOjAwWiIsIm1vZGVsL25hbWUiOiJkZWVwc2Vlay12NC1mbGFzaCIsIm1vZGVsL3Byb3ZpZGVyIjoiY2xpcHJveHktbG9jYWwiLCJtb2RlbC90aGlua2luZyI6ImxvdyIsInJlc291cmNlTGltaXRzL2NvbW1hbmRUaW1lb3V0U2Vjb25kcyI6NjAsInJlc291cmNlTGltaXRzL21heE91dHB1dEJ5dGVzIjo2NTUzNiwicmVzb3VyY2VMaW1pdHMvbWF4VHVybnMiOjQwLCJzb3VyY2VCdW5kbGVEaWdlc3QiOiJzaGEyNTY6YmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYiIsInRhc2tJZCI6IjAxMjM0NTY3ODlhYmNkZWYiLCJ0b29sQWxsb3dsaXN0IjpbImxpc3RfZGlyIiwid3JpdGVfZmlsZSIsInJ1bl9jb21tYW5kIiwiZmluaXNoIl0sIndvcmtsb2FkSWRlbnRpdHkiOiJwaS5hdHRlbXB0Iiwid29ya3NwYWNlQ29uc3RyYWludHMvcm9vdCI6IndvcmtzcGFjZXMvdGFzay0wMTIzNDU2Nzg5YWJjZGVmIn0="
+      "signatureInputB64": "eyJhdWRpZW5jZSI6InBpLnBsYXRmb3JtIiwiY29udHJvbFBsYW5lRXBvY2giOjAsImlzc3VlciI6ImF0dGVtcHQtc2VydmljZSIsImlzc3Vlcldvcmtsb2FkSWRlbnRpdHkiOiJwaS5hdHRlbXB0Iiwia2V5SWQiOiJzay1hdHRlbXB0Iiwib2JqZWN0VHlwZSI6ImF0dGVtcHRfY29udHJhY3QiLCJwYXlsb2FkRGlnZXN0Ijoic2hhMjU2OjFjY2ZmNDY4N2IyNjE4MDVlNmI2YWEwYjI2MGJlZGU4MmJlMTcxOTRjNjVjYWZiNTVmZmRlZWY2MzY5YmEyNTUiLCJzY2hlbWFWZXJzaW9uIjoiMiIsInNpZ25hdHVyZUFsZ29yaXRobSI6IkVkMjU1MTkiLCJzaWduYXR1cmVDb250ZXh0IjoicGkuY29udHJhY3Quc2lnbmF0dXJlLnYxIiwic2lnbmVkQXQiOiIyMDI2LTA5LTA1VDA4OjAxOjAwWiJ9"
     },
     {
       "id": "pos-unicode",
       "kind": "positive",
       "expectedSchemaValid": true,
       "note": "含非 ASCII（BMP 中文）与非 BMP（emoji）字符串",
+      "expectedError": null,
       "object": {
         "contractId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "contractVersion": "2",
@@ -131,13 +134,14 @@
       "calculateOnLoad": true,
       "canonicalPayloadB64": "eyJhdHRlbXB0TnVtYmVyIjoxLCJjb250cmFjdElkIjoiYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWEiLCJjb250cmFjdFZlcnNpb24iOiIyIiwiY3JlYXRlZEF0IjoiMjAyNi0wOS0wNVQwODowMDowMFoiLCJleHBpcmVzQXQiOiIyMDI2LTA5LTA1VDA5OjAwOjAwWiIsIm1vZGVsL25hbWUiOiJcdTZkNGJcdThiZDVcdTZhMjFcdTU3OGItXHUwM2IxIiwibW9kZWwvcHJvdmlkZXIiOiJjbGlwcm94eS1sb2NhbCIsIm1vZGVsL3RoaW5raW5nIjoibG93IiwicmVzb3VyY2VMaW1pdHMvY29tbWFuZFRpbWVvdXRTZWNvbmRzIjo2MCwicmVzb3VyY2VMaW1pdHMvbWF4T3V0cHV0Qnl0ZXMiOjY1NTM2LCJyZXNvdXJjZUxpbWl0cy9tYXhUdXJucyI6NDAsInNvdXJjZUJ1bmRsZURpZ2VzdCI6InNoYTI1NjpiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiIiwidGFza0lkIjoiMDEyMzQ1Njc4OWFiY2RlZiIsInRvb2xBbGxvd2xpc3QiOlsibGlzdF9kaXIiLCJ3cml0ZV9maWxlIiwicnVuX2NvbW1hbmQiLCJmaW5pc2giXSwid29ya2xvYWRJZGVudGl0eSI6InBpLmF0dGVtcHQiLCJ3b3Jrc3BhY2VDb25zdHJhaW50cy9yb290IjoiXHU1ZGU1XHU0ZjVjXHU1MzNhL1x1NGVmYlx1NTJhMS9lbW9qaVx1ZDgzZFx1ZGU4MCJ9",
       "payloadDigest": "sha256:6cb3a0d782a6e4900e36f4edfd54fa7c51cc5c8d67c1256ebd1614e1c1249f20",
-      "signatureInputB64": "eyJhdHRlbXB0TnVtYmVyIjoxLCJjb250cmFjdElkIjoiYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWEiLCJjb250cmFjdFZlcnNpb24iOiIyIiwiY3JlYXRlZEF0IjoiMjAyNi0wOS0wNVQwODowMDowMFoiLCJleHBpcmVzQXQiOiIyMDI2LTA5LTA1VDA5OjAwOjAwWiIsIm1vZGVsL25hbWUiOiJcdTZkNGJcdThiZDVcdTZhMjFcdTU3OGItXHUwM2IxIiwibW9kZWwvcHJvdmlkZXIiOiJjbGlwcm94eS1sb2NhbCIsIm1vZGVsL3RoaW5raW5nIjoibG93IiwicmVzb3VyY2VMaW1pdHMvY29tbWFuZFRpbWVvdXRTZWNvbmRzIjo2MCwicmVzb3VyY2VMaW1pdHMvbWF4T3V0cHV0Qnl0ZXMiOjY1NTM2LCJyZXNvdXJjZUxpbWl0cy9tYXhUdXJucyI6NDAsInNvdXJjZUJ1bmRsZURpZ2VzdCI6InNoYTI1NjpiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiIiwidGFza0lkIjoiMDEyMzQ1Njc4OWFiY2RlZiIsInRvb2xBbGxvd2xpc3QiOlsibGlzdF9kaXIiLCJ3cml0ZV9maWxlIiwicnVuX2NvbW1hbmQiLCJmaW5pc2giXSwid29ya2xvYWRJZGVudGl0eSI6InBpLmF0dGVtcHQiLCJ3b3Jrc3BhY2VDb25zdHJhaW50cy9yb290IjoiXHU1ZGU1XHU0ZjVjXHU1MzNhL1x1NGVmYlx1NTJhMS9lbW9qaVx1ZDgzZFx1ZGU4MCJ9"
+      "signatureInputB64": null
     },
     {
       "id": "neg-unknown-field",
       "kind": "negative",
       "expectedSchemaValid": false,
       "note": "未知字段必须拒绝",
+      "expectedError": "unknown field",
       "object": {
         "contractId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "contractVersion": "2",
@@ -176,6 +180,7 @@
       "kind": "negative",
       "expectedSchemaValid": false,
       "note": "枚举外 thinking 必须拒绝",
+      "expectedError": "enum",
       "object": {
         "contractId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "contractVersion": "2",
@@ -213,6 +218,7 @@
       "kind": "negative",
       "expectedSchemaValid": false,
       "note": "超上限 maxTurns=999 必须拒绝",
+      "expectedError": "maximum",
       "object": {
         "contractId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "contractVersion": "2",
@@ -250,6 +256,7 @@
       "kind": "negative",
       "expectedSchemaValid": false,
       "note": "toolAllowlist 重复必须拒绝",
+      "expectedError": "uniqueItems",
       "object": {
         "contractId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "contractVersion": "2",
@@ -285,6 +292,7 @@
       "kind": "negative",
       "expectedSchemaValid": false,
       "note": "非 sha256:64hex 的 sourceBundleDigest 必须拒绝",
+      "expectedError": "pattern",
       "object": {
         "contractId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "contractVersion": "2",
@@ -322,6 +330,7 @@
       "kind": "negative",
       "expectedSchemaValid": false,
       "note": "缺必需字段 expiresAt 必须拒绝",
+      "expectedError": "required",
       "object": {
         "contractId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "contractVersion": "2",

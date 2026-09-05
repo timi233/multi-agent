@@ -63,7 +63,7 @@ def build(object_type):
              {"policyTemplateRefs": [{"templateRef": "t", "templateDigest": "md5:zz"}]}, "templateDigest"),
             ("neg-policy-duplicate", False, "policyTemplateRefs 重复引用必须拒绝",
              {"policyTemplateRefs": [{"templateRef": "a", "templateDigest": D64},
-                                     {"templateRef": "a", "templateDigest": D64}]}, "uniqueItems"),
+                                     {"templateRef": "a", "templateDigest": D64}]}, "non-unique"),
         ]
     else:  # event_envelope
         base = {
@@ -110,10 +110,19 @@ def build(object_type):
                 obj[k] = v
         return obj
 
+    def finalize(obj: dict, errs: list):
+        """正向量：payloadDigest 若为信封字段则回填真实重算值（对象自洽，评审 fix-2）。"""
+        if errs or "payloadDigest" not in obj:
+            return obj
+        obj = json.loads(json.dumps(obj))
+        obj["payloadDigest"] = payload_digest(obj, profile)
+        return obj
+
     vectors = []
     for vid, valid, note, mut, kind_note in cases:
         obj = apply(mut)
         errs = validate(obj, schema)
+        obj = finalize(obj, errs)
         digest = payload_digest(obj, profile) if not errs else None
         vectors.append({
             "id": vid, "kind": "positive" if valid else "negative", "note": note,

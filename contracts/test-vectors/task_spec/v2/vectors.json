@@ -287,7 +287,7 @@
       "kind": "negative",
       "note": "policyTemplateRefs 重复引用必须拒绝",
       "schemaValid": false,
-      "expectedError": "uniqueItems",
+      "expectedError": "non-unique",
       "schemaErrors": [
         "[{'templateRef': 'a', 'templateDigest': 'sha256:0000000000000000000000000000000000000000000000000000000000000000'}, {'templateRef': 'a', 'templateDigest': 'sha256:0000000000000000000000000000000000000000000000000000000000000000'}] has non-unique elements"
       ],

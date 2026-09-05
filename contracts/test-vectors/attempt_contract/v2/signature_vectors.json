@@ -124,6 +124,42 @@
       "verifyWithSelf": false
     },
     {
+      "id": "sig-alg-altered",
+      "kind": "negative",
+      "note": "篡改 signatureAlgorithm",
+      "envelopeMutated": {
+        "signatureAlgorithm": "ECDSA"
+      },
+      "verifyWithSelf": false
+    },
+    {
+      "id": "sig-wi-altered",
+      "kind": "negative",
+      "note": "篡改 issuerWorkloadIdentity",
+      "envelopeMutated": {
+        "issuerWorkloadIdentity": "pi.evil"
+      },
+      "verifyWithSelf": false
+    },
+    {
+      "id": "sig-otype-altered",
+      "kind": "negative",
+      "note": "篡改 objectType",
+      "envelopeMutated": {
+        "objectType": "other_contract"
+      },
+      "verifyWithSelf": false
+    },
+    {
+      "id": "sig-sver-altered",
+      "kind": "negative",
+      "note": "篡改 schemaVersion",
+      "envelopeMutated": {
+        "schemaVersion": "1"
+      },
+      "verifyWithSelf": false
+    },
+    {
       "id": "sig-wrong-key",
       "kind": "negative",
       "note": "用 sk-node 公钥验证 sk-attempt 的同一有效签名（keyId/issuer 不匹配）",

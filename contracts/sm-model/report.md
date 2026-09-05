@@ -8,11 +8,12 @@
 - [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>)（—）
 - [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>)（—）
 - [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>)（—）
-- [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>)（—）
+- [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>)（SM-08 Task 差距: QUEUED->RUNNING 事件(ATTEMPT_STARTED)跨事务——领取事务不写事件；attempt/事件在后续初始化事务（worker._run_task 153-160））
 - [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>)（（无声明枚举，跳过审计））
 
 ## Attempt
 
+- [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>)（—）
 - [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>)（—）
 - [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>)（—）
 - [PASS] CheckResult(ok: 'bool', findings: 'list[str]' = <factory>)（—）

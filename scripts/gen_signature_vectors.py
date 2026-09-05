@@ -19,7 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from jsonschema import Draft202012Validator
 
 from app.contracts.codec import (
-    canonical_payload,
+    build_signature_envelope,
     load_digest_profile,
     load_schema,
     payload_digest,
@@ -75,11 +75,8 @@ def verify(pubkey: Path, data: bytes, sig_hex: str) -> bool:
 def main() -> int:
     vectors = json.loads((OUT / "vectors.json").read_text(encoding="utf-8"))
     obj = next(v["object"] for v in vectors["vectors"] if v["id"] == "pos-minimal")
-    payload = canonical_payload(obj, PROFILE)
-    digest = payload_digest(obj, PROFILE)
-
-    env = dict(ENVELOPE_BASE, payloadDigest=digest)
-    sig_input = signature_input(payload, env)
+    # 原子构造（评审 fix-1/2）：Schema 校验 → 重算 digest → §9.4 信封 → 签名输入
+    env, sig_input, digest = build_signature_envelope(obj, SCHEMA, PROFILE, ENVELOPE_BASE)
     sig_hex = sign(KEY_DIR / "sk-attempt.pem", sig_input)
 
     signed_obj = json.loads(json.dumps(obj))
@@ -87,7 +84,7 @@ def main() -> int:
         "signatureAlgorithm": "Ed25519", "keyId": env["keyId"], "issuer": env["issuer"],
         "issuerWorkloadIdentity": env["issuerWorkloadIdentity"], "audience": env["audience"],
         "objectType": env["objectType"], "schemaVersion": env["schemaVersion"],
-        "payloadDigest": digest, "controlPlaneEpoch": env["controlPlaneEpoch"],
+        "payloadDigest": env["payloadDigest"], "controlPlaneEpoch": env["controlPlaneEpoch"],
         "signedAt": env["signedAt"], "value": sig_hex,
     }
     schema_errors = list(VALIDATOR.iter_errors(signed_obj))
@@ -99,7 +96,7 @@ def main() -> int:
         return {
             "id": f"sig-{name}", "kind": "negative", "note": note,
             "envelopeMutated": {k: str(v)[:24] for k, v in changes.items()},
-            "verifyWithSelf": verify(KEY_DIR / "sk-attempt.pub.pem", signature_input(payload, e), sig_hex),
+            "verifyWithSelf": verify(KEY_DIR / "sk-attempt.pub.pem", signature_input(b"", e), sig_hex),
         }
 
     negatives = [
@@ -110,6 +107,10 @@ def main() -> int:
         mk_negative("signedat-altered", "篡改 signedAt", {"signedAt": "2026-09-05T09:00:00Z"}),
         mk_negative("audience-altered", "篡改 audience", {"audience": "evil.platform"}),
         mk_negative("epoch-altered", "篡改 controlPlaneEpoch", {"controlPlaneEpoch": 1}),
+        mk_negative("alg-altered", "篡改 signatureAlgorithm", {"signatureAlgorithm": "ECDSA"}),
+        mk_negative("wi-altered", "篡改 issuerWorkloadIdentity", {"issuerWorkloadIdentity": "pi.evil"}),
+        mk_negative("otype-altered", "篡改 objectType", {"objectType": "other_contract"}),
+        mk_negative("sver-altered", "篡改 schemaVersion", {"schemaVersion": "1"}),
     ]
     # 错误 keyId：用 sk-node 公钥验证 sk-attempt 的同一有效签名
     wrong_key = verify(KEY_DIR / "sk-node.pub.pem", sig_input, sig_hex)
@@ -117,7 +118,9 @@ def main() -> int:
     out = {
         "objectType": "attempt_contract", "schemaVersion": "2",
         "signatureConstruction": "JCS({signatureContext, signatureAlgorithm, keyId, issuer, issuerWorkloadIdentity, audience, objectType, schemaVersion, payloadDigest, controlPlaneEpoch, signedAt})",
-        "canonicalPayloadB64": base64.b64encode(payload).decode(),
+        "canonicalPayloadB64": next(
+            v["canonicalPayloadB64"] for v in vectors["vectors"]
+            if v["id"] == "pos-minimal"),
         "payloadDigest": digest,
         "signatureInputB64": base64.b64encode(sig_input).decode(),
         "envelope": env,

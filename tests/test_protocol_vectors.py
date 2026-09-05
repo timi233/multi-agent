@@ -47,12 +47,19 @@ def test_positive_recompute(schema, profile, path):
 @pytest.mark.parametrize("schema,profile,path", CASES,
                          ids=["task_spec", "event_envelope"])
 def test_negative_rejected(schema, profile, path):
+    """负向量必须被当前 Schema 实时拒绝，且错误路径/消息含预期关键字（评审 fix-3）。"""
+    from jsonschema import Draft202012Validator
     data = json.loads(path.read_text(encoding="utf-8"))
     neg = [v for v in data["vectors"] if v["kind"] == "negative"]
     assert len(neg) >= 5
     for v in neg:
-        assert v["schemaValid"] is False, f"{v['id']} 必须被拒绝"
-        assert v["expectedError"], f"{v['id']} 需声明可观察的错误关键字"
+        assert v["schemaValid"] is False, f"{v['id']} 固化的 schemaValid 必须为 False"
+        errs = [e for e in Draft202012Validator(schema).iter_errors(v["object"])]
+        assert errs, f"{v['id']} 必须被当前 Schema 实时拒绝"
+        paths = " / ".join(str(list(e.path)) for e in errs)
+        msgs = " ; ".join(e.message for e in errs)
+        assert (v["expectedError"] in paths or v["expectedError"] in msgs), \
+            f"{v['id']} 错误应可观察 keyword {v['expectedError']}: {msgs}"
 
 
 def test_event_scope_required_ids_ct08():

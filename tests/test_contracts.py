@@ -19,7 +19,9 @@ import pytest
 from jsonschema import Draft202012Validator
 
 from app.contracts.codec import (
+    SIGNATURE_ENVELOPE_KEYS,
     ContractError,
+    build_signature_envelope,
     canonical_payload,
     jcs,
     load_digest_profile,
@@ -67,10 +69,12 @@ def test_positive_vectors_recompute(vectors):
 
 
 def test_negative_vectors_rejected(vectors):
+    """负向量必须被当前 Schema 实时拒绝（评审 fix-3：不依赖固化布尔值）。"""
     neg = [v for v in vectors if v["kind"] == "negative"]
     assert len(neg) >= 4
     for v in neg:
         assert not VALIDATOR.is_valid(v["object"]), f"{v['id']} 应被 Schema 拒绝"
+        assert v["expectedError"], f"{v['id']} 需声明可观察的错误关键字"
 
 
 def test_signed_object_digest_unchanged():
@@ -112,6 +116,44 @@ def test_signature_vectors():
     wrong = next(v for v in sg["vectors"] if v["id"] == "sig-wrong-key")
     assert not _openssl_verify(pub_other, sig_input, pos["signatureHex"])
     assert wrong["verifyWithWrongKey"] is False
+
+
+def test_signature_rebuild_from_object():
+    """从正例对象原子重建签名输入（评审 fix-5）：Schema 校验 → 重算 digest →
+    §9.4 信封 → 签名输入；信封字段必须与对象签名信封自洽并验证通过。
+
+    不信任固化的 signatureInputB64/布尔——digest 与输入全部实时重算。
+    """
+    sg = json.loads((VEC / "signature_vectors.json").read_text(encoding="utf-8"))
+    sg_vec = json.loads((VEC / "vectors.json").read_text(encoding="utf-8"))
+    pos = sg["vectors"][0]
+    obj = pos["object"]
+    pub = KEY_DIR / "sk-attempt.pub.pem"
+
+    # 对象签名信封内的 payloadDigest 必须等于重算值（自洽）
+    recomputed = payload_digest(obj, PROFILE)
+    assert obj["signature"]["payloadDigest"] == recomputed
+
+    # 从对象 signature 提取 meta（不含 value/payloadDigest），原子重建
+    meta = {k: obj["signature"][k] for k in SIGNATURE_ENVELOPE_KEYS}
+    env, rebuilt, digest = build_signature_envelope(obj, SCHEMA, PROFILE, meta)
+    assert digest == recomputed
+    assert env["payloadDigest"] == recomputed
+    assert base64.b64encode(rebuilt).decode() == sg["signatureInputB64"], \
+        "重建签名输入必须与生成器一致"
+    assert _openssl_verify(pub, rebuilt, pos["signatureHex"]), \
+        "重建输入上运行时的签名必须验通"
+
+    # 篡改余下字段（signatureAlgorithm/issuerWorkloadIdentity/objectType/schemaVersion）
+    # 也必须在同一签名上失败（覆盖 10 字段信封审计）
+    tampered = dict(env)
+    for key, val in [("signatureAlgorithm", "ECDSA"),
+                     ("issuerWorkloadIdentity", "pi.evil"),
+                     ("objectType", "other_contract"),
+                     ("schemaVersion", "1")]:
+        e = dict(tampered, **{key: val})
+        assert not _openssl_verify(pub, signature_input(b"", e), pos["signatureHex"]), \
+            f"篡改 {key} 后不得通过验证"
 
 
 def test_verified_payload_digest_fail_closed():

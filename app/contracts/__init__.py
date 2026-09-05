@@ -1,5 +1,6 @@
 from .codec import (
     ContractError,
+    build_signature_envelope,
     canonical_payload,
     jcs,
     load_digest_profile,
@@ -10,6 +11,7 @@ from .codec import (
 
 __all__ = [
     "ContractError",
+    "build_signature_envelope",
     "canonical_payload",
     "jcs",
     "load_digest_profile",

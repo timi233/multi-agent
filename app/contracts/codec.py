@@ -137,15 +137,22 @@ def load_digest_profile(object_type: str, schema_version: str) -> dict:
 
 def canonical_payload(obj: dict, profile: dict) -> bytes:
     """按 DigestProfile.immutablePayloadPointers 白名单投影生成 canonicalPayload 字节。
-    可选指针在对象中缺失时跳过（投影只含实际存在的白名单字段）。"""
+
+    仅 `optionalImmutablePointers` 显式声明的可选指针允许缺失（跳过）；
+    其余指针缺失（含必需字段缺失、Profile 拼写错误）fail closed 抛错，
+    避免投影静默缩小签名覆盖范围。"""
     pointers = profile.get("immutablePayloadPointers") or []
+    optional = set(profile.get("optionalImmutablePointers") or [])
     projected: dict = {}
     for pointer in pointers:
         key = pointer.lstrip("/")
         try:
             projected[key] = _resolve_pointer(obj, pointer)
         except ContractError:
-            continue
+            if pointer in optional:
+                continue
+            raise ContractError(
+                f"projection pointer missing and not optional: {pointer}")
     return jcs(projected)
 
 
@@ -187,3 +194,26 @@ def signature_input(
         **{k: envelope[k] for k in required},
     }
     return jcs(ctx)
+
+
+# 蓝图 §9.4 签名信封键（不含 value 与 payloadDigest——payloadDigest 由原子构造重算填充）
+SIGNATURE_ENVELOPE_KEYS = (
+    "objectType", "schemaVersion", "signatureAlgorithm", "keyId", "issuer",
+    "issuerWorkloadIdentity", "audience", "controlPlaneEpoch", "signedAt",
+)
+
+
+def build_signature_envelope(obj: dict, schema: dict, profile: dict,
+                             meta: dict) -> tuple[dict, bytes, str]:
+    """原子签名信封构造（fail closed，评审 fix-1）：Schema 校验 → 重算
+    payloadDigest → 组装蓝图 §9.4 十字段信封 → 签名输入。
+
+    信封内的 payloadDigest 必然来自本对象重算，杜绝为无关对象/伪造 digest 签名。
+    返回 (envelope, signature_input_bytes, payload_digest_str)。"""
+    digest = verified_payload_digest(obj, schema, profile)
+    missing = [k for k in SIGNATURE_ENVELOPE_KEYS if k not in meta]
+    if missing:
+        raise ContractError(f"signature envelope meta missing fields: {missing}")
+    envelope = {k: meta[k] for k in SIGNATURE_ENVELOPE_KEYS}
+    envelope["payloadDigest"] = digest
+    return envelope, signature_input(b"", envelope), digest

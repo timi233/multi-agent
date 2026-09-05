@@ -136,14 +136,27 @@ def check_sm03_deadline(machine: StateMachine, policy: dict) -> CheckResult:
 
 
 def check_sm08_event_binding(machine: StateMachine, event_points: dict) -> CheckResult:
-    """转移与事件写入同事务绑定（SM-08 精神；蓝图为 TransitionRecorded.v2）。"""
+    """转移与事件写入的事务绑定（SM-08 精神；蓝图为 TransitionRecorded.v2）。
+
+    event_points: {转移: {"event": 事件名, "sameTxn": bool, "note": ...}}
+    规则：终态出口转移必须与事件同事务（fail）；非终态转移跨事务记录为差距
+    （不判失败，避免假 PASS —— 评审 fix-7）。"""
     r = CheckResult(True)
     for old, outs in machine.transitions.items():
         for out in outs:
             key = f"{old}->{out}"
-            if key not in event_points:
+            spec = event_points.get(key)
+            if spec is None:
                 r.ok = False
-                r.findings.append(f"SM-08 {machine.name} 转移 {key} 无事件写入点")
+                r.findings.append(f"SM-08 {machine.name} 转移 {key} 无事件绑定说明")
+                continue
+            if out in machine.terminal and not spec["sameTxn"]:
+                r.ok = False
+                r.findings.append(
+                    f"SM-08 {machine.name} 终态转移 {key} 事件({spec['event']})必须同事务")
+            elif not spec["sameTxn"]:
+                r.findings.append(
+                    f"SM-08 {machine.name} 差距: {key} 事件({spec['event']})跨事务——{spec.get('note', '')}")
     return r
 
 
@@ -167,16 +180,25 @@ def run_all() -> dict:
             check_sm03_deadline(machine, policy),
         ]
         results[machine.name] = checks
-    # SM-08：Task 各转移的事件写入点（worker.py / control/api.py 行号）
+    # SM-08：各转移的事件绑定（worker.py / control/api.py 实现核对）
+    # 注：QUEUED->RUNNING 领取事务只改任务状态；attempt 创建与 ATTEMPT_STARTED
+    # 在 _run_task 的下一提交（worker.py:153-160），跨事务——推进按蓝图对齐需合并或补转发表
     task_events = {
-        "QUEUED->RUNNING": "worker.py 领取事务（ATTEMPT_STARTED 同事务）",
-        "QUEUED->CANCELLED": "control/api.py cancel（单事务）",
-        "RUNNING->SUCCESS": "worker.py 终态事务（ATTEMPT_SUCCEEDED）",
-        "RUNNING->FAILED": "worker.py 失败收敛（ATTEMPT_FAILED）",
-        "RUNNING->CANCELLED": "control/api.py cancel",
+        "QUEUED->RUNNING": {
+            "event": "ATTEMPT_STARTED", "sameTxn": False,
+            "note": "领取事务不写事件；attempt/事件在后续初始化事务（worker._run_task 153-160）"},
+        "QUEUED->CANCELLED": {"event": "TASK_CANCELLED", "sameTxn": True},
+        "RUNNING->SUCCESS": {"event": "ATTEMPT_FINISHED", "sameTxn": True},
+        "RUNNING->FAILED": {"event": "ATTEMPT_FAILED", "sameTxn": True},
+        "RUNNING->CANCELLED": {"event": "TASK_CANCELLED", "sameTxn": True},
     }
     results["Task"] += [check_sm08_event_binding(TASK_SM, task_events)]
     results["Task"] += [audit_dead_enum(TASK_SM)]
+    attempt_events = {
+        "CLAIMED->TERMINAL_REPORTED": {
+            "event": "ATTEMPT_FINISHED/FAILED/RECOVERED", "sameTxn": True},
+    }
+    results["Attempt"] += [check_sm08_event_binding(ATTEMPT_SM, attempt_events)]
     results["Attempt"] += [audit_dead_enum(ATTEMPT_SM)]
     return results
 

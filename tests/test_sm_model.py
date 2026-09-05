@@ -86,5 +86,5 @@ def test_run_all_ok():
     """全套模型检查必须全绿（SM-01/02/03 + SM-08 事件绑定 + 死枚举审计）。"""
     results = run_all()
     assert all_ok(results)
-    # 断言检查数量：Task 5 项（SM01/02/03/SM08/枚举审计），Attempt 4 项
-    assert len(results["Task"]) == 5 and len(results["Attempt"]) == 4
+    # 断言检查数量：Task 5 项（SM01/02/03/SM08/枚举审计），Attempt 5 项
+    assert len(results["Task"]) == 5 and len(results["Attempt"]) == 5

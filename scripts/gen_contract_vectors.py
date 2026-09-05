@@ -16,7 +16,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from jsonschema import Draft202012Validator
 
-from app.contracts.codec import canonical_payload, load_digest_profile, load_schema, payload_digest
+from app.contracts.codec import (
+    SIGNATURE_ENVELOPE_KEYS,
+    build_signature_envelope,
+    canonical_payload,
+    load_digest_profile,
+    load_schema,
+    payload_digest,
+)
 
 OUT = Path(__file__).resolve().parent.parent / "contracts" / "test-vectors" / "attempt_contract" / "v2"
 SCHEMA = load_schema("attempt_contract", "2")
@@ -72,13 +79,24 @@ def main() -> int:
         entry = {
             "id": cid, "kind": "positive" if valid else "negative",
             "expectedSchemaValid": valid, "note": note,
+            "expectedError": invalid_reason,
             "object": obj,
             "calculateOnLoad": True,
         }
         if valid:
             entry["canonicalPayloadB64"] = base64.b64encode(canonical_payload(obj, PROFILE)).decode()
             entry["payloadDigest"] = payload_digest(obj, PROFILE)
-            entry["signatureInputB64"] = entry["canonicalPayloadB64"]
+            if "signature" in obj:
+                # pos-signed：签名信封的 payloadDigest 回填真实重算值（对象自洽）；
+                # signatureInput 为 §9.4 域分离输入（评审 fix-6，不再是 canonicalPayload 别名）。
+                entry["object"]["signature"]["payloadDigest"] = entry["payloadDigest"]
+                env, sig_in, _ = build_signature_envelope(
+                    obj, SCHEMA, PROFILE,
+                    {k: obj["signature"][k] for k in SIGNATURE_ENVELOPE_KEYS
+                     if k in obj["signature"]})
+                entry["signatureInputB64"] = base64.b64encode(sig_in).decode()
+            else:
+                entry["signatureInputB64"] = None
         else:
             entry["invalidReason"] = invalid_reason
         if schema_valid != valid:

@@ -21,6 +21,13 @@
     "/createdAt",
     "/expiresAt"
   ],
+  "optionalImmutablePointers": [
+    "/userIdentity/displayName",
+    "/requestedResources/model/thinking",
+    "/requestedResources/maxTokens",
+    "/policyTemplateRefs",
+    "/expiresAt"
+  ],
   "mutableDatabasePointers": [],
   "signatureEnvelopePointers": ["/signature"]
 }
