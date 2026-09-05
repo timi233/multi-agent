@@ -62,7 +62,7 @@ def _chain(specs: list[tuple]) -> list[dict]:
 CHAIN_FULL = _chain([
     ("RESERVED", "a" * 32, 4096, None),
     ("SENT", None, 0, None),
-    ("SETTLED", None, 0, 1250),
+    ("SETTLED", None, 4096, 1250),  # 与运行时一致：SETTLED.reserved=原预留（完整释放占额），actual 单独计 consumed
 ])
 CHAIN_FAILED = _chain([
     ("RESERVED", "a" * 32, 4096, None),
@@ -94,8 +94,8 @@ CASES = [
      {"journal": CHAIN_FULL, "consumedTokens": 1250, "status": "ACTIVE"}, None),
     ("pos-failed-release", True, "FAILED 释放预留（任务失败后 grant 终结 SETTLED，无实耗）",
      {"journal": CHAIN_FAILED, "consumedTokens": 0, "status": "SETTLED"}, None),
-    ("pos-unknown", True, "UNKNOWN 保守占额（结果不确定不累计 consumed；预算占死后 EXHAUSTED）",
-     {"journal": CHAIN_UNKNOWN, "consumedTokens": 0, "status": "EXHAUSTED"}, None),
+    ("pos-unknown", True, "UNKNOWN 保守占额（结果不确定不累计 consumed；未耗尽仍 ACTIVE——生产无 EXHAUSTED 写入路径）",
+     {"journal": CHAIN_UNKNOWN, "consumedTokens": 0, "status": "ACTIVE"}, None),
     ("neg-status-enum", False, "status 枚举外必须拒绝", {"status": "DONE"}, "enum"),
     ("neg-broken-entry-digest", False, "entryDigest 非 64hex 必须拒绝",
      {"journal": [dict(CHAIN_FULL[0], entryDigest="zz")]}, "pattern"),

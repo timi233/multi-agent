@@ -69,10 +69,10 @@
             "entryType": "SETTLED",
             "invocationId": "1111111111111111",
             "requestDigest": null,
-            "reservedTokens": 0,
+            "reservedTokens": 4096,
             "actualTokens": 1250,
             "previousEntryDigest": "395a60450403b18a217b4feb55ac0ea0141dbc60db6cbccb956e13d56f2a0296",
-            "entryDigest": "1186ec2eee1a1c40a66b61221fdeecd139ea899f255b80b550a2d146cc4cb390"
+            "entryDigest": "2eb72bb89d44c01f7fb343688898adbb6823945eca832d56a2e861d06f1d7a2f"
           }
         ],
         "createdAt": "2026-09-05T08:00:00Z"
@@ -131,7 +131,7 @@
       "id": "pos-unknown",
       "kind": "positive",
       "expectedSchemaValid": true,
-      "note": "UNKNOWN 保守占额（结果不确定不累计 consumed；预算占死后 EXHAUSTED）",
+      "note": "UNKNOWN 保守占额（结果不确定不累计 consumed；未耗尽仍 ACTIVE——生产无 EXHAUSTED 写入路径）",
       "expectedError": null,
       "object": {
         "contractId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -142,7 +142,7 @@
         "attemptId": "3333333333333333",
         "totalBudgetTokens": 200000,
         "consumedTokens": 0,
-        "status": "EXHAUSTED",
+        "status": "ACTIVE",
         "journal": [
           {
             "seq": 1,
@@ -214,10 +214,10 @@
             "entryType": "SETTLED",
             "invocationId": "1111111111111111",
             "requestDigest": null,
-            "reservedTokens": 0,
+            "reservedTokens": 4096,
             "actualTokens": 1250,
             "previousEntryDigest": "395a60450403b18a217b4feb55ac0ea0141dbc60db6cbccb956e13d56f2a0296",
-            "entryDigest": "1186ec2eee1a1c40a66b61221fdeecd139ea899f255b80b550a2d146cc4cb390"
+            "entryDigest": "2eb72bb89d44c01f7fb343688898adbb6823945eca832d56a2e861d06f1d7a2f"
           }
         ],
         "createdAt": "2026-09-05T08:00:00Z"
@@ -300,10 +300,10 @@
             "entryType": "SETTLED",
             "invocationId": "1111111111111111",
             "requestDigest": null,
-            "reservedTokens": 0,
+            "reservedTokens": 4096,
             "actualTokens": 1250,
             "previousEntryDigest": "395a60450403b18a217b4feb55ac0ea0141dbc60db6cbccb956e13d56f2a0296",
-            "entryDigest": "1186ec2eee1a1c40a66b61221fdeecd139ea899f255b80b550a2d146cc4cb390"
+            "entryDigest": "2eb72bb89d44c01f7fb343688898adbb6823945eca832d56a2e861d06f1d7a2f"
           }
         ],
         "createdAt": "2026-09-05T08:00:00Z",
@@ -384,10 +384,10 @@
             "entryType": "SETTLED",
             "invocationId": "1111111111111111",
             "requestDigest": null,
-            "reservedTokens": 0,
+            "reservedTokens": 4096,
             "actualTokens": 1250,
             "previousEntryDigest": "395a60450403b18a217b4feb55ac0ea0141dbc60db6cbccb956e13d56f2a0296",
-            "entryDigest": "1186ec2eee1a1c40a66b61221fdeecd139ea899f255b80b550a2d146cc4cb390"
+            "entryDigest": "2eb72bb89d44c01f7fb343688898adbb6823945eca832d56a2e861d06f1d7a2f"
           }
         ],
         "createdAt": "2026-09-05T08:00:00Z"
@@ -437,10 +437,10 @@
             "entryType": "SETTLED",
             "invocationId": "1111111111111111",
             "requestDigest": null,
-            "reservedTokens": 0,
+            "reservedTokens": 4096,
             "actualTokens": 1250,
             "previousEntryDigest": "395a60450403b18a217b4feb55ac0ea0141dbc60db6cbccb956e13d56f2a0296",
-            "entryDigest": "1186ec2eee1a1c40a66b61221fdeecd139ea899f255b80b550a2d146cc4cb390"
+            "entryDigest": "2eb72bb89d44c01f7fb343688898adbb6823945eca832d56a2e861d06f1d7a2f"
           }
         ],
         "createdAt": "2026-09-05T08:00:00Z",

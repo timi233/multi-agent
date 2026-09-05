@@ -51,7 +51,7 @@
 
 ## 预算契约 budget_grant v2（② 契约对象扩展）
 
-- 产物：`contracts/jsonschema/budget_grant.v2.{schema,digestprofile}.json`、`scripts/gen_budget_vectors.py`（10 向量：空 journal/链式全生命周期/FAILED 释放/UNKNOWN/pos-signed + 5 负例）、`scripts/verify_vectors_node.js` 已含该对象、`tests/test_budget_contract.py`（8 项）。
+- 产物：`contracts/jsonschema/budget_grant.v2.{schema,digestprofile}.json`、`scripts/gen_budget_vectors.py`（10 向量：空 journal/链式全生命周期/FAILED 释放/UNKNOWN/pos-signed + 5 负例）、`scripts/verify_vectors_node.js` 已含该对象、`tests/test_budget_contract.py`（9 项）。
 - 对象边界：签名 payload 只锚定**不可变授权字段**（grantId/taskId/attemptId/totalBudgetTokens/createdAt 等）；`consumedTokens/status/journal` 为**消费事实**（mutableDatabasePointers，不投影）——每次结算/失败/未知改变事务事实但不改变 Grant 授权签名（`test_grant_immutable_consumption_mutable` 覆盖）。
 - 链式 Journal：RESERVED/SENT/SETTLED/FAILED/UNKNOWN 条目含 `previousEntryDigest/entryDigest`（首条根锚 `pi-budget-root-v1`），向量链为 `_entry_digest` **逐条真实计算**；有序性/逐条 digest/consumed 对账由 `BudgetDomain.verified_budget_grant()` 语义校验入口保证（测试覆盖篡改断链/伪造 digest/对账不符）。
 - 双实现：Node 参考实现逐字节一致（CT-01 PASS，15 正向量 0 不一致）。

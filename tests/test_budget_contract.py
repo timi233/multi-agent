@@ -87,7 +87,7 @@ def test_journal_chain_is_real_digests():
 
 def test_verified_function_accepts_positive_rejects_tamper():
     """verified_budget_grant：正向量全通过；篡改（断链/伪造 digest/consumed
-    对账不符）均报问题；可信快照 empty。"""
+    对账不符/协议违规——SENT 无 RESERVED/重复终结/SETTLED 未完整释放）均报问题。"""
     for v in VECTORS["vectors"]:
         if v["kind"] == "positive":
             assert BudgetDomain.verified_budget_grant(v["object"]) == [], v["id"]
@@ -107,6 +107,69 @@ def test_verified_function_accepts_positive_rejects_tamper():
     tampered3["consumedTokens"] = 9999
     assert any("consumedTokens" in p
                for p in BudgetDomain.verified_budget_grant(tampered3))
+    # 协议违规：SETTLED 未完整释放原预留（评审 fix）
+    tampered4 = json.loads(json.dumps(base))
+    tampered4["journal"][2]["reservedTokens"] = 0
+    assert any("未完整释放预留" in p
+               for p in BudgetDomain.verified_budget_grant(tampered4))
+    # 协议违规：SENT 无前序 RESERVED
+    tampered5 = json.loads(json.dumps(base))
+    tampered5["journal"] = tampered5["journal"][1:]  # 去掉 RESERVED
+    assert any("无前序 RESERVED" in p
+               for p in BudgetDomain.verified_budget_grant(tampered5))
+    # 协议违规：同一 invocation 重复终结
+    tampered6 = json.loads(json.dumps(base))
+    dup = json.loads(json.dumps(tampered6["journal"][2]))
+    dup["seq"] = 4
+    tampered6["journal"].append(dup)
+    assert any("重复终结" in p
+               for p in BudgetDomain.verified_budget_grant(tampered6))
+
+
+def test_db_flow_matches_vector_fields():
+    """真实 DB 执行 reserve→sent→settle 后，journal 行与 pos-chain-settled
+    向量逐字段一致（评审 fix：向量账目事实与运行时协议对照）。"""
+    from app.db import connect as db_connect
+
+    vec = _vec("pos-chain-settled")["object"]
+    conn = db_connect()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                "INSERT INTO pi_tasks (id, title, prompt, workspace, status) "
+                "VALUES (%s,'t','p','w','QUEUED')", (vec["taskId"],))
+            conn.commit()
+        b = BudgetDomain.create(conn, vec["taskId"], vec["attemptId"],
+                                vec["totalBudgetTokens"], grant_id=vec["grantId"])
+        conn.commit()
+        inv = vec["journal"][0]["invocationId"]
+        req = vec["journal"][0]["requestDigest"]
+        b.reserve(conn, inv, req, vec["journal"][0]["reservedTokens"])
+        conn.commit()
+        b.sent(conn, inv)
+        conn.commit()
+        b.settle(conn, inv, 1250)
+        conn.commit()
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT seq, entry_type, invocation_id, request_digest, "
+                "reserved_tokens, actual_tokens, previous_entry_digest, "
+                "entry_digest FROM gw_journal WHERE grant_id=%s ORDER BY seq",
+                (vec["grantId"],))
+            rows = cur.fetchall()
+        # 契约 seq 为 per-grant 连续序号（row_number）；DB seq 为全局 BIGSERIAL，
+        # 逐字段对照用行序映射 seq；其余字段与向量逐项相等
+        assert [{"seq": i, "entryType": r["entry_type"],
+                 "invocationId": r["invocation_id"],
+                 "requestDigest": r["request_digest"],
+                 "reservedTokens": r["reserved_tokens"],
+                 "actualTokens": r["actual_tokens"] if r["actual_tokens"] is not None
+                 else None,
+                 "previousEntryDigest": r["previous_entry_digest"],
+                 "entryDigest": r["entry_digest"]}
+                for i, r in enumerate(rows, start=1)] == vec["journal"]
+    finally:
+        conn.close()
 
 
 def test_grant_immutable_consumption_mutable():

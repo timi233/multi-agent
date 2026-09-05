@@ -193,6 +193,9 @@ class BudgetDomain:
         journal = report.get("journal") or []
         grant_id = report.get("grantId") or ""
         prev_digest = ROOT_DIGEST
+        per_inv: dict[str, dict] = {}
+        reserved_sum = 0
+        released_sum = 0
         for i, entry in enumerate(journal, start=1):
             if entry.get("seq") != i:
                 problems.append(f"journal seq 不连续: 期望 {i} 实际 {entry.get('seq')}")
@@ -207,6 +210,36 @@ class BudgetDomain:
             if entry.get("entryDigest") != recomputed:
                 problems.append(f"seq {entry.get('seq')} entryDigest 非真实重算")
             prev_digest = entry.get("entryDigest", "")
+            # 按 invocation 重放协议/账目（评审 fix：SETTLED 完整释放、终态唯一、
+            # 无终态前置、无重复 RESERVED）
+            inv = entry.get("invocationId", "")
+            st = per_inv.setdefault(inv, {"reserved": None, "terminated": False})
+            etype = entry.get("entryType")
+            rt = entry.get("reservedTokens", 0)
+            if etype == "RESERVED":
+                if st["reserved"] is not None:
+                    problems.append(f"invocation {inv} 重复 RESERVED")
+                st["reserved"] = rt
+                reserved_sum += rt
+            elif etype == "SENT":
+                if st["reserved"] is None:
+                    problems.append(f"SENT {inv} 无前序 RESERVED")
+                if st["terminated"]:
+                    problems.append(f"SENT {inv} 出现在终结之后")
+            elif etype in ("SETTLED", "FAILED", "UNKNOWN"):
+                if st["reserved"] is None:
+                    problems.append(f"{etype} {inv} 无前序 RESERVED")
+                if st["terminated"]:
+                    problems.append(f"{etype} {inv} 重复终结")
+                if etype in ("SETTLED", "FAILED") and rt != st["reserved"]:
+                    problems.append(
+                        f"{etype} {inv} 未完整释放预留: released={rt} "
+                        f"!= reserved={st['reserved']}")
+                st["terminated"] = True
+                released_sum += rt
+        if reserved_sum - released_sum < 0:
+            problems.append(
+                f"outstanding 为负（释放超过预留）: {reserved_sum - released_sum}")
         settled_sum = sum(
             (e.get("actualTokens") or 0) for e in journal
             if e.get("entryType") == "SETTLED")
