@@ -7,7 +7,7 @@
       "id": "pos-minimal",
       "kind": "positive",
       "expectedSchemaValid": true,
-      "note": "合法对象：新建 Grant 尚无消费（空 journal）",
+      "note": "合法对象：新建 Grant 尚未消费（空 journal、consumed=0）",
       "expectedError": null,
       "object": {
         "contractId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -17,21 +17,21 @@
         "taskId": "0123456789abcdef",
         "attemptId": "3333333333333333",
         "totalBudgetTokens": 200000,
-        "consumedTokens": 1250,
+        "consumedTokens": 0,
         "status": "ACTIVE",
         "journal": [],
         "createdAt": "2026-09-05T08:00:00Z"
       },
       "calculateOnLoad": true,
-      "canonicalPayloadB64": "eyJhdHRlbXB0SWQiOiIzMzMzMzMzMzMzMzMzMzMzIiwiY29uc3VtZWRUb2tlbnMiOjEyNTAsImNvbnRyYWN0SWQiOiJhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYSIsImNvbnRyYWN0VmVyc2lvbiI6IjIiLCJjcmVhdGVkQXQiOiIyMDI2LTA5LTA1VDA4OjAwOjAwWiIsImdyYW50SWQiOiIyMjIyMjIyMjIyMjIyMjIyIiwiam91cm5hbCI6W10sInN0YXR1cyI6IkFDVElWRSIsInRhc2tJZCI6IjAxMjM0NTY3ODlhYmNkZWYiLCJ0b3RhbEJ1ZGdldFRva2VucyI6MjAwMDAwLCJ3b3JrbG9hZElkZW50aXR5IjoicGkuZ2F0ZSJ9",
-      "payloadDigest": "sha256:680b3858f5dc2aaf6ac66dbc49acb1cbe81e4d5d64c5df4fd48be47a374e384e",
+      "canonicalPayloadB64": "eyJhdHRlbXB0SWQiOiIzMzMzMzMzMzMzMzMzMzMzIiwiY29udHJhY3RJZCI6ImFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhIiwiY29udHJhY3RWZXJzaW9uIjoiMiIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDVUMDg6MDA6MDBaIiwiZ3JhbnRJZCI6IjIyMjIyMjIyMjIyMjIyMjIiLCJ0YXNrSWQiOiIwMTIzNDU2Nzg5YWJjZGVmIiwidG90YWxCdWRnZXRUb2tlbnMiOjIwMDAwMCwid29ya2xvYWRJZGVudGl0eSI6InBpLmdhdGUifQ==",
+      "payloadDigest": "sha256:d42d48284a03801457fd198b239cca62fc1750464f89066acff56c7b5f0567a4",
       "signatureInputB64": null
     },
     {
       "id": "pos-chain-settled",
       "kind": "positive",
       "expectedSchemaValid": true,
-      "note": "链式 journal 全生命周期（RESERVED→SENT→SETTLED）",
+      "note": "全生命周期消费中（SETTLED 已累计 consumed=1250，Grant 仍 ACTIVE）",
       "expectedError": null,
       "object": {
         "contractId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -50,8 +50,9 @@
             "invocationId": "1111111111111111",
             "requestDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
             "reservedTokens": 4096,
+            "actualTokens": null,
             "previousEntryDigest": "pi-budget-root-v1",
-            "entryDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            "entryDigest": "5b600a3de8d2980dcbc49e8a12a95ef52710bd13bbb56ed06f6f2f06d3a2b887"
           },
           {
             "seq": 2,
@@ -59,32 +60,33 @@
             "invocationId": "1111111111111111",
             "requestDigest": null,
             "reservedTokens": 0,
-            "previousEntryDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-            "entryDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            "actualTokens": null,
+            "previousEntryDigest": "5b600a3de8d2980dcbc49e8a12a95ef52710bd13bbb56ed06f6f2f06d3a2b887",
+            "entryDigest": "395a60450403b18a217b4feb55ac0ea0141dbc60db6cbccb956e13d56f2a0296"
           },
           {
             "seq": 3,
             "entryType": "SETTLED",
             "invocationId": "1111111111111111",
             "requestDigest": null,
-            "reservedTokens": 4096,
+            "reservedTokens": 0,
             "actualTokens": 1250,
-            "previousEntryDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-            "entryDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            "previousEntryDigest": "395a60450403b18a217b4feb55ac0ea0141dbc60db6cbccb956e13d56f2a0296",
+            "entryDigest": "1186ec2eee1a1c40a66b61221fdeecd139ea899f255b80b550a2d146cc4cb390"
           }
         ],
         "createdAt": "2026-09-05T08:00:00Z"
       },
       "calculateOnLoad": true,
-      "canonicalPayloadB64": "eyJhdHRlbXB0SWQiOiIzMzMzMzMzMzMzMzMzMzMzIiwiY29uc3VtZWRUb2tlbnMiOjEyNTAsImNvbnRyYWN0SWQiOiJhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYSIsImNvbnRyYWN0VmVyc2lvbiI6IjIiLCJjcmVhdGVkQXQiOiIyMDI2LTA5LTA1VDA4OjAwOjAwWiIsImdyYW50SWQiOiIyMjIyMjIyMjIyMjIyMjIyIiwiam91cm5hbCI6W3siZW50cnlEaWdlc3QiOiJhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhIiwiZW50cnlUeXBlIjoiUkVTRVJWRUQiLCJpbnZvY2F0aW9uSWQiOiIxMTExMTExMTExMTExMTExIiwicHJldmlvdXNFbnRyeURpZ2VzdCI6InBpLWJ1ZGdldC1yb290LXYxIiwicmVxdWVzdERpZ2VzdCI6ImFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhIiwicmVzZXJ2ZWRUb2tlbnMiOjQwOTYsInNlcSI6MX0seyJlbnRyeURpZ2VzdCI6ImJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmIiLCJlbnRyeVR5cGUiOiJTRU5UIiwiaW52b2NhdGlvbklkIjoiMTExMTExMTExMTExMTExMSIsInByZXZpb3VzRW50cnlEaWdlc3QiOiJhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhIiwicmVxdWVzdERpZ2VzdCI6bnVsbCwicmVzZXJ2ZWRUb2tlbnMiOjAsInNlcSI6Mn0seyJhY3R1YWxUb2tlbnMiOjEyNTAsImVudHJ5RGlnZXN0IjoiY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjYyIsImVudHJ5VHlwZSI6IlNFVFRMRUQiLCJpbnZvY2F0aW9uSWQiOiIxMTExMTExMTExMTExMTExIiwicHJldmlvdXNFbnRyeURpZ2VzdCI6ImJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmIiLCJyZXF1ZXN0RGlnZXN0IjpudWxsLCJyZXNlcnZlZFRva2VucyI6NDA5Niwic2VxIjozfV0sInN0YXR1cyI6IkFDVElWRSIsInRhc2tJZCI6IjAxMjM0NTY3ODlhYmNkZWYiLCJ0b3RhbEJ1ZGdldFRva2VucyI6MjAwMDAwLCJ3b3JrbG9hZElkZW50aXR5IjoicGkuZ2F0ZSJ9",
-      "payloadDigest": "sha256:e1625de0c66c4ac70f0580bcc70af8950b706dc3205f5363e7f4149fcc1bb773",
+      "canonicalPayloadB64": "eyJhdHRlbXB0SWQiOiIzMzMzMzMzMzMzMzMzMzMzIiwiY29udHJhY3RJZCI6ImFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhIiwiY29udHJhY3RWZXJzaW9uIjoiMiIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDVUMDg6MDA6MDBaIiwiZ3JhbnRJZCI6IjIyMjIyMjIyMjIyMjIyMjIiLCJ0YXNrSWQiOiIwMTIzNDU2Nzg5YWJjZGVmIiwidG90YWxCdWRnZXRUb2tlbnMiOjIwMDAwMCwid29ya2xvYWRJZGVudGl0eSI6InBpLmdhdGUifQ==",
+      "payloadDigest": "sha256:d42d48284a03801457fd198b239cca62fc1750464f89066acff56c7b5f0567a4",
       "signatureInputB64": null
     },
     {
       "id": "pos-failed-release",
       "kind": "positive",
       "expectedSchemaValid": true,
-      "note": "FAILED 释放预留（条目 reservedTokens=原预留）",
+      "note": "FAILED 释放预留（任务失败后 grant 终结 SETTLED，无实耗）",
       "expectedError": null,
       "object": {
         "contractId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -103,8 +105,9 @@
             "invocationId": "1111111111111111",
             "requestDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
             "reservedTokens": 4096,
+            "actualTokens": null,
             "previousEntryDigest": "pi-budget-root-v1",
-            "entryDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            "entryDigest": "5b600a3de8d2980dcbc49e8a12a95ef52710bd13bbb56ed06f6f2f06d3a2b887"
           },
           {
             "seq": 2,
@@ -112,22 +115,23 @@
             "invocationId": "1111111111111111",
             "requestDigest": null,
             "reservedTokens": 4096,
-            "previousEntryDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-            "entryDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            "actualTokens": null,
+            "previousEntryDigest": "5b600a3de8d2980dcbc49e8a12a95ef52710bd13bbb56ed06f6f2f06d3a2b887",
+            "entryDigest": "a8299d8fd4d39e66b5f736a6661d8addeb215e00d3ba368907858c5c26ba32cd"
           }
         ],
         "createdAt": "2026-09-05T08:00:00Z"
       },
       "calculateOnLoad": true,
-      "canonicalPayloadB64": "eyJhdHRlbXB0SWQiOiIzMzMzMzMzMzMzMzMzMzMzIiwiY29uc3VtZWRUb2tlbnMiOjAsImNvbnRyYWN0SWQiOiJhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYSIsImNvbnRyYWN0VmVyc2lvbiI6IjIiLCJjcmVhdGVkQXQiOiIyMDI2LTA5LTA1VDA4OjAwOjAwWiIsImdyYW50SWQiOiIyMjIyMjIyMjIyMjIyMjIyIiwiam91cm5hbCI6W3siZW50cnlEaWdlc3QiOiJhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhIiwiZW50cnlUeXBlIjoiUkVTRVJWRUQiLCJpbnZvY2F0aW9uSWQiOiIxMTExMTExMTExMTExMTExIiwicHJldmlvdXNFbnRyeURpZ2VzdCI6InBpLWJ1ZGdldC1yb290LXYxIiwicmVxdWVzdERpZ2VzdCI6ImFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhIiwicmVzZXJ2ZWRUb2tlbnMiOjQwOTYsInNlcSI6MX0seyJlbnRyeURpZ2VzdCI6ImJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmIiLCJlbnRyeVR5cGUiOiJGQUlMRUQiLCJpbnZvY2F0aW9uSWQiOiIxMTExMTExMTExMTExMTExIiwicHJldmlvdXNFbnRyeURpZ2VzdCI6ImFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWEiLCJyZXF1ZXN0RGlnZXN0IjpudWxsLCJyZXNlcnZlZFRva2VucyI6NDA5Niwic2VxIjoyfV0sInN0YXR1cyI6IlNFVFRMRUQiLCJ0YXNrSWQiOiIwMTIzNDU2Nzg5YWJjZGVmIiwidG90YWxCdWRnZXRUb2tlbnMiOjIwMDAwMCwid29ya2xvYWRJZGVudGl0eSI6InBpLmdhdGUifQ==",
-      "payloadDigest": "sha256:4760e1a273d99d7ed833004e94068f2f8507be5ef02adb6e5308c439b9e5c475",
+      "canonicalPayloadB64": "eyJhdHRlbXB0SWQiOiIzMzMzMzMzMzMzMzMzMzMzIiwiY29udHJhY3RJZCI6ImFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhIiwiY29udHJhY3RWZXJzaW9uIjoiMiIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDVUMDg6MDA6MDBaIiwiZ3JhbnRJZCI6IjIyMjIyMjIyMjIyMjIyMjIiLCJ0YXNrSWQiOiIwMTIzNDU2Nzg5YWJjZGVmIiwidG90YWxCdWRnZXRUb2tlbnMiOjIwMDAwMCwid29ya2xvYWRJZGVudGl0eSI6InBpLmdhdGUifQ==",
+      "payloadDigest": "sha256:d42d48284a03801457fd198b239cca62fc1750464f89066acff56c7b5f0567a4",
       "signatureInputB64": null
     },
     {
       "id": "pos-unknown",
       "kind": "positive",
       "expectedSchemaValid": true,
-      "note": "UNKNOWN 保守占额（Provider 结果不确定）",
+      "note": "UNKNOWN 保守占额（结果不确定不累计 consumed；预算占死后 EXHAUSTED）",
       "expectedError": null,
       "object": {
         "contractId": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -137,7 +141,7 @@
         "taskId": "0123456789abcdef",
         "attemptId": "3333333333333333",
         "totalBudgetTokens": 200000,
-        "consumedTokens": 1250,
+        "consumedTokens": 0,
         "status": "EXHAUSTED",
         "journal": [
           {
@@ -146,8 +150,9 @@
             "invocationId": "1111111111111111",
             "requestDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
             "reservedTokens": 4096,
+            "actualTokens": null,
             "previousEntryDigest": "pi-budget-root-v1",
-            "entryDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            "entryDigest": "5b600a3de8d2980dcbc49e8a12a95ef52710bd13bbb56ed06f6f2f06d3a2b887"
           },
           {
             "seq": 2,
@@ -155,15 +160,16 @@
             "invocationId": "1111111111111111",
             "requestDigest": null,
             "reservedTokens": 0,
-            "previousEntryDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-            "entryDigest": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+            "actualTokens": null,
+            "previousEntryDigest": "5b600a3de8d2980dcbc49e8a12a95ef52710bd13bbb56ed06f6f2f06d3a2b887",
+            "entryDigest": "a5d5e5e43dee2d4062887177790fe2e4dc7f11100e2e5a9f8a8b7af2bbccb5b9"
           }
         ],
         "createdAt": "2026-09-05T08:00:00Z"
       },
       "calculateOnLoad": true,
-      "canonicalPayloadB64": "eyJhdHRlbXB0SWQiOiIzMzMzMzMzMzMzMzMzMzMzIiwiY29uc3VtZWRUb2tlbnMiOjEyNTAsImNvbnRyYWN0SWQiOiJhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYSIsImNvbnRyYWN0VmVyc2lvbiI6IjIiLCJjcmVhdGVkQXQiOiIyMDI2LTA5LTA1VDA4OjAwOjAwWiIsImdyYW50SWQiOiIyMjIyMjIyMjIyMjIyMjIyIiwiam91cm5hbCI6W3siZW50cnlEaWdlc3QiOiJhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhIiwiZW50cnlUeXBlIjoiUkVTRVJWRUQiLCJpbnZvY2F0aW9uSWQiOiIxMTExMTExMTExMTExMTExIiwicHJldmlvdXNFbnRyeURpZ2VzdCI6InBpLWJ1ZGdldC1yb290LXYxIiwicmVxdWVzdERpZ2VzdCI6ImFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhIiwicmVzZXJ2ZWRUb2tlbnMiOjQwOTYsInNlcSI6MX0seyJlbnRyeURpZ2VzdCI6ImRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGQiLCJlbnRyeVR5cGUiOiJVTktOT1dOIiwiaW52b2NhdGlvbklkIjoiMTExMTExMTExMTExMTExMSIsInByZXZpb3VzRW50cnlEaWdlc3QiOiJhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhIiwicmVxdWVzdERpZ2VzdCI6bnVsbCwicmVzZXJ2ZWRUb2tlbnMiOjAsInNlcSI6Mn1dLCJzdGF0dXMiOiJFWEhBVVNURUQiLCJ0YXNrSWQiOiIwMTIzNDU2Nzg5YWJjZGVmIiwidG90YWxCdWRnZXRUb2tlbnMiOjIwMDAwMCwid29ya2xvYWRJZGVudGl0eSI6InBpLmdhdGUifQ==",
-      "payloadDigest": "sha256:f0fe83ea0b9d599fbada24c3467f1dd220ec44bd44b805c545a5acbe7a495f29",
+      "canonicalPayloadB64": "eyJhdHRlbXB0SWQiOiIzMzMzMzMzMzMzMzMzMzMzIiwiY29udHJhY3RJZCI6ImFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhIiwiY29udHJhY3RWZXJzaW9uIjoiMiIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDVUMDg6MDA6MDBaIiwiZ3JhbnRJZCI6IjIyMjIyMjIyMjIyMjIyMjIiLCJ0YXNrSWQiOiIwMTIzNDU2Nzg5YWJjZGVmIiwidG90YWxCdWRnZXRUb2tlbnMiOjIwMDAwMCwid29ya2xvYWRJZGVudGl0eSI6InBpLmdhdGUifQ==",
+      "payloadDigest": "sha256:d42d48284a03801457fd198b239cca62fc1750464f89066acff56c7b5f0567a4",
       "signatureInputB64": null
     },
     {
@@ -180,7 +186,7 @@
         "taskId": "0123456789abcdef",
         "attemptId": "3333333333333333",
         "totalBudgetTokens": 200000,
-        "consumedTokens": 1250,
+        "consumedTokens": 0,
         "status": "DONE",
         "journal": [
           {
@@ -189,8 +195,9 @@
             "invocationId": "1111111111111111",
             "requestDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
             "reservedTokens": 4096,
+            "actualTokens": null,
             "previousEntryDigest": "pi-budget-root-v1",
-            "entryDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            "entryDigest": "5b600a3de8d2980dcbc49e8a12a95ef52710bd13bbb56ed06f6f2f06d3a2b887"
           },
           {
             "seq": 2,
@@ -198,18 +205,19 @@
             "invocationId": "1111111111111111",
             "requestDigest": null,
             "reservedTokens": 0,
-            "previousEntryDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-            "entryDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            "actualTokens": null,
+            "previousEntryDigest": "5b600a3de8d2980dcbc49e8a12a95ef52710bd13bbb56ed06f6f2f06d3a2b887",
+            "entryDigest": "395a60450403b18a217b4feb55ac0ea0141dbc60db6cbccb956e13d56f2a0296"
           },
           {
             "seq": 3,
             "entryType": "SETTLED",
             "invocationId": "1111111111111111",
             "requestDigest": null,
-            "reservedTokens": 4096,
+            "reservedTokens": 0,
             "actualTokens": 1250,
-            "previousEntryDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-            "entryDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            "previousEntryDigest": "395a60450403b18a217b4feb55ac0ea0141dbc60db6cbccb956e13d56f2a0296",
+            "entryDigest": "1186ec2eee1a1c40a66b61221fdeecd139ea899f255b80b550a2d146cc4cb390"
           }
         ],
         "createdAt": "2026-09-05T08:00:00Z"
@@ -231,7 +239,7 @@
         "taskId": "0123456789abcdef",
         "attemptId": "3333333333333333",
         "totalBudgetTokens": 200000,
-        "consumedTokens": 1250,
+        "consumedTokens": 0,
         "status": "ACTIVE",
         "journal": [
           {
@@ -240,6 +248,7 @@
             "invocationId": "1111111111111111",
             "requestDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
             "reservedTokens": 4096,
+            "actualTokens": null,
             "previousEntryDigest": "pi-budget-root-v1",
             "entryDigest": "zz"
           }
@@ -263,7 +272,7 @@
         "taskId": "0123456789abcdef",
         "attemptId": "3333333333333333",
         "totalBudgetTokens": 200000,
-        "consumedTokens": 1250,
+        "consumedTokens": 0,
         "status": "ACTIVE",
         "journal": [
           {
@@ -272,8 +281,9 @@
             "invocationId": "1111111111111111",
             "requestDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
             "reservedTokens": 4096,
+            "actualTokens": null,
             "previousEntryDigest": "pi-budget-root-v1",
-            "entryDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            "entryDigest": "5b600a3de8d2980dcbc49e8a12a95ef52710bd13bbb56ed06f6f2f06d3a2b887"
           },
           {
             "seq": 2,
@@ -281,18 +291,19 @@
             "invocationId": "1111111111111111",
             "requestDigest": null,
             "reservedTokens": 0,
-            "previousEntryDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-            "entryDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            "actualTokens": null,
+            "previousEntryDigest": "5b600a3de8d2980dcbc49e8a12a95ef52710bd13bbb56ed06f6f2f06d3a2b887",
+            "entryDigest": "395a60450403b18a217b4feb55ac0ea0141dbc60db6cbccb956e13d56f2a0296"
           },
           {
             "seq": 3,
             "entryType": "SETTLED",
             "invocationId": "1111111111111111",
             "requestDigest": null,
-            "reservedTokens": 4096,
+            "reservedTokens": 0,
             "actualTokens": 1250,
-            "previousEntryDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-            "entryDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            "previousEntryDigest": "395a60450403b18a217b4feb55ac0ea0141dbc60db6cbccb956e13d56f2a0296",
+            "entryDigest": "1186ec2eee1a1c40a66b61221fdeecd139ea899f255b80b550a2d146cc4cb390"
           }
         ],
         "createdAt": "2026-09-05T08:00:00Z",
@@ -315,7 +326,7 @@
         "taskId": "0123456789abcdef",
         "attemptId": "3333333333333333",
         "totalBudgetTokens": 200000,
-        "consumedTokens": 1250,
+        "consumedTokens": 0,
         "status": "ACTIVE",
         "journal": [
           {
@@ -345,7 +356,7 @@
         "taskId": "0123456789abcdef",
         "attemptId": "3333333333333333",
         "totalBudgetTokens": -1,
-        "consumedTokens": 1250,
+        "consumedTokens": 0,
         "status": "ACTIVE",
         "journal": [
           {
@@ -354,8 +365,9 @@
             "invocationId": "1111111111111111",
             "requestDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
             "reservedTokens": 4096,
+            "actualTokens": null,
             "previousEntryDigest": "pi-budget-root-v1",
-            "entryDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            "entryDigest": "5b600a3de8d2980dcbc49e8a12a95ef52710bd13bbb56ed06f6f2f06d3a2b887"
           },
           {
             "seq": 2,
@@ -363,18 +375,19 @@
             "invocationId": "1111111111111111",
             "requestDigest": null,
             "reservedTokens": 0,
-            "previousEntryDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-            "entryDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            "actualTokens": null,
+            "previousEntryDigest": "5b600a3de8d2980dcbc49e8a12a95ef52710bd13bbb56ed06f6f2f06d3a2b887",
+            "entryDigest": "395a60450403b18a217b4feb55ac0ea0141dbc60db6cbccb956e13d56f2a0296"
           },
           {
             "seq": 3,
             "entryType": "SETTLED",
             "invocationId": "1111111111111111",
             "requestDigest": null,
-            "reservedTokens": 4096,
+            "reservedTokens": 0,
             "actualTokens": 1250,
-            "previousEntryDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-            "entryDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            "previousEntryDigest": "395a60450403b18a217b4feb55ac0ea0141dbc60db6cbccb956e13d56f2a0296",
+            "entryDigest": "1186ec2eee1a1c40a66b61221fdeecd139ea899f255b80b550a2d146cc4cb390"
           }
         ],
         "createdAt": "2026-09-05T08:00:00Z"
@@ -405,8 +418,9 @@
             "invocationId": "1111111111111111",
             "requestDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
             "reservedTokens": 4096,
+            "actualTokens": null,
             "previousEntryDigest": "pi-budget-root-v1",
-            "entryDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            "entryDigest": "5b600a3de8d2980dcbc49e8a12a95ef52710bd13bbb56ed06f6f2f06d3a2b887"
           },
           {
             "seq": 2,
@@ -414,18 +428,19 @@
             "invocationId": "1111111111111111",
             "requestDigest": null,
             "reservedTokens": 0,
-            "previousEntryDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-            "entryDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            "actualTokens": null,
+            "previousEntryDigest": "5b600a3de8d2980dcbc49e8a12a95ef52710bd13bbb56ed06f6f2f06d3a2b887",
+            "entryDigest": "395a60450403b18a217b4feb55ac0ea0141dbc60db6cbccb956e13d56f2a0296"
           },
           {
             "seq": 3,
             "entryType": "SETTLED",
             "invocationId": "1111111111111111",
             "requestDigest": null,
-            "reservedTokens": 4096,
+            "reservedTokens": 0,
             "actualTokens": 1250,
-            "previousEntryDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-            "entryDigest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+            "previousEntryDigest": "395a60450403b18a217b4feb55ac0ea0141dbc60db6cbccb956e13d56f2a0296",
+            "entryDigest": "1186ec2eee1a1c40a66b61221fdeecd139ea899f255b80b550a2d146cc4cb390"
           }
         ],
         "createdAt": "2026-09-05T08:00:00Z",
@@ -437,16 +452,16 @@
           "audience": "pi.platform",
           "objectType": "budget_grant",
           "schemaVersion": "2",
-          "payloadDigest": "sha256:e1625de0c66c4ac70f0580bcc70af8950b706dc3205f5363e7f4149fcc1bb773",
+          "payloadDigest": "sha256:d42d48284a03801457fd198b239cca62fc1750464f89066acff56c7b5f0567a4",
           "controlPlaneEpoch": 1,
           "signedAt": "2026-09-05T08:01:00Z",
           "value": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc=="
         }
       },
       "calculateOnLoad": true,
-      "canonicalPayloadB64": "eyJhdHRlbXB0SWQiOiIzMzMzMzMzMzMzMzMzMzMzIiwiY29uc3VtZWRUb2tlbnMiOjEyNTAsImNvbnRyYWN0SWQiOiJhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYSIsImNvbnRyYWN0VmVyc2lvbiI6IjIiLCJjcmVhdGVkQXQiOiIyMDI2LTA5LTA1VDA4OjAwOjAwWiIsImdyYW50SWQiOiIyMjIyMjIyMjIyMjIyMjIyIiwiam91cm5hbCI6W3siZW50cnlEaWdlc3QiOiJhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhIiwiZW50cnlUeXBlIjoiUkVTRVJWRUQiLCJpbnZvY2F0aW9uSWQiOiIxMTExMTExMTExMTExMTExIiwicHJldmlvdXNFbnRyeURpZ2VzdCI6InBpLWJ1ZGdldC1yb290LXYxIiwicmVxdWVzdERpZ2VzdCI6ImFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhIiwicmVzZXJ2ZWRUb2tlbnMiOjQwOTYsInNlcSI6MX0seyJlbnRyeURpZ2VzdCI6ImJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmIiLCJlbnRyeVR5cGUiOiJTRU5UIiwiaW52b2NhdGlvbklkIjoiMTExMTExMTExMTExMTExMSIsInByZXZpb3VzRW50cnlEaWdlc3QiOiJhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhIiwicmVxdWVzdERpZ2VzdCI6bnVsbCwicmVzZXJ2ZWRUb2tlbnMiOjAsInNlcSI6Mn0seyJhY3R1YWxUb2tlbnMiOjEyNTAsImVudHJ5RGlnZXN0IjoiY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjYyIsImVudHJ5VHlwZSI6IlNFVFRMRUQiLCJpbnZvY2F0aW9uSWQiOiIxMTExMTExMTExMTExMTExIiwicHJldmlvdXNFbnRyeURpZ2VzdCI6ImJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmIiLCJyZXF1ZXN0RGlnZXN0IjpudWxsLCJyZXNlcnZlZFRva2VucyI6NDA5Niwic2VxIjozfV0sInN0YXR1cyI6IkFDVElWRSIsInRhc2tJZCI6IjAxMjM0NTY3ODlhYmNkZWYiLCJ0b3RhbEJ1ZGdldFRva2VucyI6MjAwMDAwLCJ3b3JrbG9hZElkZW50aXR5IjoicGkuZ2F0ZSJ9",
-      "payloadDigest": "sha256:e1625de0c66c4ac70f0580bcc70af8950b706dc3205f5363e7f4149fcc1bb773",
-      "signatureInputB64": "eyJhdWRpZW5jZSI6InBpLnBsYXRmb3JtIiwiY29udHJvbFBsYW5lRXBvY2giOjEsImlzc3VlciI6ImdhdGV3YXktc2VydmljZSIsImlzc3Vlcldvcmtsb2FkSWRlbnRpdHkiOiJwaS5nYXRlIiwia2V5SWQiOiJzay1nYXRlIiwib2JqZWN0VHlwZSI6ImJ1ZGdldF9ncmFudCIsInBheWxvYWREaWdlc3QiOiJzaGEyNTY6ZTE2MjVkZTBjNjZjNGFjNzBmMDU4MGJjYzcwYWY4OTUwYjcwNmRjMzIwNWY1MzYzZTdmNDE0OWZjYzFiYjc3MyIsInNjaGVtYVZlcnNpb24iOiIyIiwic2lnbmF0dXJlQWxnb3JpdGhtIjoiRWQyNTUxOSIsInNpZ25hdHVyZUNvbnRleHQiOiJwaS5jb250cmFjdC5zaWduYXR1cmUudjEiLCJzaWduZWRBdCI6IjIwMjYtMDktMDVUMDg6MDE6MDBaIn0="
+      "canonicalPayloadB64": "eyJhdHRlbXB0SWQiOiIzMzMzMzMzMzMzMzMzMzMzIiwiY29udHJhY3RJZCI6ImFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhIiwiY29udHJhY3RWZXJzaW9uIjoiMiIsImNyZWF0ZWRBdCI6IjIwMjYtMDktMDVUMDg6MDA6MDBaIiwiZ3JhbnRJZCI6IjIyMjIyMjIyMjIyMjIyMjIiLCJ0YXNrSWQiOiIwMTIzNDU2Nzg5YWJjZGVmIiwidG90YWxCdWRnZXRUb2tlbnMiOjIwMDAwMCwid29ya2xvYWRJZGVudGl0eSI6InBpLmdhdGUifQ==",
+      "payloadDigest": "sha256:d42d48284a03801457fd198b239cca62fc1750464f89066acff56c7b5f0567a4",
+      "signatureInputB64": "eyJhdWRpZW5jZSI6InBpLnBsYXRmb3JtIiwiY29udHJvbFBsYW5lRXBvY2giOjEsImlzc3VlciI6ImdhdGV3YXktc2VydmljZSIsImlzc3Vlcldvcmtsb2FkSWRlbnRpdHkiOiJwaS5nYXRlIiwia2V5SWQiOiJzay1nYXRlIiwib2JqZWN0VHlwZSI6ImJ1ZGdldF9ncmFudCIsInBheWxvYWREaWdlc3QiOiJzaGEyNTY6ZDQyZDQ4Mjg0YTAzODAxNDU3ZmQxOThiMjM5Y2NhNjJmYzE3NTA0NjRmODkwNjZhY2ZmNTZjN2I1ZjA1NjdhNCIsInNjaGVtYVZlcnNpb24iOiIyIiwic2lnbmF0dXJlQWxnb3JpdGhtIjoiRWQyNTUxOSIsInNpZ25hdHVyZUNvbnRleHQiOiJwaS5jb250cmFjdC5zaWduYXR1cmUudjEiLCJzaWduZWRBdCI6IjIwMjYtMDktMDVUMDg6MDE6MDBaIn0="
     }
   ]
 }

@@ -181,6 +181,41 @@ class BudgetDomain:
                 "UPDATE gw_budget_grants SET status='SETTLED', "
                 "settled_at=now() WHERE id=%s", (self.grant_id,))
 
+    # ---------- 契约快照语义校验（budget_grant v2）----------
+
+    @staticmethod
+    def verified_budget_grant(report: dict) -> list[str]:
+        """校验 BudgetGrant 契约快照的事实一致性（评审 fix：schema 形状之外
+        的语义——seq 连续/链连续/条 digest 真实/consumed 对账）。
+
+        返回问题列表；空 = 合法快照。供正/负向量与验收使用。"""
+        problems: list[str] = []
+        journal = report.get("journal") or []
+        grant_id = report.get("grantId") or ""
+        prev_digest = ROOT_DIGEST
+        for i, entry in enumerate(journal, start=1):
+            if entry.get("seq") != i:
+                problems.append(f"journal seq 不连续: 期望 {i} 实际 {entry.get('seq')}")
+            if entry.get("previousEntryDigest") != prev_digest:
+                problems.append(
+                    f"seq {entry.get('seq')} 链断裂: previous="
+                    f"{entry.get('previousEntryDigest')!r} 期望 {prev_digest!r}")
+            recomputed = _entry_digest(
+                prev_digest, grant_id, entry.get("invocationId", ""),
+                entry.get("entryType", ""), entry.get("reservedTokens", 0),
+                entry.get("actualTokens"), entry.get("requestDigest"))
+            if entry.get("entryDigest") != recomputed:
+                problems.append(f"seq {entry.get('seq')} entryDigest 非真实重算")
+            prev_digest = entry.get("entryDigest", "")
+        settled_sum = sum(
+            (e.get("actualTokens") or 0) for e in journal
+            if e.get("entryType") == "SETTLED")
+        if (report.get("consumedTokens") or 0) != settled_sum:
+            problems.append(
+                f"consumedTokens={report.get('consumedTokens')} "
+                f"!= ΣSETTLED.actualTokens={settled_sum}")
+        return problems
+
     # ---------- 链式 Journal ----------
 
     def _last_digest(self, conn) -> str:

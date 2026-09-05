@@ -12,12 +12,9 @@
     "/taskId",
     "/attemptId",
     "/totalBudgetTokens",
-    "/consumedTokens",
-    "/status",
-    "/journal",
     "/createdAt"
   ],
-  "orderedArrays": ["/journal"],
+  "mutableDatabasePointers": ["/consumedTokens", "/status", "/journal"],
   "signatureEnvelopePointers": ["/signature"],
-  "notes": "BudgetGrant：Gateway 预算 Grant 声明 + 链式消费 Journal。journal 为**有序语义**（previousEntryDigest/entryDigest 链式追加，顺序不可重排），声明 orderedArrays（与 canonicalSortKeys 互斥，profile 一致性校验强制）——JCS 不替数组排序，投影按原序。signature 为蓝图 §9.4 十字段信封（value=Ed25519 64 字节 Base64）。"
+  "notes": "BudgetGrant：调用前签发的**不可变额度授权**（蓝图 §18.3：BudgetGrant 绑定 Gateway 代次、持久化预留）。签名 payload 只锚定签发字段（grantId/taskId/attemptId/totalBudgetTokens 等）；consumedTokens/status/journal 为后续**消费事实**（mutable，不进入投影）——每次结算/失败/未知都改变事务事实但不改变 Grant 授权签名。Journal 链式事实的有序性与逐条 digest 由语义校验（app.runtime.budget.verified_budget_grant）保证。signature 为蓝图 §9.4 十字段信封（value=Ed25519 64 字节 Base64）。"
 }

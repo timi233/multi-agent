@@ -1,6 +1,6 @@
-"""budget_grant v2 契约测试：正/负向量、digest 重算、profile 一致性（orderedArrays 语义）。"""
+"""budget_grant v2 契约测试：正/负向量、digest 重算、Grant 签发不可变 +
+消费事实 mutable、语义校验（verified_budget_grant）。"""
 import base64
-import hashlib
 import json
 from pathlib import Path
 
@@ -16,6 +16,7 @@ from app.contracts.codec import (
     payload_digest,
     validate_profile_consistency,
 )
+from app.runtime.budget import ROOT_DIGEST, _entry_digest, BudgetDomain
 
 ROOT = Path(__file__).resolve().parent.parent
 VECTORS = json.loads(
@@ -25,6 +26,10 @@ VECTORS = json.loads(
 SCHEMA = load_schema("budget_grant", "2")
 PROFILE = load_digest_profile("budget_grant", "2")
 VALIDATOR = Draft202012Validator(SCHEMA)
+
+
+def _vec(vid: str) -> dict:
+    return next(x for x in VECTORS["vectors"] if x["id"] == vid)
 
 
 def test_profile_consistency_ok():
@@ -53,60 +58,86 @@ def test_positive_digests_recomputable():
 
 
 def test_pos_signed_envelope_self_consistent():
-    """pos-signed：信封 meta 重算得同一 signatureInput/payloadDigest。"""
-    v = next(x for x in VECTORS["vectors"] if x["id"] == "pos-signed")
+    v = _vec("pos-signed")
     obj = v["object"]
     meta = {k: obj["signature"][k] for k in SIGNATURE_ENVELOPE_KEYS
             if k in obj["signature"]}
     env, sig_in, _ = build_signature_envelope(obj, SCHEMA, PROFILE, meta)
     assert env["payloadDigest"] == v["payloadDigest"]
-    assert obj["signature"]["payloadDigest"] == v["payloadDigest"]  # 自洽回填
+    assert obj["signature"]["payloadDigest"] == v["payloadDigest"]
     assert base64.b64encode(sig_in).decode() == v["signatureInputB64"]
 
 
-def test_journal_ordered_array_semantics():
-    """journal 声明 orderedArrays（链式有序）：乱序 journal → digest 变化
-    （与 CT-03 集合数组相反）；若误把 journal 声明为 canonicalSortKeys 则
-    profile 一致性校验拒绝（互斥）。"""
-    base = next(x for x in VECTORS["vectors"] if x["id"] == "pos-chain-settled")
-    obj = base["object"]
-    ordered = canonical_payload(obj, PROFILE)
-    reversed_obj = dict(obj, journal=list(reversed(obj["journal"])))
-    assert canonical_payload(reversed_obj, PROFILE) != ordered  # 顺序敏感
-    # 互斥声明：journal 同时进 canonicalSortKeys 与 orderedArrays → 拒绝
-    bad_profile = dict(PROFILE)
-    bad_profile["canonicalSortKeys"] = {"/journal": {"by": "value"}}
-    problems = validate_profile_consistency(SCHEMA, bad_profile)
-    assert any("互斥" in p or "orderedArrays" in p or "canonicalSortKeys" in p
-               for p in problems)
+def test_journal_chain_is_real_digests():
+    """向量链为真实 _entry_digest 序列：previous 链、entryDigest 逐条重算相等
+    （评审 block-fix：不再人工占位）。"""
+    for v in VECTORS["vectors"]:
+        if v["kind"] != "positive" or not v["object"].get("journal"):
+            continue
+        prev = ROOT_DIGEST
+        grant_id = v["object"]["grantId"]
+        for e in v["object"]["journal"]:
+            assert e["previousEntryDigest"] == prev, v["id"]
+            recomputed = _entry_digest(
+                prev, grant_id, e["invocationId"], e["entryType"],
+                e["reservedTokens"], e.get("actualTokens"), e.get("requestDigest"))
+            assert e["entryDigest"] == recomputed, v["id"]
+            prev = e["entryDigest"]
 
 
-def test_broken_chain_digest_vector_value():
-    """budget 运行时链式 digest（sha256 hex，无前缀）与会话预算实现一致：
-    previousEntryDigest 首条=根锚、后继=前条 entryDigest（契约样本自洽）。"""
-    chain = next(x for x in VECTORS["vectors"]
-                 if x["id"] == "pos-chain-settled")["object"]["journal"]
-    assert chain[0]["previousEntryDigest"] == "pi-budget-root-v1"
-    for prev, cur in zip(chain, chain[1:]):
-        assert cur["previousEntryDigest"] == prev["entryDigest"]
-        assert len(cur["entryDigest"]) == 64
-        int(cur["entryDigest"], 16)  # 合法 hex
+def test_verified_function_accepts_positive_rejects_tamper():
+    """verified_budget_grant：正向量全通过；篡改（断链/伪造 digest/consumed
+    对账不符）均报问题；可信快照 empty。"""
+    for v in VECTORS["vectors"]:
+        if v["kind"] == "positive":
+            assert BudgetDomain.verified_budget_grant(v["object"]) == [], v["id"]
+    base = _vec("pos-chain-settled")["object"]
+    # 断链：前条 digest 被改
+    tampered = json.loads(json.dumps(base))
+    tampered["journal"][1]["previousEntryDigest"] = "f" * 64
+    assert any("链断裂" in p
+               for p in BudgetDomain.verified_budget_grant(tampered))
+    # 伪造 digest：非真实重算
+    tampered2 = json.loads(json.dumps(base))
+    tampered2["journal"][2]["entryDigest"] = "e" * 64
+    assert any("非真实重算" in p
+               for p in BudgetDomain.verified_budget_grant(tampered2))
+    # consumed 对账不符
+    tampered3 = json.loads(json.dumps(base))
+    tampered3["consumedTokens"] = 9999
+    assert any("consumedTokens" in p
+               for p in BudgetDomain.verified_budget_grant(tampered3))
 
 
-def test_entry_digest_matches_runtime_algorithm():
-    """契约链 digest 与 app.runtime.budget._entry_digest 同算法（哈希一致性）。"""
-    from app.runtime.budget import _entry_digest
+def test_grant_immutable_consumption_mutable():
+    """Grant 签发不变：追加消费事实（journal/consumed/status 变化）不改变
+    payloadDigest；签发额度变化（totalBudgetTokens）才改变（评审 block-fix：对象
+    边界——不可变授权与消费事实分离）。"""
+    base = _vec("pos-chain-settled")["object"]
+    digest1 = payload_digest(base, PROFILE)
+    more = json.loads(json.dumps(base))
+    more["journal"].append({
+        "seq": 4, "entryType": "SETTLED", "invocationId": "1111111111111111",
+        "requestDigest": None, "reservedTokens": 0, "actualTokens": 10,
+        "previousEntryDigest": base["journal"][-1]["entryDigest"],
+        "entryDigest": "0" * 64,  # mutable 事实不投影，digest 不受影响
+    })
+    more["consumedTokens"] = 1260
+    more["status"] = "SETTLED"
+    assert payload_digest(more, PROFILE) == digest1  # 消费事实不改变授权签名
+    changed = dict(base, totalBudgetTokens=100000)
+    assert payload_digest(changed, PROFILE) != digest1  # 签发额度变化必变
 
-    chain = next(x for x in VECTORS["vectors"]
-                 if x["id"] == "pos-chain-settled")["object"]["journal"]
-    recomputed = []
-    for entry in chain:
-        d = _entry_digest(
-            entry["previousEntryDigest"], "2222222222222222",
-            entry["invocationId"], entry["entryType"], entry["reservedTokens"],
-            entry.get("actualTokens"), entry.get("requestDigest"))
-        recomputed.append(d)
-    # 契约样本 entryDigest 为人为构造（a/b/c），此处只验证算法输入输出形状
-    # 一致：任意条目重算结果均为 64hex（运行时可复算链）
-    for d in recomputed:
-        assert len(d) == 64 and all(c in "0123456789abcdef" for c in d)
+
+def test_positive_facts_self_consistent():
+    """正向量事实自洽：consumedTokens == ΣSETTLED.actualTokens，且状态与
+    journal 生命周期对应（评审 should-fix：消除矛盾样例）。"""
+    for v in VECTORS["vectors"]:
+        if v["kind"] != "positive":
+            continue
+        obj = v["object"]
+        settled = sum(e.get("actualTokens") or 0 for e in obj["journal"]
+                      if e.get("entryType") == "SETTLED")
+        assert obj["consumedTokens"] == settled, v["id"]
+    assert _vec("pos-minimal")["object"]["consumedTokens"] == 0
+    assert _vec("pos-unknown")["object"]["consumedTokens"] == 0

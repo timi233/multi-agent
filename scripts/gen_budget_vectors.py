@@ -4,7 +4,10 @@
 覆盖：空 journal（无消费）、链式 journal 全生命周期（RESERVED→SENT→SETTLED）、
 FAILED 释放、UNKNOWN 保守占额、pos-signed（§9.4 信封自洽回填 payloadDigest）；
 负向量：状态枚举外、entryDigest 非 hex、未知字段、缺必填。
-环境变量 PI_VEC_OUT 可覆盖输出目录（可复现性测试用）。
+
+链式 digest 用 app.runtime.budget._entry_digest 逐条真实计算（previousEntryDigest
+= 前条 entryDigest，首条 = pi-budget-root-v1）——向量即守法快照，可由
+BudgetDomain.verified_budget_grant 复核。环境变量 PI_VEC_OUT 可覆盖输出目录。
 """
 from __future__ import annotations
 
@@ -27,6 +30,7 @@ from app.contracts.codec import (  # noqa: E402
     load_schema,
     payload_digest,
 )
+from app.runtime.budget import ROOT_DIGEST, _entry_digest  # noqa: E402
 
 OUT_DEFAULT = ROOT / "contracts" / "test-vectors" / "budget_grant" / "v2"
 OUT = Path(os.environ.get("PI_VEC_OUT", OUT_DEFAULT))
@@ -35,69 +39,75 @@ SCHEMA = load_schema("budget_grant", "2")
 PROFILE = load_digest_profile("budget_grant", "2")
 VALIDATOR = Draft202012Validator(SCHEMA)
 
-_JOURNAL_CHAIN = [
-    {
-        "seq": 1, "entryType": "RESERVED", "invocationId": "1111111111111111",
-        "requestDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "reservedTokens": 4096,
-        "previousEntryDigest": "pi-budget-root-v1",
-        "entryDigest": "a" * 64,
-    },
-    {
-        "seq": 2, "entryType": "SENT", "invocationId": "1111111111111111",
-        "requestDigest": None, "reservedTokens": 0,
-        "previousEntryDigest": "a" * 64,
-        "entryDigest": "b" * 64,
-    },
-    {
-        "seq": 3, "entryType": "SETTLED", "invocationId": "1111111111111111",
-        "requestDigest": None, "reservedTokens": 4096, "actualTokens": 1250,
-        "previousEntryDigest": "b" * 64,
-        "entryDigest": "c" * 64,
-    },
-]
+GRANT_ID = "2222222222222222"
+INV = "1111111111111111"
+
+
+def _chain(specs: list[tuple]) -> list[dict]:
+    """按 _entry_digest 逐条生成真实链（previous=前条 digest，首条=根锚）。"""
+    out: list[dict] = []
+    prev = ROOT_DIGEST
+    for seq, (etype, req, reserved, actual) in enumerate(specs, start=1):
+        digest = _entry_digest(prev, GRANT_ID, INV, etype, reserved, actual, req)
+        out.append({
+            "seq": seq, "entryType": etype, "invocationId": INV,
+            "requestDigest": req, "reservedTokens": reserved,
+            "actualTokens": actual, "previousEntryDigest": prev,
+            "entryDigest": digest,
+        })
+        prev = digest
+    return out
+
+
+CHAIN_FULL = _chain([
+    ("RESERVED", "a" * 32, 4096, None),
+    ("SENT", None, 0, None),
+    ("SETTLED", None, 0, 1250),
+])
+CHAIN_FAILED = _chain([
+    ("RESERVED", "a" * 32, 4096, None),
+    ("FAILED", None, 4096, None),
+])
+CHAIN_UNKNOWN = _chain([
+    ("RESERVED", "a" * 32, 4096, None),
+    ("UNKNOWN", None, 0, None),
+])
 
 BASE = {
     "contractId": "a" * 32,
     "contractVersion": "2",
     "workloadIdentity": "pi.gate",
-    "grantId": "2222222222222222",
+    "grantId": GRANT_ID,
     "taskId": "0123456789abcdef",
     "attemptId": "3333333333333333",
     "totalBudgetTokens": 200000,
-    "consumedTokens": 1250,
+    "consumedTokens": 0,
     "status": "ACTIVE",
-    "journal": _JOURNAL_CHAIN,
+    "journal": CHAIN_FULL,
     "createdAt": "2026-09-05T08:00:00Z",
 }
 
 CASES = [
-    ("pos-minimal", True, "合法对象：新建 Grant 尚无消费（空 journal）",
-     {"journal": []}, None),
-    ("pos-chain-settled", True, "链式 journal 全生命周期（RESERVED→SENT→SETTLED）",
-     None, None),
-    ("pos-failed-release", True, "FAILED 释放预留（条目 reservedTokens=原预留）",
-     {"status": "SETTLED", "consumedTokens": 0,
-      "journal": [dict(_JOURNAL_CHAIN[0], seq=1),
-                  {"seq": 2, "entryType": "FAILED", "invocationId": "1111111111111111",
-                   "requestDigest": None, "reservedTokens": 4096,
-                   "previousEntryDigest": "a" * 64, "entryDigest": "b" * 64}]}, None),
-    ("pos-unknown", True, "UNKNOWN 保守占额（Provider 结果不确定）",
-     {"status": "EXHAUSTED", "journal": [dict(_JOURNAL_CHAIN[0], seq=1),
-      {"seq": 2, "entryType": "UNKNOWN", "invocationId": "1111111111111111",
-       "requestDigest": None, "reservedTokens": 0,
-       "previousEntryDigest": "a" * 64, "entryDigest": "d" * 64}]}, None),
+    ("pos-minimal", True, "合法对象：新建 Grant 尚未消费（空 journal、consumed=0）",
+     {"journal": [], "consumedTokens": 0, "status": "ACTIVE"}, None),
+    ("pos-chain-settled", True, "全生命周期消费中（SETTLED 已累计 consumed=1250，Grant 仍 ACTIVE）",
+     {"journal": CHAIN_FULL, "consumedTokens": 1250, "status": "ACTIVE"}, None),
+    ("pos-failed-release", True, "FAILED 释放预留（任务失败后 grant 终结 SETTLED，无实耗）",
+     {"journal": CHAIN_FAILED, "consumedTokens": 0, "status": "SETTLED"}, None),
+    ("pos-unknown", True, "UNKNOWN 保守占额（结果不确定不累计 consumed；预算占死后 EXHAUSTED）",
+     {"journal": CHAIN_UNKNOWN, "consumedTokens": 0, "status": "EXHAUSTED"}, None),
     ("neg-status-enum", False, "status 枚举外必须拒绝", {"status": "DONE"}, "enum"),
     ("neg-broken-entry-digest", False, "entryDigest 非 64hex 必须拒绝",
-     {"journal": [dict(_JOURNAL_CHAIN[0], entryDigest="zz")]}, "pattern"),
+     {"journal": [dict(CHAIN_FULL[0], entryDigest="zz")]}, "pattern"),
     ("neg-unknown-field", False, "未知字段必须拒绝", {"bogusField": "x"}, "unknown field"),
     ("neg-missing-entry-required", False, "journal 条目缺 entryDigest 必须拒绝",
      {"journal": [{"seq": 1, "entryType": "RESERVED",
-                   "invocationId": "1111111111111111", "reservedTokens": 1,
-                   "previousEntryDigest": "pi-budget-root-v1"}]}, "required"),
+                   "invocationId": INV, "reservedTokens": 1,
+                   "previousEntryDigest": ROOT_DIGEST}]}, "required"),
     ("neg-negative-total", False, "totalBudgetTokens 负数必须拒绝",
      {"totalBudgetTokens": -1}, "minimum"),
     ("pos-signed", True, "含 §9.4 签名信封（对象自洽回填 payloadDigest）",
-     {"signature": {
+     {"consumedTokens": 1250, "signature": {
          "signatureAlgorithm": "Ed25519", "keyId": "sk-gate", "issuer": "gateway-service",
          "issuerWorkloadIdentity": "pi.gate", "audience": "pi.platform",
          "objectType": "budget_grant", "schemaVersion": "2",
