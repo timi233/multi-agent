@@ -83,6 +83,14 @@
 - Grant 生命周期：任务收敛（成功/失败/预算耗尽）在终态事务中 `settle_grant`（SETTLED）。
 - 简化差距（记录）：GW-10"热路径不查询 PostgreSQL"未达（每预算操作一次 PG 往返，单实例可接受）；单实例单代次、无 Ledger Service 分片对账、预算为全局每 attempt（`PI_MAX_BUDGET_TOKENS`/`PI_BUDGET_RESERVE_TOKENS`）、Grant 轮换/故障转移未实现。
 
+## G1 编排与 Run 状态机（蓝图 §6.3/6.4/§8.2/§10.5.1 单机子集）
+
+- 产物：`migrations/003_run_state_machine.sql`（`pi_runs` 表 + `pi_tasks.plan` 列）、`app/orchestrator.py`（`compile_plan`）、`app/runtime/run_state.py`（白名单 + 表操作）、worker 逐步执行接线、`GET /api/v1/tasks/{id}/runs`（RunOut）、`tests/test_run_state.py`（5 项）+ `tests/test_orchestrator.py`（8 项）。
+- **Plan 先行**：Task 进入执行前 `compile_plan` 发布**签名 ExecutionPlanSnapshot**（INITIAL，产物必过 `verified_execution_plan` 语义校验）；旧任务（无 `plan`）编译为默认单步 IMPLEMENTATION（行为兼容回归）；`POST /tasks` 可携带 `plan` 步骤数组（多步：IMPLEMENTATION/READ_ONLY…按 plannedAttemptInputs 次序顺序执行，依赖由步骤次序保证）。
+- **Run 状态机**（`pi_runs`，每任务每步一 Run，`UNIQUE(task_id, step_index)`）：`CREATED→READY→EXECUTING→OUTPUT_STAGED→VERIFYING→VERIFIED`；失败映射 `EXECUTING→FAILED|BUDGET_EXHAUSTED`；任意非终态→`CANCELLED`（cancel 同事务收敛全部活动 Run）；`recover_stale` 启动恢复将任务遗留活动 Run 一并收敛 `FAILED(PLATFORM_RESTART)`（不悬挂/不与任务终态漂移）。Attempt 每步独立（独立 AttemptId/BudgetGrant/ATTEMPT_* 事件），步骤终态同事务 `settle_grant`；Grant 结算按 task_id 全量 ACTIVE→SETTLED（多步多 grant 幂等收敛）。
+- 事件扩展：`TASK_PLAN_COMPILED`（计划 id/digest/步骤数）、`RUN_CREATED`（runId/stepIndex/kind）、`ATTEMPT_STARTED/FINISHED` 带 runId/stepIndex。
+- 简化差距（记录）：每步独立 BudgetGrant（同 `PI_MAX_BUDGET_TOKENS`，Task 级总预算收敛待 G6）；无 Lease/Fencing（§6.5 单实例单代次）；NO_VERDICT/HANDOFF_TO_HUMAN/BLOCKED/FAILED_DEPENDENCY/REPAIR_REQUIRED 为蓝图保留名（子集不达）；REVIEW runKind 不触 Git/评审流（随 G5）；计划每次编译生成新快照（新 input id），同一 task.plan 不重编译旧计划；运行时计划信封与 RT/attempt 共用节点密钥（issuer=pi.orchestrator，正式独立 Orchestrator 密钥随 Phase 0 ADR/G4）。
+
 ## 兼容性边界（CT-03 语义变更，如实披露）
 
 - 启用 `canonicalSortKeys` 后，`attempt_contract`（schemaVersion="2"）的 `toolAllowlist` 语义由"有序（元素顺序即声明顺序，JCS 不重排）"改为"**集合（无序）**——投影前按元素值字节序 canonical sort，乱序传入 digest 稳定"。

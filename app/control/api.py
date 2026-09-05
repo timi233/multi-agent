@@ -42,11 +42,14 @@ def create_task(body: models.TaskCreate):
         with conn.cursor() as cur:
             cur.execute(
                 """
-                INSERT INTO pi_tasks (id, title, prompt, workspace, status, model)
-                VALUES (%s, %s, %s, %s, 'QUEUED', %s)
+                INSERT INTO pi_tasks (id, title, prompt, workspace, status, model, plan)
+                VALUES (%s, %s, %s, %s, 'QUEUED', %s, %s::jsonb)
                 RETURNING *
                 """,
-                (task_id, body.title, body.prompt, workspace, body.model or settings.cliproxy_model),
+                (task_id, body.title, body.prompt, workspace,
+                 body.model or settings.cliproxy_model,
+                 json.dumps(body.plan, ensure_ascii=False) if body.plan is not None
+                 else None),
             )
             row = cur.fetchone()
             cur.execute(
@@ -108,10 +111,33 @@ def cancel_task(task_id: str):
                 "WHERE task_id=%s AND status='ACTIVE'",
                 (task_id,),
             )
+            cur.execute(  # 取消同事务收敛任务全部活动 Run（蓝图 §8.2 任意非终态→CANCELLED）
+                "UPDATE pi_runs SET status='CANCELLED', error_code='TASK_CANCELLED', "
+                "finished_at=now(), updated_at=now() "
+                "WHERE task_id=%s AND status IN "
+                "('CREATED','READY','EXECUTING','OUTPUT_STAGED','VERIFYING')",
+                (task_id,),
+            )
         conn.commit()
     finally:
         conn.close()
     return _row_to_task(row)
+
+
+# ---------- Run（编排步骤执行记录，蓝图 §8.2） ----------
+
+@router.get("/tasks/{task_id}/runs", response_model=list[models.RunOut])
+def list_runs(task_id: str):
+    if not execute_one("SELECT 1 FROM pi_tasks WHERE id=%s", (task_id,)):
+        raise HTTPException(404, f"task {task_id} not found")
+    rows = execute(
+        "SELECT run_id, task_id, step_index, workflow_node_id, run_kind, "
+        "deliverable_kind, execution_plan_snapshot_id, plan_digest, attempt_id, "
+        "status, error_code, created_at, updated_at, finished_at "
+        "FROM pi_runs WHERE task_id=%s ORDER BY step_index",
+        (task_id,),
+    )
+    return [models.RunOut(**r) for r in rows]
 
 
 # ---------- 事件 ----------

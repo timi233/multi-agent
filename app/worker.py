@@ -19,9 +19,19 @@ from pathlib import Path
 from .config import settings
 from .db import connect
 from .runtime.budget import BudgetDomain, BudgetExceeded
+from .runtime.run_state import insert_run, transition_run
 
 _RUNNING = "RUNNING"
 _TERMINAL = ("SUCCESS", "FAILED", "CANCELLED")
+_RUN_TERMINAL = ("VERIFIED", "FAILED", "BUDGET_EXHAUSTED", "CANCELLED")
+
+
+class _StepFailure(Exception):
+    """任务步骤业务失败（非平台异常）：收敛 Run/Attempt 后由外层收敛 Task。"""
+
+    def __init__(self, error: str):
+        super().__init__(error)
+        self.error = error
 
 
 def _emit_event(conn, task_id: str, attempt_id: str, event_type: str, payload: dict) -> None:
@@ -55,8 +65,27 @@ def _converge_attempt(conn, task_id: str, attempt_id: str, task_state: str,
                     {"status": task_state, "note": note})
 
 
+def _fail_run_isolated(run_id: str, status: str, error_code: str) -> None:
+    """独立连接将 Run 收敛为终态（幂等：仅非终态可收敛，用于预算耗尽等
+    aborted 事务之后的补偿路径）。"""
+    conn = connect()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                "UPDATE pi_runs SET status=%s, error_code=%s, finished_at=now(), "
+                "updated_at=now() WHERE run_id=%s AND status NOT IN "
+                "('VERIFIED','FAILED','BUDGET_EXHAUSTED','CANCELLED')",
+                (status, error_code, run_id),
+            )
+        conn.commit()
+    finally:
+        conn.close()
+
+
 def recover_stale() -> list[str]:
-    """启动恢复：把崩溃遗留的 RUNNING 任务收敛为 FAILED（含已建 attempt 但未终态者），不悬挂。"""
+    """启动恢复：把崩溃遗留的 RUNNING 任务收敛为 FAILED（含已建 attempt 但未终态者），
+    并把该任务仍在活动的 Run（CREATED/READY/EXECUTING/OUTPUT_STAGED/VERIFYING）
+    一并收敛为 FAILED（PLATFORM_RESTART），不悬挂、不与任务终态漂移。"""
     conn = connect()
     stale: list[str] = []
     try:
@@ -68,6 +97,13 @@ def recover_stale() -> list[str]:
                     "UPDATE pi_tasks SET status='FAILED', finished_at=now(), "
                     "updated_at=now(), error='PLATFORM_RESTART: RUNNING at startup' "
                     "WHERE id=%s AND status='RUNNING'",
+                    (tid,),
+                )
+                cur.execute(
+                    "UPDATE pi_runs SET status='FAILED', error_code='PLATFORM_RESTART', "
+                    "finished_at=now(), updated_at=now() "
+                    "WHERE task_id=%s AND status NOT IN "
+                    "('VERIFIED','FAILED','BUDGET_EXHAUSTED','CANCELLED')",
                     (tid,),
                 )
                 cur.execute(
@@ -176,10 +212,14 @@ def _fail_task_isolated(task_id: str, error: str, attempt_id: str | None = None,
 def _run_task(conn, task_id: str) -> None:
     """执行一个已处于 RUNNING 的任务；任务可能被 cancel 抢占。
 
-    初始化（查询/attempt/事件/首 commit）与主执行都在统一异常边界内；
-    任何失败都经独立连接补偿收敛，任务不会停在 RUNNING（评审 fix-3/4）。
+    编译签名 ExecutionPlanSnapshot（旧任务→默认单步计划，兼容回归）→
+    逐步执行：每步建 Run（CREATED→READY→EXECUTING）、独立 Attempt 与
+    BudgetGrant、调 run_attempt；成功路径 OUTPUT_STAGED→VERIFYING→VERIFIED，
+    失败映射 FAILED/BUDGET_EXHAUSTED 并中断后续步骤；任务终态 SUCCESS/FAILED
+    由外层统一收敛。任何失败都经独立连接补偿收敛，任务不会停在 RUNNING。
     """
     attempt_id: str | None = None
+    current_run_id: str | None = None
     try:
         with conn.cursor() as cur:
             cur.execute("SELECT * FROM pi_tasks WHERE id=%s AND status=%s", (task_id, _RUNNING))
@@ -187,71 +227,142 @@ def _run_task(conn, task_id: str) -> None:
         if not task:
             return  # 已被取消或已终态
 
-        attempt_id = uuid.uuid4().hex[:16]
+        from .orchestrator import compile_plan  # 延迟导入（避免模块环）
+
+        plan = compile_plan(task)
         trace_id = uuid.uuid4().hex
         with conn.cursor() as cur:
-            cur.execute(
-                "INSERT INTO pi_attempts (id, task_id, number, status, trace_id) "
-                "VALUES (%s,%s,1,'CLAIMED',%s)",
-                (attempt_id, task_id, trace_id),
-            )
-            _emit_event(conn, task_id, attempt_id, "ATTEMPT_STARTED",
-                        {"traceId": trace_id, "model": task["model"]})
+            _emit_event(conn, task_id, None, "TASK_PLAN_COMPILED",
+                        {"executionPlanSnapshotId": plan["executionPlanSnapshotId"],
+                         "payloadDigest": plan["payloadDigest"],
+                         "steps": len(plan["plannedAttemptInputs"])})
         conn.commit()
 
-        # Gateway 预算：attempt 级 BudgetGrant（蓝图 §18.2；GW-07 超限阻断）
-        budget = BudgetDomain.create(conn, task_id, attempt_id,
-                                     settings.max_budget_tokens)
-        conn.commit()
-    except Exception as exc:  # 初始化失败：先释放已持锁再独立连接补偿，不悬挂
-        try:
-            conn.rollback()
-        except Exception:
-            pass
-        _fail_task_isolated(task_id, f"INIT: {type(exc).__name__}: {exc}", attempt_id)
-        return
-
-    try:
         workspace_dir = (settings.workspaces_dir / task["workspace"]).resolve()
         workspace_dir.mkdir(parents=True, exist_ok=True)
-
         from .runtime.agent import run_attempt  # 延迟导入：测试 monkeypatch agent.run_attempt
 
-        ok, summary, error = run_attempt(
-            task=task,
-            workspace_dir=workspace_dir,
-            trace_id=trace_id,
-            emit_event=lambda t, p: _emit_event(conn, task_id, attempt_id, t, p),
-            max_turns=settings.max_turns,
-            budget=budget,
-            budget_conn=conn,
-        )
-        final = "SUCCESS" if ok else "FAILED"
-        with conn.cursor() as cur:
-            cur.execute(
-                "UPDATE pi_tasks SET status=%s, finished_at=now(), updated_at=now(), error=%s "
-                "WHERE id=%s AND status=%s RETURNING id",
-                (final, error, task_id, _RUNNING),
-            )
-            finalized = cur.fetchone() is not None
-            if finalized:
+        last_attempt_id = None
+        for step in plan["plannedAttemptInputs"]:
+            attempt_id = None
+            # 每步重新锁定 Task 并确认仍 RUNNING（评审 block-2）：避免 cancel 竞争
+            # 窗口内继续创建并执行后续 Run（Task→Run 固定加锁顺序，与 cancel 一致）
+            with conn.cursor() as cur:
                 cur.execute(
-                    "UPDATE pi_attempts SET status='TERMINAL_REPORTED', finished_at=now() WHERE id=%s",
+                    "SELECT status FROM pi_tasks WHERE id=%s FOR UPDATE", (task_id,))
+                trow = cur.fetchone()
+                if trow is None or trow["status"] != _RUNNING:
+                    conn.commit()
+                    return  # 已被取消/已终态：不创建新 Run
+            step_index = int(step["workflowNodeId"].split("-")[1])
+            run_id = insert_run(
+                conn, task_id=task_id, step_index=step_index,
+                workflow_node_id=step["workflowNodeId"], run_kind=step["runKind"],
+                deliverable_kind=step["deliverableKind"],
+                execution_plan_snapshot_id=plan["executionPlanSnapshotId"],
+                plan_digest=plan["payloadDigest"], plan_payload=plan)
+            current_run_id = run_id
+            with conn.cursor() as cur:
+                _emit_event(conn, task_id, None, "RUN_CREATED",
+                            {"runId": run_id, "stepIndex": step_index,
+                             "workflowNodeId": step["workflowNodeId"],
+                             "runKind": step["runKind"],
+                             "deliverableKind": step["deliverableKind"]})
+            transition_run(conn, run_id, "READY")
+
+            attempt_id = uuid.uuid4().hex[:16]
+            with conn.cursor() as cur:
+                cur.execute(
+                    "INSERT INTO pi_attempts (id, task_id, number, status, trace_id) "
+                    "VALUES (%s,%s,1,'CLAIMED',%s)",
+                    (attempt_id, task_id, trace_id),
+                )
+                _emit_event(conn, task_id, attempt_id, "ATTEMPT_STARTED",
+                            {"traceId": trace_id, "model": task["model"],
+                             "runId": run_id, "stepIndex": step_index})
+            transition_run(conn, run_id, "EXECUTING", attempt_id=attempt_id)
+            budget = BudgetDomain.create(conn, task_id, attempt_id,
+                                         settings.max_budget_tokens)
+            conn.commit()
+
+            try:
+                step_input = dict(task)
+                step_input["prompt"] = step["promptContent"]
+                ok, summary, error = run_attempt(
+                    task=step_input,
+                    workspace_dir=workspace_dir,
+                    trace_id=trace_id,
+                    emit_event=lambda t, p: _emit_event(conn, task_id, attempt_id, t, p),
+                    max_turns=settings.max_turns,
+                    budget=budget,
+                    budget_conn=conn,
+                )
+            except BudgetExceeded as exc:  # 该步预算耗尽：先收敛 Run 再抛给外层收敛 Task
+                try:
+                    conn.rollback()
+                except Exception:
+                    pass
+                _fail_run_isolated(run_id, "BUDGET_EXHAUSTED", str(exc)[:200])
+                raise
+
+            if not ok:  # 步骤业务失败：Run/Attempt/Grant 在当前事务收敛后中断
+                with conn.cursor() as cur:
+                    transition_run(conn, run_id, "FAILED", attempt_id=attempt_id,
+                                   error_code=(error or "STEP_FAILED")[:200])
+                    cur.execute(
+                        "UPDATE pi_attempts SET status='TERMINAL_REPORTED', "
+                        "finished_at=now() WHERE id=%s AND status='CLAIMED'",
+                        (attempt_id,),
+                    )
+                    budget.settle_grant(conn)
+                    _emit_event(conn, task_id, attempt_id, "ATTEMPT_FINISHED",
+                                {"status": "FAILED", "summary": (summary or "")[:4000],
+                                 "stepIndex": step_index, "runId": run_id})
+                conn.commit()
+                raise _StepFailure(
+                    f"步骤 {step_index} ({step['workflowNodeId']}) 失败: "
+                    f"{(error or 'attempt failed')[:300]}")
+
+            with conn.cursor() as cur:
+                transition_run(conn, run_id, "OUTPUT_STAGED", attempt_id=attempt_id)
+                transition_run(conn, run_id, "VERIFYING")
+                transition_run(conn, run_id, "VERIFIED")
+                cur.execute(
+                    "UPDATE pi_attempts SET status='TERMINAL_REPORTED', "
+                    "finished_at=now() WHERE id=%s",
                     (attempt_id,),
                 )
-                budget.settle_grant(conn)  # 成功/失败终态同事务结算 Grant
+                budget.settle_grant(conn)  # 步骤成功终态同事务结算 Grant
                 _emit_event(conn, task_id, attempt_id, "ATTEMPT_FINISHED",
-                            {"status": final, "summary": (summary or "")[:4000]})
-            else:
+                            {"status": "SUCCESS", "summary": (summary or "")[:4000],
+                             "stepIndex": step_index, "runId": run_id})
+            conn.commit()
+            last_attempt_id = attempt_id
+
+        final = "SUCCESS"
+        with conn.cursor() as cur:
+            cur.execute(
+                "UPDATE pi_tasks SET status=%s, finished_at=now(), updated_at=now(), "
+                "error=NULL WHERE id=%s AND status=%s RETURNING id",
+                (final, task_id, _RUNNING),
+            )
+            finalized = cur.fetchone() is not None
+            if not finalized:
                 cur.execute("SELECT status FROM pi_tasks WHERE id=%s", (task_id,))
                 row = cur.fetchone()
                 task_state = row["status"] if row else "UNKNOWN"
         conn.commit()
         if not finalized:
             if task_state in _TERMINAL:
-                _converge_attempt(conn, task_id, attempt_id, task_state,
+                _converge_attempt(conn, task_id, last_attempt_id, task_state,
                                   note="completed-late-after-state-change")
                 conn.commit()
+    except _StepFailure as exc:  # 步骤业务失败：任务 FAILED（steps 已各自收敛）
+        try:
+            conn.rollback()
+        except Exception:
+            pass
+        _fail_task_isolated(task_id, f"TASK: {exc.error}", attempt_id)
     except BudgetExceeded as exc:  # 预算超限：GW-07 100% 阻断，任务 FAILED(BUDGET_EXHAUSTED)
         try:
             conn.rollback()
@@ -264,6 +375,9 @@ def _run_task(conn, task_id: str) -> None:
             conn.rollback()
         except Exception:
             pass
+        if current_run_id:  # 评审 block-1：异常时活动 Run 不得永久停在 EXECUTING
+            _fail_run_isolated(current_run_id, "FAILED",
+                               f"PLATFORM:{type(exc).__name__}")
         _fail_task_isolated(task_id, f"{type(exc).__name__}: {exc}", attempt_id)
 
 

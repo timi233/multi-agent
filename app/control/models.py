@@ -11,6 +11,26 @@ class TaskCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=200, description="任务标题")
     prompt: str = Field(..., min_length=1, description="给 agent 的任务提示词")
     model: str | None = Field(None, description="覆盖默认模型（可空）")
+    plan: list[dict] | None = Field(
+        None, description="可选编译前步骤数组（每项 runKind/deliverableKind/"
+        "promptContent/upstreamBindings?）；缺省编译为默认单步 IMPLEMENTATION 计划")
+
+
+class RunOut(BaseModel):
+    run_id: str
+    task_id: str
+    step_index: int
+    workflow_node_id: str
+    run_kind: str
+    deliverable_kind: str
+    execution_plan_snapshot_id: str
+    plan_digest: str
+    attempt_id: str | None = None
+    status: str
+    error_code: str | None = None
+    created_at: datetime
+    updated_at: datetime
+    finished_at: datetime | None = None
 
 
 class TaskOut(BaseModel):

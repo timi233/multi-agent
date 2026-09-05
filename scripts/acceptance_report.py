@@ -38,8 +38,9 @@ ENTRIES: list[dict] = [
     {"id": "CT-04", "label": "必须签名对象正/反向量 + 真实签名可验签",
      "phase": "Phase 0", "status": "PARTIAL",
      "evidence": ["scripts/gen_signature_vectors.py", "scripts/gen_budget_vectors.py（pos-signed 真实 Ed25519）",
-                  "tests/test_runtime_capabilities.py / test_budget_contract.py（验签真/伪）"],
-     "note": "已覆盖 5 类对象（attempt_contract/task_spec/event_envelope/budget_grant/runtime_capability_report）；"
+                  "scripts/gen_execution_plan_vectors.py（pos-signed 真实 Ed25519）",
+                  "tests/test_runtime_capabilities.py / test_budget_contract.py / test_execution_plan_contract.py（验签真/伪）"],
+     "note": "已覆盖 6 类对象（attempt_contract/task_spec/event_envelope/budget_grant/runtime_capability_report/execution_plan_snapshot）；"
              "蓝图 §9.4 完整清单（node_state/execution_lease/route_attestation/commit_intent 等）未覆盖——如实 PARTIAL"},
     {"id": "CT-08", "label": "事件信封 if/then 约束（Attempt/Run/Artifact/Evidence/Budget vs Task）",
      "phase": "Phase 0", "status": "PASS",
@@ -48,8 +49,10 @@ ENTRIES: list[dict] = [
     # ---------- 状态机 ----------
     {"id": "SM-xx", "label": "状态机白名单 + 跨事务收敛/防悬挂",
      "phase": "Phase 0", "status": "PARTIAL",
-     "evidence": ["tests/test_sm_model.py（11 项）", "tests/test_security.py（cancel/abort 收敛）"],
-     "note": "覆盖 Task/Attempt 白名单与跨事务检查；SM-01 要求的 Run/CandidateStagingOperation 对象未实现；"
+     "evidence": ["tests/test_sm_model.py（11 项）", "tests/test_security.py（cancel/abort 收敛）",
+                  "tests/test_run_state.py（Run 白名单/db 推进）", "tests/test_orchestrator.py（G1b 编排）"],
+     "note": "Task/Attempt/Run 白名单与跨事务检查已覆盖：Run 主行进路径 CREATED→READY→EXECUTING→OUTPUT_STAGED→VERIFYING→VERIFIED + FAILED/BUDGET_EXHAUSTED/CANCELLED（G1b 落地，pi_runs + api /tasks/{id}/runs）；"
+             "SM-01 剩余缺口为 CandidateStagingOperation 对象（随 G5 Git 侧）；"
              "QUEUED->RUNNING 跨事务事件仍为 SM-08 warnings（count_warnings==1 锁定）——如实 PARTIAL"},
     # ---------- Gateway 预算 ----------
     {"id": "GW-03", "label": "调用前 RESERVED/SENT 持久化预留；崩溃不恢复余额",
