@@ -70,26 +70,30 @@ def test_pos_signed_envelope_self_consistent():
 
     TEST_SEED = bytes.fromhex(
         "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")
-    REGISTRY_FP = "25db92710d26368a512531d6abb756ba8fed325fdca0241f8d881125d7c10f4d"
 
     v = _vec("pos-signed")
     obj = v["object"]
+    # 从 registry 动态解析 sk-budget-vector（评审 nit：避免硬编码漂移）
+    registry = json.loads((ROOT / "deploy" / "keys" / "keys.lock.json")
+                          .read_text(encoding="utf-8"))
+    reg = registry["keys"]["sk-budget-vector"]
+    assert reg["issuer"] == obj["signature"]["issuer"] == "ledger-test"
+    assert "budget_grants" in reg["allowedObjectTypes"]
     meta = {k: obj["signature"][k] for k in SIGNATURE_ENVELOPE_KEYS
             if k in obj["signature"]}
     env, sig_in, _ = build_signature_envelope(obj, SCHEMA, PROFILE, meta)
     assert env["payloadDigest"] == v["payloadDigest"]
     assert obj["signature"]["payloadDigest"] == v["payloadDigest"]
-    assert b64.b64encode(sig_in).decode() == v["signatureInputB64"]
+    assert base64.b64encode(sig_in).decode() == v["signatureInputB64"]
     key = Ed25519PrivateKey.from_private_bytes(TEST_SEED)
     pub_der = key.public_key().public_bytes(
         encoding=serialization.Encoding.DER,
         format=serialization.PublicFormat.SubjectPublicKeyInfo)
-    assert hashlib.sha256(pub_der).hexdigest() == REGISTRY_FP
-    key.public_key().verify(b64.b64decode(obj["signature"]["value"]), sig_in)  # 验签通过
+    assert hashlib.sha256(pub_der).hexdigest() == reg["pubFingerprintSha256"]
+    key.public_key().verify(base64.b64decode(obj["signature"]["value"]), sig_in)  # 验签通过
     assert obj["signature"]["keyId"] == "sk-budget-vector"
-    assert obj["signature"]["issuer"] == "ledger-test"
     with pytest.raises(Exception):
-        key.public_key().verify(b64.b64decode(obj["signature"]["value"]), b"tampered")
+        key.public_key().verify(base64.b64decode(obj["signature"]["value"]), b"tampered")
 
 
 def test_journal_chain_is_real_digests():
