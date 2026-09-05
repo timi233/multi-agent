@@ -55,7 +55,7 @@ class Settings:
     # PostgreSQL（S1 已搭建：127.0.0.1:15432, 库 pi_platform）
     pg_host: str = "127.0.0.1"
     pg_port: int = 15432
-    pg_db: str = "pi_platform"
+    pg_db: str = os.environ.get("PI_PG_DB", "pi_platform")
     pg_user: str = "pi_admin"
     pg_password: str = field(default_factory=lambda: _load_dotenv(COMPOSE_ENV).get("POSTGRES_PASSWORD", ""))
 

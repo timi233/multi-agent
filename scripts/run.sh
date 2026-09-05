@@ -22,7 +22,17 @@ case "$cmd" in
     exec "$PY" -m app.main serve --host 127.0.0.1 --port "$port"
     ;;
   test)
+    # 独立测试库 pi_platform_test：避免与运行中的 worker 共享生产库（测试偶发失败根因）
+    PGUSER="$(sed -n 's/^POSTGRES_USER=//p' deploy/compose/.env)"
+    PGPWD="$(sed -n 's/^POSTGRES_PASSWORD=//p' deploy/compose/.env)"
+    if ! docker exec -e PGPASSWORD="$PGPWD" pi-postgres psql -h 127.0.0.1 -U "$PGUSER" -d postgres -tAc \
+        "SELECT 1 FROM pg_database WHERE datname='pi_platform_test'" | grep -q 1; then
+      docker exec -e PGPASSWORD="$PGPWD" pi-postgres psql -h 127.0.0.1 -U "$PGUSER" -d postgres \
+        -c "CREATE DATABASE pi_platform_test" >/dev/null
+    fi
+    export PI_PG_DB=pi_platform_test
     "$VENV/bin/pip" install -q pytest
+    "$PY" -m app.migrate
     "$PY" -m pytest tests/ -q
     ;;
   submit)
