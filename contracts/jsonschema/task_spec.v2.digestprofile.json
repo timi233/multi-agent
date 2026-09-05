@@ -28,6 +28,9 @@
     "/policyTemplateRefs",
     "/expiresAt"
   ],
+  "canonicalSortKeys": {
+    "/policyTemplateRefs": { "by": "key", "key": "templateRef" }
+  },
   "mutableDatabasePointers": [],
   "signatureEnvelopePointers": ["/signature"]
 }

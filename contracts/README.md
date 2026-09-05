@@ -32,7 +32,7 @@
 |---|---|
 | CT-01 canonicalPayload/digest 逐字节一致 | PASS：Python 主实现 vs Node 独立参考实现，3 正向量 0 不一致（attempt_contract） |
 | CT-02 未知字段/未知枚举/超限字段拒绝 | PASS：attempt_contract 6 负向量 + task_spec/事件信封各 6 负向量全部 Schema 拒绝 |
-| CT-03 集合数组乱序/重复 | 部分：`uniqueItems` 重复拒绝 PASS；canonical 排序语义留待后续对象启用 |
+| CT-03 集合数组乱序/重复 | PASS：`canonicalSortKeys` 机制（蓝图 §12："JCS 不替数组排序——集合数组先按稳定键排序、拒绝重复再计算 digest"）——attempt_contract `/toolAllowlist`（by=value）与 task_spec `/policyTemplateRefs`（by=key, templateRef）启用；乱序正向量 digest 与有序逐字节一致、canonical 层重复/缺键拒绝；Node 参考实现同规范同步（10 正向量 0 不一致）；数组字段必须声明 canonicalSortKeys（profile 一致性校验） |
 | CT-04 必须签名对象正反向量 | PASS（attempt_contract 起步）：有效签名验通、篡改信封任一字段失败、错 keyId 失败；签名信封不改变 payloadDigest |
 | CT-08 事件信封作用域必填 ID | PASS：Task 事件仅要求 taskId（无 runId/attemptId 合法）；Attempt 事件要求 taskId+runId+attemptId 三者，缺一即拒 |
 

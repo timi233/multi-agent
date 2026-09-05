@@ -76,10 +76,49 @@ function pointerGet(obj, pointer) {
   return cur;
 }
 
+function sortKeyOf(elem, spec) {
+  // 与 Python _canonical_sort_key 同规范：稳定键字节序比较
+  if (spec.by === 'key') {
+    if (elem === null || typeof elem !== 'object' || Array.isArray(elem) ||
+        !(spec.key in elem)) {
+      throw new Error('canonical sort key missing: ' + spec.key);
+    }
+    return Buffer.from(jcs(elem[spec.key]), 'utf8');
+  }
+  return Buffer.from(jcs(elem), 'utf8');
+}
+
+function normalizeSortedArray(arr, spec) {
+  // 集合数组：按排序键字节序稳定排序；相邻排序键相等即重复拒绝
+  const keyed = arr.map(e => ({ sk: sortKeyOf(e, spec), e }));
+  keyed.sort((a, b) => Buffer.compare(a.sk, b.sk));
+  const out = [];
+  let prev = null;
+  for (const item of keyed) {
+    if (prev !== null && Buffer.compare(item.sk, prev) === 0) {
+      throw new Error('canonical sort duplicate element');
+    }
+    prev = item.sk;
+    out.push(item.e);
+  }
+  return out;
+}
+
 function canonicalPayload(obj, profile) {
+  const optional = new Set(profile.optionalImmutablePointers || []);
+  const sorts = profile.canonicalSortKeys || {};
   const projected = {};
   for (const ptr of profile.immutablePayloadPointers) {
-    projected[ptr.slice(1)] = pointerGet(obj, ptr);
+    let v;
+    try {
+      v = pointerGet(obj, ptr);
+    } catch (e) {
+      if (optional.has(ptr)) continue;
+      throw e;
+    }
+    const spec = sorts[ptr];
+    if (spec && Array.isArray(v)) v = normalizeSortedArray(v, spec);
+    projected[ptr.slice(1)] = v;
   }
   return jcs(projected);
 }

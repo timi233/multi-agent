@@ -177,7 +177,46 @@ def validate_profile_consistency(schema: dict, profile: dict) -> list[str]:
         if env_key not in SIGNATURE_ENVELOPE_KEYS:
             problems.append(
                 f"duplicateConsistencyPointers 信封键不在 §9.4 键集中: {env_key}")
+    # 蓝图 §12：JCS 不替数组排序——已投影的数组字段必须声明 canonicalSortKeys
+    # （集合数组必须有无序语义；有序语义字段需在 Schema 声明 type=array + 有序标记，
+    #  当前契约仅支持 canonicalSortKeys 声明方式）。
+    sorts = profile.get("canonicalSortKeys") or {}
+    for p in profile.get("immutablePayloadPointers") or []:
+        node = schema_at(p)
+        if isinstance(node, dict) and node.get("type") == "array":
+            if p not in sorts:
+                problems.append(f"数组字段 {p} 必须声明 canonicalSortKeys（蓝图 §12）")
+            elif sorts[p].get("by") == "key" and not sorts[p].get("key"):
+                problems.append(f"canonicalSortKeys {p} by=key 必须提供 key")
     return problems
+
+
+def _canonical_sort_key(elem, spec: dict) -> bytes:
+    """canonicalSortKeys 排序键（蓝图 §12：集合数组按稳定键/值字节序排序）。
+
+    by=value（标量数组）：对元素整体 JCS 编码；by=key（对象数组）：对
+    elems[key] JCS 编码（key 缺失或非对象元素即失败，排序键必须存在）。"""
+    if spec.get("by") == "key":
+        key = spec["key"]
+        if not isinstance(elem, dict) or key not in elem:
+            raise ContractError(
+                f"canonical sort key missing: {key!r} in {elem!r}")
+        return jcs(elem[key])
+    return jcs(elem)
+
+
+def _canonical_normalize_array(arr: list, spec: dict) -> list:
+    """集合数组规范化：按排序键字节序稳定排序，相邻排序键相等即重复拒绝。"""
+    keyed = [(_canonical_sort_key(e, spec), e) for e in arr]
+    keyed.sort(key=lambda t: t[0])
+    out: list = []
+    prev = None
+    for sk, elem in keyed:
+        if prev is not None and sk == prev:
+            raise ContractError("canonical sort detected duplicate element")
+        prev = sk
+        out.append(elem)
+    return out
 
 
 def canonical_payload(obj: dict, profile: dict) -> bytes:
@@ -185,19 +224,26 @@ def canonical_payload(obj: dict, profile: dict) -> bytes:
 
     仅 `optionalImmutablePointers` 显式声明的可选指针允许缺失（跳过）；
     其余指针缺失（含必需字段缺失、Profile 拼写错误）fail closed 抛错，
-    避免投影静默缩小签名覆盖范围。"""
+    避免投影静默缩小签名覆盖范围。
+    声明于 `canonicalSortKeys` 的集合数组在投影时先按规范排序并拒绝重复
+    （蓝图 §12：JCS 不替数组排序——集合数组必须先 canonical sort）。"""
     pointers = profile.get("immutablePayloadPointers") or []
     optional = set(profile.get("optionalImmutablePointers") or [])
+    sorts = profile.get("canonicalSortKeys") or {}
     projected: dict = {}
     for pointer in pointers:
         key = pointer.lstrip("/")
         try:
-            projected[key] = _resolve_pointer(obj, pointer)
+            value = _resolve_pointer(obj, pointer)
         except ContractError:
             if pointer in optional:
                 continue
             raise ContractError(
                 f"projection pointer missing and not optional: {pointer}")
+        spec = sorts.get(pointer)
+        if spec and isinstance(value, list):
+            value = _canonical_normalize_array(value, spec)
+        projected[key] = value
     return jcs(projected)
 
 

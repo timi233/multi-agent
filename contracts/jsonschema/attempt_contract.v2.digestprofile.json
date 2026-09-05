@@ -23,6 +23,9 @@
     "/expiresAt"
   ],
   "signatureEnvelopePointers": ["/signature"],
+  "canonicalSortKeys": {
+    "/toolAllowlist": { "by": "value" }
+  },
   "mutableDatabasePointers": ["/rowVersion", "/state", "/updatedAt"],
-  "notes": "canonicalPayload = immutablePayloadPointers 白名单投影（未知字段拒绝于 Schema 层；signature/mutable 字段不进入投影）；payloadDigest = sha256(JCS(canonicalPayload))；toolAllowlist 为有序语义数组，JCS 不重排。"
+  "notes": "canonicalPayload = immutablePayloadPointers 白名单投影（未知字段拒绝于 Schema 层；signature/mutable 字段不进入投影）；payloadDigest = sha256(JCS(canonicalPayload))；toolAllowlist 为集合数组，按 canonicalSortKeys（元素值字节序）先排序、拒绝重复再计算 digest（蓝图 §12：JCS 不替数组排序）。"
 }

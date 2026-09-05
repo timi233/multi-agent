@@ -56,6 +56,8 @@ CASES = [
         "objectType": "attempt_contract", "schemaVersion": "2",
         "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
         "controlPlaneEpoch": 0, "signedAt": "2026-09-05T08:01:00Z", "value": "c" * 128}}, None),
+    ("pos-tools-unordered", True, "CT-03：toolAllowlist 乱序——集合数组 canonical sort 后 digest 与有序一致",
+     {"toolAllowlist": ["finish", "run_command", "list_dir", "write_file"]}, None),
     ("pos-unicode", True, "含非 ASCII（BMP 中文）与非 BMP（emoji）字符串",
      {"model": {"provider": "cliproxy-local", "name": "测试模型-α", "thinking": "low"},
       "workspaceConstraints": {"root": "工作区/任务/emoji🚀"}}, None),

@@ -2,9 +2,9 @@
   "objectType": "attempt_contract",
   "schemaVersion": "2",
   "signatureConstruction": "JCS({signatureContext, signatureAlgorithm, keyId, issuer, issuerWorkloadIdentity, audience, objectType, schemaVersion, payloadDigest, controlPlaneEpoch, signedAt})",
-  "canonicalPayloadB64": "eyJhdHRlbXB0TnVtYmVyIjoxLCJjb250cmFjdElkIjoiYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWEiLCJjb250cmFjdFZlcnNpb24iOiIyIiwiY3JlYXRlZEF0IjoiMjAyNi0wOS0wNVQwODowMDowMFoiLCJleHBpcmVzQXQiOiIyMDI2LTA5LTA1VDA5OjAwOjAwWiIsIm1vZGVsL25hbWUiOiJkZWVwc2Vlay12NC1mbGFzaCIsIm1vZGVsL3Byb3ZpZGVyIjoiY2xpcHJveHktbG9jYWwiLCJtb2RlbC90aGlua2luZyI6ImxvdyIsInJlc291cmNlTGltaXRzL2NvbW1hbmRUaW1lb3V0U2Vjb25kcyI6NjAsInJlc291cmNlTGltaXRzL21heE91dHB1dEJ5dGVzIjo2NTUzNiwicmVzb3VyY2VMaW1pdHMvbWF4VHVybnMiOjQwLCJzb3VyY2VCdW5kbGVEaWdlc3QiOiJzaGEyNTY6YmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYiIsInRhc2tJZCI6IjAxMjM0NTY3ODlhYmNkZWYiLCJ0b29sQWxsb3dsaXN0IjpbImxpc3RfZGlyIiwid3JpdGVfZmlsZSIsInJ1bl9jb21tYW5kIiwiZmluaXNoIl0sIndvcmtsb2FkSWRlbnRpdHkiOiJwaS5hdHRlbXB0Iiwid29ya3NwYWNlQ29uc3RyYWludHMvcm9vdCI6IndvcmtzcGFjZXMvdGFzay0wMTIzNDU2Nzg5YWJjZGVmIn0=",
-  "payloadDigest": "sha256:1ccff4687b261805e6b6aa0b260bede82be17194c65cafb55ffdeef6369ba255",
-  "signatureInputB64": "eyJhdWRpZW5jZSI6InBpLnBsYXRmb3JtIiwiY29udHJvbFBsYW5lRXBvY2giOjAsImlzc3VlciI6ImF0dGVtcHQtc2VydmljZSIsImlzc3Vlcldvcmtsb2FkSWRlbnRpdHkiOiJwaS5hdHRlbXB0Iiwia2V5SWQiOiJzay1hdHRlbXB0Iiwib2JqZWN0VHlwZSI6ImF0dGVtcHRfY29udHJhY3QiLCJwYXlsb2FkRGlnZXN0Ijoic2hhMjU2OjFjY2ZmNDY4N2IyNjE4MDVlNmI2YWEwYjI2MGJlZGU4MmJlMTcxOTRjNjVjYWZiNTVmZmRlZWY2MzY5YmEyNTUiLCJzY2hlbWFWZXJzaW9uIjoiMiIsInNpZ25hdHVyZUFsZ29yaXRobSI6IkVkMjU1MTkiLCJzaWduYXR1cmVDb250ZXh0IjoicGkuY29udHJhY3Quc2lnbmF0dXJlLnYxIiwic2lnbmVkQXQiOiIyMDI2LTA5LTA1VDA4OjAxOjAwWiJ9",
+  "canonicalPayloadB64": "eyJhdHRlbXB0TnVtYmVyIjoxLCJjb250cmFjdElkIjoiYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWEiLCJjb250cmFjdFZlcnNpb24iOiIyIiwiY3JlYXRlZEF0IjoiMjAyNi0wOS0wNVQwODowMDowMFoiLCJleHBpcmVzQXQiOiIyMDI2LTA5LTA1VDA5OjAwOjAwWiIsIm1vZGVsL25hbWUiOiJkZWVwc2Vlay12NC1mbGFzaCIsIm1vZGVsL3Byb3ZpZGVyIjoiY2xpcHJveHktbG9jYWwiLCJtb2RlbC90aGlua2luZyI6ImxvdyIsInJlc291cmNlTGltaXRzL2NvbW1hbmRUaW1lb3V0U2Vjb25kcyI6NjAsInJlc291cmNlTGltaXRzL21heE91dHB1dEJ5dGVzIjo2NTUzNiwicmVzb3VyY2VMaW1pdHMvbWF4VHVybnMiOjQwLCJzb3VyY2VCdW5kbGVEaWdlc3QiOiJzaGEyNTY6YmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYiIsInRhc2tJZCI6IjAxMjM0NTY3ODlhYmNkZWYiLCJ0b29sQWxsb3dsaXN0IjpbImZpbmlzaCIsImxpc3RfZGlyIiwicnVuX2NvbW1hbmQiLCJ3cml0ZV9maWxlIl0sIndvcmtsb2FkSWRlbnRpdHkiOiJwaS5hdHRlbXB0Iiwid29ya3NwYWNlQ29uc3RyYWludHMvcm9vdCI6IndvcmtzcGFjZXMvdGFzay0wMTIzNDU2Nzg5YWJjZGVmIn0=",
+  "payloadDigest": "sha256:35650907b5f7cfb8d1d4e3ae3420dd447b1ef418445625332486b335ae0cb245",
+  "signatureInputB64": "eyJhdWRpZW5jZSI6InBpLnBsYXRmb3JtIiwiY29udHJvbFBsYW5lRXBvY2giOjAsImlzc3VlciI6ImF0dGVtcHQtc2VydmljZSIsImlzc3Vlcldvcmtsb2FkSWRlbnRpdHkiOiJwaS5hdHRlbXB0Iiwia2V5SWQiOiJzay1hdHRlbXB0Iiwib2JqZWN0VHlwZSI6ImF0dGVtcHRfY29udHJhY3QiLCJwYXlsb2FkRGlnZXN0Ijoic2hhMjU2OjM1NjUwOTA3YjVmN2NmYjhkMWQ0ZTNhZTM0MjBkZDQ0N2IxZWY0MTg0NDU2MjUzMzI0ODZiMzM1YWUwY2IyNDUiLCJzY2hlbWFWZXJzaW9uIjoiMiIsInNpZ25hdHVyZUFsZ29yaXRobSI6IkVkMjU1MTkiLCJzaWduYXR1cmVDb250ZXh0IjoicGkuY29udHJhY3Quc2lnbmF0dXJlLnYxIiwic2lnbmVkQXQiOiIyMDI2LTA5LTA1VDA4OjAxOjAwWiJ9",
   "envelope": {
     "objectType": "attempt_contract",
     "schemaVersion": "2",
@@ -15,7 +15,7 @@
     "audience": "pi.platform",
     "controlPlaneEpoch": 0,
     "signedAt": "2026-09-05T08:01:00Z",
-    "payloadDigest": "sha256:1ccff4687b261805e6b6aa0b260bede82be17194c65cafb55ffdeef6369ba255"
+    "payloadDigest": "sha256:35650907b5f7cfb8d1d4e3ae3420dd447b1ef418445625332486b335ae0cb245"
   },
   "vectors": [
     {
@@ -58,13 +58,13 @@
           "audience": "pi.platform",
           "objectType": "attempt_contract",
           "schemaVersion": "2",
-          "payloadDigest": "sha256:1ccff4687b261805e6b6aa0b260bede82be17194c65cafb55ffdeef6369ba255",
+          "payloadDigest": "sha256:35650907b5f7cfb8d1d4e3ae3420dd447b1ef418445625332486b335ae0cb245",
           "controlPlaneEpoch": 0,
           "signedAt": "2026-09-05T08:01:00Z",
-          "value": "b2e524fdc63dd1c449792279440133cd2eac4f56503cdd27e502e7244d7f181c4b2605640b57f26a8952f9e4bf2d47b181a231fecb20105b215e54389375b60d"
+          "value": "0dc0f9c7a8b7fbf69de000031b9bb22946c176157535e78ffdebdd690d4c97793c98f73809544297269316056b5750394116ddf4d5d87f428bf6ea81c2427007"
         }
       },
-      "signatureHex": "b2e524fdc63dd1c449792279440133cd2eac4f56503cdd27e502e7244d7f181c4b2605640b57f26a8952f9e4bf2d47b181a231fecb20105b215e54389375b60d",
+      "signatureHex": "0dc0f9c7a8b7fbf69de000031b9bb22946c176157535e78ffdebdd690d4c97793c98f73809544297269316056b5750394116ddf4d5d87f428bf6ea81c2427007",
       "schemaValid": true,
       "digestUnchanged": true,
       "verifyWithSelf": true

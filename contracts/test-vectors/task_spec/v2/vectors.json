@@ -85,6 +85,94 @@
       "payloadDigest": "sha256:962a790bcd6e063fdd0b0a512e5da71a341839dd84403f51c8199876d5e2962a"
     },
     {
+      "id": "pos-policy-refs-a",
+      "kind": "positive",
+      "note": "CT-03：policyTemplateRefs 两元素（key 序）",
+      "schemaValid": true,
+      "expectedError": null,
+      "schemaErrors": [],
+      "object": {
+        "schemaVersion": "2",
+        "taskId": "0123456789abcdef",
+        "specVersion": "1",
+        "userIdentity": {
+          "subjectId": "user-042",
+          "displayName": "测试用户"
+        },
+        "title": "整理周报",
+        "prompt": "读取 workspace 内 weekly.md，汇总为三要点。",
+        "workspace": {
+          "root": "workspaces/t001",
+          "writable": true
+        },
+        "requestedResources": {
+          "model": {
+            "provider": "cliproxy-local",
+            "name": "deepseek-v4-flash",
+            "thinking": "low"
+          },
+          "maxTurns": 8
+        },
+        "policyTemplateRefs": [
+          {
+            "templateRef": "eval-tpl/001",
+            "templateDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "templateRef": "eval-tpl/002",
+            "templateDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "createdAt": "2026-09-05T08:00:00Z"
+      },
+      "canonicalPayloadB64": "eyJjcmVhdGVkQXQiOiIyMDI2LTA5LTA1VDA4OjAwOjAwWiIsInBvbGljeVRlbXBsYXRlUmVmcyI6W3sidGVtcGxhdGVEaWdlc3QiOiJzaGEyNTY6MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsInRlbXBsYXRlUmVmIjoiZXZhbC10cGwvMDAxIn0seyJ0ZW1wbGF0ZURpZ2VzdCI6InNoYTI1NjowMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIiwidGVtcGxhdGVSZWYiOiJldmFsLXRwbC8wMDIifV0sInByb21wdCI6Ilx1OGJmYlx1NTNkNiB3b3Jrc3BhY2UgXHU1MTg1IHdlZWtseS5tZFx1ZmYwY1x1NmM0N1x1NjAzYlx1NGUzYVx1NGUwOVx1ODk4MVx1NzBiOVx1MzAwMiIsInJlcXVlc3RlZFJlc291cmNlcy9tYXhUdXJucyI6OCwicmVxdWVzdGVkUmVzb3VyY2VzL21vZGVsL25hbWUiOiJkZWVwc2Vlay12NC1mbGFzaCIsInJlcXVlc3RlZFJlc291cmNlcy9tb2RlbC9wcm92aWRlciI6ImNsaXByb3h5LWxvY2FsIiwicmVxdWVzdGVkUmVzb3VyY2VzL21vZGVsL3RoaW5raW5nIjoibG93Iiwic2NoZW1hVmVyc2lvbiI6IjIiLCJzcGVjVmVyc2lvbiI6IjEiLCJ0YXNrSWQiOiIwMTIzNDU2Nzg5YWJjZGVmIiwidGl0bGUiOiJcdTY1NzRcdTc0MDZcdTU0NjhcdTYyYTUiLCJ1c2VySWRlbnRpdHkvZGlzcGxheU5hbWUiOiJcdTZkNGJcdThiZDVcdTc1MjhcdTYyMzciLCJ1c2VySWRlbnRpdHkvc3ViamVjdElkIjoidXNlci0wNDIiLCJ3b3Jrc3BhY2Uvcm9vdCI6IndvcmtzcGFjZXMvdDAwMSIsIndvcmtzcGFjZS93cml0YWJsZSI6dHJ1ZX0=",
+      "payloadDigest": "sha256:3febbd760eb588394f496c8dd42734f2a02645affbfc78f67009b2c2a9043ee3"
+    },
+    {
+      "id": "pos-policy-refs-b",
+      "kind": "positive",
+      "note": "CT-03：同一集合乱序——digest 与 pos-policy-refs-a 一致",
+      "schemaValid": true,
+      "expectedError": null,
+      "schemaErrors": [],
+      "object": {
+        "schemaVersion": "2",
+        "taskId": "0123456789abcdef",
+        "specVersion": "1",
+        "userIdentity": {
+          "subjectId": "user-042",
+          "displayName": "测试用户"
+        },
+        "title": "整理周报",
+        "prompt": "读取 workspace 内 weekly.md，汇总为三要点。",
+        "workspace": {
+          "root": "workspaces/t001",
+          "writable": true
+        },
+        "requestedResources": {
+          "model": {
+            "provider": "cliproxy-local",
+            "name": "deepseek-v4-flash",
+            "thinking": "low"
+          },
+          "maxTurns": 8
+        },
+        "policyTemplateRefs": [
+          {
+            "templateRef": "eval-tpl/002",
+            "templateDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "templateRef": "eval-tpl/001",
+            "templateDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "createdAt": "2026-09-05T08:00:00Z"
+      },
+      "canonicalPayloadB64": "eyJjcmVhdGVkQXQiOiIyMDI2LTA5LTA1VDA4OjAwOjAwWiIsInBvbGljeVRlbXBsYXRlUmVmcyI6W3sidGVtcGxhdGVEaWdlc3QiOiJzaGEyNTY6MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsInRlbXBsYXRlUmVmIjoiZXZhbC10cGwvMDAxIn0seyJ0ZW1wbGF0ZURpZ2VzdCI6InNoYTI1NjowMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIiwidGVtcGxhdGVSZWYiOiJldmFsLXRwbC8wMDIifV0sInByb21wdCI6Ilx1OGJmYlx1NTNkNiB3b3Jrc3BhY2UgXHU1MTg1IHdlZWtseS5tZFx1ZmYwY1x1NmM0N1x1NjAzYlx1NGUzYVx1NGUwOVx1ODk4MVx1NzBiOVx1MzAwMiIsInJlcXVlc3RlZFJlc291cmNlcy9tYXhUdXJucyI6OCwicmVxdWVzdGVkUmVzb3VyY2VzL21vZGVsL25hbWUiOiJkZWVwc2Vlay12NC1mbGFzaCIsInJlcXVlc3RlZFJlc291cmNlcy9tb2RlbC9wcm92aWRlciI6ImNsaXByb3h5LWxvY2FsIiwicmVxdWVzdGVkUmVzb3VyY2VzL21vZGVsL3RoaW5raW5nIjoibG93Iiwic2NoZW1hVmVyc2lvbiI6IjIiLCJzcGVjVmVyc2lvbiI6IjEiLCJ0YXNrSWQiOiIwMTIzNDU2Nzg5YWJjZGVmIiwidGl0bGUiOiJcdTY1NzRcdTc0MDZcdTU0NjhcdTYyYTUiLCJ1c2VySWRlbnRpdHkvZGlzcGxheU5hbWUiOiJcdTZkNGJcdThiZDVcdTc1MjhcdTYyMzciLCJ1c2VySWRlbnRpdHkvc3ViamVjdElkIjoidXNlci0wNDIiLCJ3b3Jrc3BhY2Uvcm9vdCI6IndvcmtzcGFjZXMvdDAwMSIsIndvcmtzcGFjZS93cml0YWJsZSI6dHJ1ZX0=",
+      "payloadDigest": "sha256:3febbd760eb588394f496c8dd42734f2a02645affbfc78f67009b2c2a9043ee3"
+    },
+    {
       "id": "neg-unknown-field",
       "kind": "negative",
       "note": "未知字段必须拒绝",
