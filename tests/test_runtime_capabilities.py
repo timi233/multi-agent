@@ -93,10 +93,18 @@ def test_contract_id_deterministic_across_generatedAt():
     assert r1["contractId"] == r2["contractId"]
     assert r1["signature"]["payloadDigest"] != r2["signature"]["payloadDigest"]
     f1 = core_facts()
+    # 真实事实变化（模型名）→ ID 必变
     f2 = dict(f1, model={"provider": "cliproxy-local", "name": "other-model"})
     assert _contract_id(f1) != _contract_id(f2)
+    # 集合枚举顺序变化（工具/readOnlyDirs 乱序）→ ID 不变（与 DigestProfile 集合语义一致）
     f3 = dict(f1, toolCapabilities=list(reversed(f1["toolCapabilities"])))
-    assert _contract_id(f1) != _contract_id(f3)
+    assert _contract_id(f1) == _contract_id(f3)
+    iso4 = dict(f1["isolation"], readOnlyDirs=["a", "b"])
+    iso5 = dict(f1["isolation"], readOnlyDirs=["b", "a"])
+    assert _contract_id(dict(f1, isolation=iso4)) == _contract_id(
+        dict(f1, isolation=iso5))
+    assert _contract_id(f1) != _contract_id(
+        dict(f1, knownGaps=list(f1["knownGaps"]) + ["RT-99: 新增差距"]))
 
 
 def test_cached_report_idempotent_and_isolated():

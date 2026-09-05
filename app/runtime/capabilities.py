@@ -94,9 +94,17 @@ def core_facts() -> dict:
 
 
 def _contract_id(facts: dict) -> str:
-    """事实锚 = sha256(JCS(核心事实))[:32]；复用项目 canonical（jcs），
-    事实/工具集合顺序变化即变（评审 should-fix：无第二套 canonical）。"""
-    return hashlib.sha256(jcs(facts)).hexdigest()[:32]
+    """事实锚 = sha256(JCS(集合归一化后的核心事实))[:32]；复用项目 canonical
+    （jcs）。toolCapabilities/knownGaps/readOnlyDirs 与 DigestProfile 一样视为
+    无序集合先排序——枚举顺序变化不改 ID，真实事实内容变化必改（评审 should-fix）。"""
+    norm = dict(facts)
+    norm["toolCapabilities"] = sorted(facts["toolCapabilities"],
+                                      key=lambda t: t["name"])
+    norm["knownGaps"] = sorted(facts.get("knownGaps") or [])
+    iso = dict(facts.get("isolation") or {})
+    iso["readOnlyDirs"] = sorted((facts.get("isolation") or {}).get("readOnlyDirs") or [])
+    norm["isolation"] = iso
+    return hashlib.sha256(jcs(norm)).hexdigest()[:32]
 
 
 def build_report() -> dict:

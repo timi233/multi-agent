@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import os
 from pathlib import Path
 
 from cryptography.hazmat.primitives import serialization
@@ -23,10 +24,16 @@ KEYS_DIR = BASE_DIR / "data" / "keys"
 PRIVATE_KEY_PATH = KEYS_DIR / "runtime_ed25519.pem"
 
 
+def _load() -> Ed25519PrivateKey:
+    return serialization.load_pem_private_key(
+        PRIVATE_KEY_PATH.read_bytes(), password=None)
+
+
 def _load_or_create() -> Ed25519PrivateKey:
+    """原子创建（评审 should-fix）：O_EXCL 保证并发生成只有一个成功，
+    竞争失败方回退读取既有密钥，避免互相覆盖导致签名不可验证。"""
     if PRIVATE_KEY_PATH.exists():
-        return serialization.load_pem_private_key(
-            PRIVATE_KEY_PATH.read_bytes(), password=None)
+        return _load()
     KEYS_DIR.mkdir(parents=True, exist_ok=True)
     key = Ed25519PrivateKey.generate()
     pem = key.private_bytes(
@@ -34,9 +41,14 @@ def _load_or_create() -> Ed25519PrivateKey:
         format=serialization.PrivateFormat.PKCS8,
         encryption_algorithm=serialization.NoEncryption(),
     )
-    PRIVATE_KEY_PATH.write_bytes(pem)
-    PRIVATE_KEY_PATH.chmod(0o600)
-    return key
+    try:
+        fd = os.open(PRIVATE_KEY_PATH,
+                     os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        with os.fdopen(fd, "wb") as f:
+            f.write(pem)
+    except FileExistsError:
+        pass  # 竞争失败：既有密钥为准
+    return _load()
 
 
 def _private_key() -> Ed25519PrivateKey:
