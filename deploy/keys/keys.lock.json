@@ -1,0 +1,126 @@
+{
+  "registryVersion": "experimental-1",
+  "algorithm": "Ed25519",
+  "note": "S1 实验配置 Key Registry；正式 keyId 表须在 Phase 0 ADR 冻结后再签发（手册 §4.4 / IN-08）",
+  "createdAt": "2026-09-05T02:43:40.466670+00:00",
+  "keys": {
+    "sk-task-api": {
+      "purpose": "Task API",
+      "issuer": "task-api",
+      "allowedObjectTypes": [
+        "task_specs",
+        "task_admission_decisions",
+        "idempotency_records(scope=task)"
+      ],
+      "pubFingerprintSha256": "9a1c35251355bef467451f2960fa312d4a553fed44749e79ed0e53024208abfc",
+      "privateKeyFile": "sk-task-api.pem",
+      "publicKeyFile": "sk-task-api.pub.pem"
+    },
+    "sk-attempt": {
+      "purpose": "Attempt Service",
+      "issuer": "attempt-service",
+      "allowedObjectTypes": [
+        "attempt_contracts"
+      ],
+      "pubFingerprintSha256": "b5049e5694080e5493b2fc7fd148dbc19199cbd9a2230facb014ec37d27a94ed",
+      "privateKeyFile": "sk-attempt.pem",
+      "publicKeyFile": "sk-attempt.pub.pem"
+    },
+    "sk-node": {
+      "purpose": "Node（终态信封来源证明）",
+      "issuer": "node-agent",
+      "allowedObjectTypes": [
+        "node_state_envelope"
+      ],
+      "pubFingerprintSha256": "e4d5aaa1b408a86707c9e6db0850e5090433773ef2b55f7e99938be83553c1af",
+      "privateKeyFile": "sk-node.pem",
+      "publicKeyFile": "sk-node.pub.pem"
+    },
+    "sk-commit-bundle": {
+      "purpose": "Commit Bundle Signer",
+      "issuer": "commit-bundle",
+      "allowedObjectTypes": [
+        "commit_intents",
+        "candidate_staging_operations"
+      ],
+      "pubFingerprintSha256": "31368fe188622927af3dd32e6e7e64a92484ec63e4a1a8e34bad74d6af86ce59",
+      "privateKeyFile": "sk-commit-bundle.pem",
+      "publicKeyFile": "sk-commit-bundle.pub.pem"
+    },
+    "sk-attestation": {
+      "purpose": "Attestation Signer",
+      "issuer": "verification",
+      "allowedObjectTypes": [
+        "route_attestation",
+        "gate_attestation",
+        "revocation_check_attestation"
+      ],
+      "pubFingerprintSha256": "9b378c2ef931339dc1e210ce65b6875dfcbff77a93803f61df8cbe630d41204e",
+      "privateKeyFile": "sk-attestation.pem",
+      "publicKeyFile": "sk-attestation.pub.pem"
+    },
+    "sk-delivery-authz": {
+      "purpose": "Delivery Authorization",
+      "issuer": "delivery-authz",
+      "allowedObjectTypes": [
+        "delivery_authorizations",
+        "git_staging_leases"
+      ],
+      "pubFingerprintSha256": "bff5c24e665bc6a7f95cf5394f2d7d4f37416fa84a277bf95aafd228ffcf7a6b",
+      "privateKeyFile": "sk-delivery-authz.pem",
+      "publicKeyFile": "sk-delivery-authz.pub.pem"
+    },
+    "sk-revocation": {
+      "purpose": "Revocation Service",
+      "issuer": "revocation",
+      "allowedObjectTypes": [
+        "revocation_records",
+        "revocation_view_checkpoints"
+      ],
+      "pubFingerprintSha256": "b76b573a01cdbe7f6bffdd2117cdaca77c34402e0eb5e1e83269cca41fb30161",
+      "privateKeyFile": "sk-revocation.pem",
+      "publicKeyFile": "sk-revocation.pub.pem"
+    },
+    "sk-ledger": {
+      "purpose": "Ledger",
+      "issuer": "ledger",
+      "allowedObjectTypes": [
+        "budget_grants",
+        "budget_ledger_entries"
+      ],
+      "pubFingerprintSha256": "e2e4cd1465539ce318c1979ce0a522d33a2caea10bbff8cfc6ddd0c7e9b004c6",
+      "privateKeyFile": "sk-ledger.pem",
+      "publicKeyFile": "sk-ledger.pub.pem"
+    },
+    "sk-skill": {
+      "purpose": "Skill Signer",
+      "issuer": "skill-governance",
+      "allowedObjectTypes": [
+        "skill_bundle"
+      ],
+      "pubFingerprintSha256": "34e976fce6e51d0b291b01106c55c7abce54c3cd4a76204a4240f6a62b7efb0c",
+      "privateKeyFile": "sk-skill.pem",
+      "publicKeyFile": "sk-skill.pub.pem"
+    },
+    "sk-image": {
+      "purpose": "Image Signer",
+      "issuer": "image-governance",
+      "allowedObjectTypes": [
+        "dependency_image"
+      ],
+      "pubFingerprintSha256": "0c78f754f22ab0b4fc88c8b935f7782bb2c33fa32d8af5f16a5db2252e6ffddd",
+      "privateKeyFile": "sk-image.pem",
+      "publicKeyFile": "sk-image.pub.pem"
+    },
+    "sk-publisher": {
+      "purpose": "Publisher",
+      "issuer": "publisher",
+      "allowedObjectTypes": [
+        "publication_records"
+      ],
+      "pubFingerprintSha256": "6beff4eae07e326b73003ea04f09476cb56d9208c55690c6af5f0cefbf4e1757",
+      "privateKeyFile": "sk-publisher.pem",
+      "publicKeyFile": "sk-publisher.pub.pem"
+    }
+  }
+}

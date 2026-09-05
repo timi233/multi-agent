@@ -1,0 +1,17 @@
+# ---- 敏感物：严禁入库 ----
+# 部署凭据（PostgreSQL/MinIO/服务角色密码）
+deploy/compose/.env
+# 私钥与公钥材料（Key Registry，见 deploy/keys/keys.lock.json 登记表）
+*.pem
+*.key
+
+# ---- 运行时数据：不入库 ----
+# PostgreSQL / MinIO 数据卷、OTel 日志（含审计/事件数据）
+data/
+
+# ---- 临时 / 探针产物 ----
+*.bin
+*.log
+
+# ---- OS / IDE ----
+.DS_Store

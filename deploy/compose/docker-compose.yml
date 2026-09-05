@@ -1,0 +1,113 @@
+# Pi 多 Agent 无人自治开发平台 —— S1 基础设施（实验配置）
+# 依据：《环境搭建与验证手册 v1.3.2》§4.1 / §4.2 / §4.3 / §4.4
+# 声明：IN-01~IN-12 尚未冻结，本 compose 仅作实验配置，不构成正式环境（手册 §2）。
+# 端口一律只绑定 127.0.0.1（手册 §3.1 网络要求）；容器间通过 pi-infra 网络互通。
+name: pi-infra
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: pi-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: pi_platform
+      SVC_ROLES_PASSWORD: ${SVC_ROLES_PASSWORD}
+      TZ: UTC
+      PGTZ: UTC
+    command:
+      - "postgres"
+      - "-c"
+      - "timezone=UTC"
+      - "-c"
+      - "log_min_duration_statement=1000"
+      - "-c"
+      - "log_connections=on"
+      - "-c"
+      - "log_disconnections=on"
+    volumes:
+      - ../../data/pg:/var/lib/postgresql/data
+      - ../initdb:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "127.0.0.1:15432:5432"   # 宿主 5432 已被既有服务占用，实验配置映射 15432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d pi_platform"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    networks: [pi-infra]
+    cpus: 1.0
+    mem_limit: 1g
+
+  minio:
+    image: minio/minio:latest
+    container_name: pi-minio
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - ../../data/minio:/data
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    networks: [pi-infra]
+    cpus: 1.0
+    mem_limit: 1g
+
+  # 一次性：创建 staging/ 与 cas/（对象锁 WORM）两个 bucket（手册 §4.2）
+  minio-init:
+    image: minio/mc:latest
+    container_name: pi-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - ../scripts/minio-init.sh:/init/minio-init.sh:ro
+    entrypoint: ["/bin/sh", "/init/minio-init.sh"]
+    restart: "no"
+    networks: [pi-infra]
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: pi-otel
+    command: ["--config=/etc/otel/config.yaml"]
+    volumes:
+      - ../otel/otel-collector.yml:/etc/otel/config.yaml:ro
+      - ../../data/otel-logs:/logs
+    ports:
+      - "127.0.0.1:4317:4317"   # OTLP/gRPC
+      - "127.0.0.1:4318:4318"   # OTLP/HTTP
+      - "127.0.0.1:13133:13133" # health_check
+    healthcheck:
+      # distroless 镜像无 curl/wget/shell；用 validate 校验二进制与配置可用性，
+      # 端口 13133 的真实 HTTP 探测由宿主侧验证命令执行（experimental notes）。
+      test: ["CMD", "/otelcol-contrib", "validate", "--config=/etc/otel/config.yaml"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    networks: [pi-infra]
+    cpus: 0.5
+    mem_limit: 512m
+
+networks:
+  pi-infra:
+    driver: bridge

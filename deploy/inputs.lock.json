@@ -1,0 +1,37 @@
+{
+  "lockVersion": "1",
+  "environment": "local-experimental",
+  "declaration": "S1 基础设施实验配置。依据《环境搭建与验证手册 v1.3.2》§0 规则 2/§2：IN-01~IN-12 未完成 Phase 0 冻结的项均标注状态；本环境不可作为正式验证环境（手册 §18.2 就绪表不满足）。",
+  "inputs": {
+    "IN-01": { "item": "Git Provider 与隔离仓库", "status": "待冻结", "value": null },
+    "IN-02": { "item": "Git 对象算法", "status": "待冻结", "value": null },
+    "IN-03": { "item": "宿主 OS/内核/容器运行时/MAC", "status": "实验登记（不达标）", "value": {
+        "os": "Ubuntu 26.04 LTS", "kernel": "7.0.0-30-generic", "arch": "x86_64",
+        "cgroup": "cgroup2fs (v2)", "docker": "29.7.2 (cgroup driver systemd)",
+        "mac": "AppArmor/SELinux 未启用，H-03 不满足",
+        "timezone": "宿主 CST（H-02 不满足；PG 容器内 UTC 已满足）",
+        "isolationUsers": "无 pi-* 宿主用户（H-04/H-05 待办）",
+        "storageVolumes": "单卷（H-06 不满足）" } },
+    "IN-04": { "item": "PostgreSQL/MinIO/OTel 组件摘要", "status": "实验登记", "value": {
+        "postgres": "postgres@sha256:fe0737ba566a2c5b2a28f34433c0a423261900ec17b9bf7ad115e1aae7e57f1b (postgres:15-alpine)",
+        "minio": "minio/minio@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e",
+        "mc": "minio/mc@sha256:a7fe349ef4bd8521fb8497f55c6042871b2ae640607cf99d9bede5e9bdf11727",
+        "otel": "otel/opentelemetry-collector-contrib@sha256:799dc6cf12c96192af37b5bdba804da8c10b3bc563b43cb90c3f3c58d9572ad6 (v0.160.0)" } },
+    "IN-05": { "item": "Runtime 入口与 shim", "status": "待冻结", "value": null },
+    "IN-06": { "item": "模型真实路线与费率上界", "status": "待冻结", "value": null },
+    "IN-07": { "item": "镜像来源策略", "status": "待冻结", "value": null },
+    "IN-08": { "item": "工作负载身份与签名 key", "status": "实验登记（待 ADR 冻结后重签发）", "value": "deploy/keys/keys.lock.json：11 个 Ed25519 keyId（sk-task-api/attempt/node/commit-bundle/attestation/delivery-authz/revocation/ledger/skill/image/publisher），私钥 0600" },
+    "IN-09": { "item": "撤销新鲜度", "status": "待审批", "value": { "maxViewAgeSeconds": 30, "maxActionGrantSeconds": 30, "clockSkewToleranceSeconds": 2, "note": "蓝图初值，未发布 RevocationFreshnessPolicy" } },
+    "IN-10": { "item": "Lease/StateDeadline 策略", "status": "待审批", "value": { "executionTtlSeconds": 30, "heartbeatSeconds": 10, "renewBeforeSeconds": 10, "verificationGitStagingTtlSeconds": 60, "pauseGraceSeconds": 60, "note": "蓝图初值，未发布 LeasePolicySnapshot/StateDeadlinePolicy" } },
+    "IN-11": { "item": "预算 Journal 持久化介质", "status": "待冻结", "value": null },
+    "IN-12": { "item": "证据保留与 GC", "status": "实验登记", "value": { "casRetention": "COMPLIANCE 90DAYS（MinIO bucket default retention）", "note": "正式 WORM 保留期须按 ArtifactService 配置冻结" } }
+  },
+  "componentDigests": {
+    "compose": "sha256:1f8f370fe1bc9bfd1a7e969ad5a265fe9094635efdc9cc9aadb2d60eb457b8ec",
+    "otelConfig": "sha256:7e3798273db2df842716b07e54f878d69719966789a007d7494fd911209ea56a",
+    "rolesScript": "sha256:32478f7512612d3a114c07e0e29d7c02665018afa6f29481e869a83a11dbf0cf",
+    "minioInitScript": "sha256:62912277f4925e37fd3ca99ae4b7e919f73b4328b53f2e4004d7bde097f21813",
+    "keysManifest": "sha256:33361c87c826c45971895b450953d0086c2f84be8a64ec39c36ddcc969bfd30d",
+    "generatedAt": "2026-09-05T02:44:00Z"
+  }
+}
