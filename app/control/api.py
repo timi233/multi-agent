@@ -71,24 +71,22 @@ def get_task(task_id: str):
 def cancel_task(task_id: str):
     import json
 
-    row = execute_one("SELECT * FROM pi_tasks WHERE id = %s", (task_id,))
-    if not row:
-        raise HTTPException(404, f"task {task_id} not found")
-    old = row["status"]
-    if old not in ("QUEUED", "RUNNING"):
-        raise HTTPException(409, f"cannot cancel task in status {old}")
-    # 状态条件更新 + 事件写入在同一连接同一事务（评审 fix-2）
+    # 状态条件更新 + 事件写入在同一连接同一事务；FOR UPDATE 保证读到真实旧状态
     conn = connect()
     try:
         with conn.cursor() as cur:
+            cur.execute("SELECT * FROM pi_tasks WHERE id=%s FOR UPDATE", (task_id,))
+            row = cur.fetchone()
+            if not row:
+                raise HTTPException(404, f"task {task_id} not found")
+            old = row["status"]
+            if old not in ("QUEUED", "RUNNING"):
+                raise HTTPException(409, f"cannot cancel task in status {old}")
             cur.execute(
                 "UPDATE pi_tasks SET status='CANCELLED', finished_at=now(), updated_at=now() "
-                "WHERE id=%s AND status IN ('QUEUED','RUNNING') RETURNING *",
+                "WHERE id=%s",
                 (task_id,),
             )
-            rows = cur.fetchall()
-            if not rows:
-                raise HTTPException(409, f"task {task_id} no longer cancellable")
             cur.execute(
                 "INSERT INTO pi_events (task_id, seq, event_type, payload) "
                 "VALUES (%s, (SELECT COALESCE(MAX(seq),0)+1 FROM pi_events WHERE task_id=%s), "
@@ -98,7 +96,9 @@ def cancel_task(task_id: str):
         conn.commit()
     finally:
         conn.close()
-    return _row_to_task(rows[0])
+    row["status"] = "CANCELLED"
+    row["finished_at"] = row["updated_at"]
+    return _row_to_task(row)
 
 
 # ---------- 事件 ----------

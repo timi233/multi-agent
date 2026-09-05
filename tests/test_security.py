@@ -60,12 +60,15 @@ def test_run_command_cleans_env(tmp_path):
 
 
 def test_worker_cancel_during_run(monkeypatch):
-    """真实竞争：run_attempt 已启动执行后 cancel，worker 迟到收敛不得回退且 attempt 收敛。"""
+    """真实竞争：run_attempt 已启动执行后经 API 取消，worker 迟到收敛且 attempt/事件收敛。"""
     import threading
     import uuid
 
+    from fastapi.testclient import TestClient
+
     from app.db import connect, execute
     from app import worker as worker_mod
+    from app.main import create_app
 
     tid = uuid.uuid4().hex[:16]
     ws = f"task-{tid}"
@@ -86,8 +89,6 @@ def test_worker_cancel_during_run(monkeypatch):
 
     monkeypatch.setattr("app.runtime.agent.run_attempt", fake_run_attempt)
 
-    results = {}
-
     def run_in_thread():
         conn = connect()
         try:
@@ -98,29 +99,25 @@ def test_worker_cancel_during_run(monkeypatch):
     t = threading.Thread(target=run_in_thread)
     t.start()
     assert started.wait(timeout=10), "run_attempt 未启动"
-    # run_attempt 执行中被 cancel（条件更新 + 事件同事务）
-    conn = connect()
-    with conn.cursor() as cur:
-        cur.execute(
-            "UPDATE pi_tasks SET status='CANCELLED', finished_at=now(), updated_at=now() "
-            "WHERE id=%s AND status IN ('QUEUED','RUNNING') RETURNING id",
-            (tid,),
-        )
-        results["cancel_affected"] = cur.fetchone() is not None
-    conn.commit()
-    conn.close()
+    # 经真实 API 取消（验证 cancel 单事务 + TASK_CANCELLED 事件）
+    monkeypatch.setattr("app.runtime.agent.run_attempt", fake_run_attempt)
+    client = TestClient(create_app(enable_worker=False))
+    with client:
+        resp = client.post(f"/api/v1/tasks/{tid}/cancel")
+        assert resp.status_code == 200, resp.text
+        assert resp.json()["status"] == "CANCELLED"
     release.set()
     t.join(timeout=15)
 
     row = execute("SELECT status, error FROM pi_tasks WHERE id=%s", (tid,))[0]
-    assert results["cancel_affected"] is True
     assert row["status"] == "CANCELLED", "已取消任务不得被 worker 回退为 SUCCESS/FAILED"
     assert row["error"] is None
     # attempt 必须收敛，不得停在 CLAIMED
     att = execute("SELECT status FROM pi_attempts WHERE task_id=%s", (tid,))[0]
     assert att["status"] == "TERMINAL_REPORTED"
     ev_types = [e["event_type"] for e in execute("SELECT event_type FROM pi_events WHERE task_id=%s", (tid,))]
-    assert "ATTEMPT_CANCELLED" in ev_types, f"缺 ATTEMPT_CANCELLED: {ev_types}"
+    assert "TASK_CANCELLED" in ev_types, f"缺 TASK_CANCELLED 事件: {ev_types}"
+    assert "ATTEMPT_CANCELLED" in ev_types, f"缺 ATTEMPT_CANCELLED 事件: {ev_types}"
     execute("DELETE FROM pi_events WHERE task_id=%s", (tid,))
     execute("DELETE FROM pi_attempts WHERE task_id=%s", (tid,))
     execute("DELETE FROM pi_tasks WHERE id=%s", (tid,))
