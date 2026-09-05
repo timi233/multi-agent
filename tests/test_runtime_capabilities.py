@@ -15,6 +15,7 @@ from app.runtime.capabilities import (
     core_facts,
 )
 from app.runtime.tools import TOOL_DEFINITIONS
+from app.security import keys as node_keys
 
 SCHEMA = load_schema("runtime_capability_report", "2")
 PROFILE = load_digest_profile("runtime_capability_report", "2")
@@ -43,6 +44,7 @@ def test_report_structure():
     assert len(rep["contractId"]) == 32
     assert {t["name"] for t in rep["toolCapabilities"]} == _tool_names()
     assert rep["isolation"]["processExecutionForTools"] is True
+    assert rep["isolation"]["networkEnabledForTools"] is True  # run_command 可触网，如实声明
     assert rep["knownGaps"] == RT_KNOWN_GAPS  # 事实基线如实披露
 
 
@@ -55,40 +57,59 @@ def test_schema_and_profile_consistency():
 
 
 def test_signature_envelope_digest_recomputable():
-    """信封 payloadDigest == 独立重算 canonicalPayload 的 sha256。"""
+    """信封 payloadDigest == 独立重算 canonicalPayload 的 sha256；
+    value == 对 signature_input 的真实 Ed25519 签名（可验签）。"""
+    from app.contracts.codec import build_signature_envelope as rebuild
+
     rep = build_report()
     sig = rep["signature"]
-    envelope_keys = {k for k in sig if k != "value"}  # value=Ed25519 占位
-    assert envelope_keys == {
+    assert {k for k in sig} == {
         "objectType", "schemaVersion", "signatureAlgorithm", "keyId",
         "issuer", "issuerWorkloadIdentity", "audience", "controlPlaneEpoch",
-        "signedAt", "payloadDigest"}
+        "signedAt", "payloadDigest", "value"}
     obj = {k: v for k, v in rep.items() if k != "signature"}
     canon = canonical_payload(obj, PROFILE)
     assert "sha256:" + hashlib.sha256(canon).hexdigest() == sig["payloadDigest"]
+    # 用 envelope 原 meta 重算 signature_input，验签 value（评审 block-fix）
+    meta = {k: sig[k] for k in (
+        "objectType", "schemaVersion", "signatureAlgorithm", "keyId",
+        "issuer", "issuerWorkloadIdentity", "audience", "controlPlaneEpoch",
+        "signedAt")}
+    _, sig_input, _ = rebuild(obj, SCHEMA, PROFILE, meta)
+    assert node_keys.verify(sig_input, sig["value"]) is True
+    assert node_keys.verify(b"tampered-bytes", sig["value"]) is False
 
 
 def test_contract_id_deterministic_across_generatedAt():
     """contractId 锚定核心事实（不含 generatedAt）：两次构造一致；
-    payloadDigest 随 generatedAt 变化（诚实：时间戳属于被签名事实）。"""
+    事实变化（模型名/工具集合顺序）必然改变 contractId。"""
     import time
+
+    from app.runtime.capabilities import _contract_id
 
     r1 = build_report()
     time.sleep(1.1)  # generatedAt 为秒级 UTC
     r2 = build_report()
     assert r1["contractId"] == r2["contractId"]
     assert r1["signature"]["payloadDigest"] != r2["signature"]["payloadDigest"]
-    # 结构等价（除时间戳/签名）
-    a = {k: v for k, v in r1.items() if k not in ("generatedAt", "signature")}
-    b = {k: v for k, v in r2.items() if k not in ("generatedAt", "signature")}
-    assert a == b
+    f1 = core_facts()
+    f2 = dict(f1, model={"provider": "cliproxy-local", "name": "other-model"})
+    assert _contract_id(f1) != _contract_id(f2)
+    f3 = dict(f1, toolCapabilities=list(reversed(f1["toolCapabilities"])))
+    assert _contract_id(f1) != _contract_id(f3)
 
 
-def test_cached_report_idempotent():
-    """进程内缓存：同一对象同一签名（generatedAt 固定）。"""
-    r1, r2 = build_cached_report(), build_cached_report()
+def test_cached_report_idempotent_and_isolated():
+    """缓存幂等 + deepcopy 隔离：外部修改返回对象不污染缓存（评审 should-fix）。"""
+    r1 = build_cached_report()
+    r2 = build_cached_report()
     assert r1 == r2
     assert r1["signature"]["payloadDigest"] == r2["signature"]["payloadDigest"]
+    r1["toolCapabilities"][0]["name"] = "tampered"
+    r1["model"]["name"] = "tampered"
+    r3 = build_cached_report()
+    assert r3["model"]["name"] != "tampered"
+    assert "tampered" not in {t["name"] for t in r3["toolCapabilities"]}
 
 
 def test_core_facts_roundtrip_matches_report():

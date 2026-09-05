@@ -1,29 +1,33 @@
 """Runtime 能力报告（RT）：引擎事实基线。
 
-固化运行环境/工具集/模型路由/资源参数/隔离边界/已知差距，作为事后零
-运行的签名可验证事实基线（蓝图 §8.2 六问、手册 RT-xx 简化版；评审建议
-"为后续准入与 Gateway 身份绑定提供事实基线"）。
+固化运行环境/工具集/模型路由/资源参数/隔离边界/已知差距，作为**真实
+Ed25519 签名**的可验证事实基线（蓝图 §8.2 六问、手册 RT-xx 简化版；评审
+建议"为后续准入与 Gateway 身份绑定提供事实基线"）。
 
 - 报告在进程生命周期内生成一次（`build_cached_report`，generatedAt 固定），
-  内容不变则幂等；
+  内容不变则幂等；缓存返回 deepcopy，外部无法污染内部事实；
 - `contractId` = sha256(JCS(核心事实，不含 generatedAt)) 前缀 32：事实变化即变，
-  避免 digest 自指循环；
+  复用项目 canonical（jcs），无第二套算法；
 - 签名信封复用 Phase 0 codec（蓝图 §9.4 十字段，`build_signature_envelope`
-  在 schema/digestprofile 校验通过后原子生成）。
+  校验后原子生成 `signature_input`）；`signature.value` = 持久化 Runtime
+  私钥（data/keys/runtime_ed25519.pem）对 signature_input 的 Ed25519 签名，
+  keyId = 公钥指纹——真实可验签（`app.security.keys.verify`）。
 """
 from __future__ import annotations
 
+import copy
 import hashlib
-import json
 import platform
 from datetime import datetime, timezone
 
 from ..config import settings
 from ..contracts import (
     build_signature_envelope,
+    jcs,
     load_digest_profile,
     load_schema,
 )
+from ..security import keys as node_keys
 from .tools import TOOL_DEFINITIONS
 
 PI_RUNTIME_VERSION = "0.3.0"
@@ -43,7 +47,7 @@ _ENVELOPE_BASE = {
     "objectType": "runtime_capability_report",
     "schemaVersion": "2",
     "signatureAlgorithm": "Ed25519",
-    "keyId": "sk-runtime",
+    "keyId": node_keys.key_id(),
     "issuer": "runtime-service",
     "issuerWorkloadIdentity": "pi.node",
     "audience": "pi.platform",
@@ -81,7 +85,7 @@ def core_facts() -> dict:
             "sandbox": "workspace-root-limit",
             "workspacesRoot": str(settings.workspaces_dir),
             "readOnlyDirs": [],
-            "networkEnabledForTools": False,
+            "networkEnabledForTools": True,   # 如实：run_command 子进程可触网（无网络隔离，见 knownGaps RT-04）
             "processExecutionForTools": True,  # run_command 受限执行（超时+截断）
         },
         "toolCapabilities": tools,
@@ -90,9 +94,9 @@ def core_facts() -> dict:
 
 
 def _contract_id(facts: dict) -> str:
-    blob = json.dumps(facts, ensure_ascii=False, separators=(",", ":"),
-                      sort_keys=True)
-    return hashlib.sha256(blob.encode("utf-8")).hexdigest()[:32]
+    """事实锚 = sha256(JCS(核心事实))[:32]；复用项目 canonical（jcs），
+    事实/工具集合顺序变化即变（评审 should-fix：无第二套 canonical）。"""
+    return hashlib.sha256(jcs(facts)).hexdigest()[:32]
 
 
 def build_report() -> dict:
@@ -103,18 +107,21 @@ def build_report() -> dict:
     schema = load_schema("runtime_capability_report", "2")
     profile = load_digest_profile("runtime_capability_report", "2")
     meta = {**_ENVELOPE_BASE, "signedAt": _utc_now()}
-    env, _sig_input, _digest = build_signature_envelope(
+    env, sig_input, _digest = build_signature_envelope(
         report, schema, profile, meta)
-    report["signature"] = {**env, "value": "d" * 128}
+    # 真实 Ed25519 签名（评审 block-fix）：对 codec 生成的 signature_input 签名
+    report["signature"] = {**env, "value": node_keys.sign(sig_input)}
     return report
 
 
 def build_cached_report() -> dict:
-    """进程内缓存：生命周期内 generatedAt/签名/对象完全幂等（运行前事实基线）。"""
+    """进程内缓存：生命周期内 generatedAt/签名/对象完全幂等（运行前事实基线）。
+
+    返回 deepcopy：外部调用方修改返回对象不会污染缓存事实（评审 should-fix）。"""
     global _CACHED
     if _CACHED is None:
         _CACHED = build_report()
-    return _CACHED
+    return copy.deepcopy(_CACHED)
 
 
 def clear_cache() -> None:  # 测试用：强制重建
