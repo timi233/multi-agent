@@ -43,6 +43,12 @@
 - 结果：**无违规**。SM-01 白名单穷举（25 对 + 套件全查）PASS；SM-02 终态闭合 PASS；SM-03 每个可达非终态存在 StateDeadlinePolicy 出口且在白名单内 PASS；SM-08 终态转移事件同事务 PASS；死枚举审计：Attempt `RUNNING`/`FAILED` 为声明未用（基线固化）。
 - 已知差距（不并入通过判定）：SM-08 `Task QUEUED->RUNNING` 的事件（`ATTEMPT_STARTED`）在后续初始化事务写入，跨事务（1 项，`tests/test_sm_model.py::test_run_all_ok` 锁定）；运行时 deadline 定时留待 Gateway 预算层。
 
+## 兼容性边界（CT-03 语义变更，如实披露）
+
+- 启用 `canonicalSortKeys` 后，`attempt_contract`（schemaVersion="2"）的 `toolAllowlist` 语义由"有序（元素顺序即声明顺序，JCS 不重排）"改为"**集合（无序）**——投影前按元素值字节序 canonical sort，乱序传入 digest 稳定"。
+- 因此同一 schemaVersion="2" 下：既有 `canonicalPayload`、`payloadDigest`、签名输入与 Ed25519 签名**全部失效**（toolAllowlist 原固化为非字母序）；已重生成全部向量（attempt 10 / task_spec 10 / event 8）并经 Python 主实现、Node 独立参考实现、Ed25519 真实验签与可复现性逐字节比对确认。
+- 迁移策略：本阶段属契约基线内修订（正式基准未冻结）；进入正式基准前应提升契约版本（v3）或按蓝图 §4.4 以 ADR 冻结该变更。旧 digest/签名一律视为无效，不得用于验签。
+
 ## 已知边界（记录，不视为缺陷）
 
 - canonical 编码为 "RFC8785-JCS-lite"：数字仅整数（浮点规范化差异规避）、键全 ASCII、`ensure_ascii` 转义约定——两实现已按同一规范逐字节一致；若蓝图后续引入浮点或非 ASCII 键，需按 RFC 8785 完整语义评估。

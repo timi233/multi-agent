@@ -153,6 +153,37 @@ def test_profile_consistency(object_type):
     assert validate_profile_consistency(schema, profile) == []
 
 
+def test_profile_consistency_ordered_arrays_semantics():
+    """蓝图 §12『有序语义或 canonicalSortKey』（评审 fix-B2）：orderedArrays
+    合法；两者皆缺报问题；by 枚举非法报问题。"""
+    schema = load_schema("task_spec", "2")
+    base = load_digest_profile("task_spec", "2")
+
+    # 1) 有序语义声明：从 canonicalSortKeys 移到 orderedArrays → 仍合法
+    p1 = dict(base)
+    p1["orderedArrays"] = ["/policyTemplateRefs"]
+    p1.pop("canonicalSortKeys", None)
+    assert validate_profile_consistency(schema, p1) == []
+
+    # 2) 两者皆缺 → 报问题
+    p2 = dict(base)
+    p2.pop("canonicalSortKeys", None)
+    problems2 = validate_profile_consistency(schema, p2)
+    assert any("必须声明 canonicalSortKeys 或 orderedArrays" in x for x in problems2)
+
+    # 3) by 枚举非法（拼写错误 keyy 不再静默退化为 value）
+    p3 = dict(base)
+    p3["canonicalSortKeys"] = {"/policyTemplateRefs": {"by": "keyy", "key": "templateRef"}}
+    problems3 = validate_profile_consistency(schema, p3)
+    assert any("by 仅允许 value|key" in x for x in problems3)
+
+    # 4) canonicalSortKeys 指向非投影字段 → 报问题（防漂移）
+    p4 = dict(base)
+    p4["canonicalSortKeys"] = {"/not-a-projected-array": {"by": "value"}}
+    problems4 = validate_profile_consistency(schema, p4)
+    assert any("不在 immutablePayloadPointers" in x for x in problems4)
+
+
 def test_profile_consistency_rejects_drift():
     """duplicateConsistencyPointers 防漂移（评审 nit-3）：错误指针/键必须报问题。"""
     schema = load_schema("event_envelope", "2")

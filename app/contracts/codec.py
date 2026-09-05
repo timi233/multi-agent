@@ -177,16 +177,30 @@ def validate_profile_consistency(schema: dict, profile: dict) -> list[str]:
         if env_key not in SIGNATURE_ENVELOPE_KEYS:
             problems.append(
                 f"duplicateConsistencyPointers 信封键不在 §9.4 键集中: {env_key}")
-    # 蓝图 §12：JCS 不替数组排序——已投影的数组字段必须声明 canonicalSortKeys
-    # （集合数组必须有无序语义；有序语义字段需在 Schema 声明 type=array + 有序标记，
-    #  当前契约仅支持 canonicalSortKeys 声明方式）。
+    # 蓝图 §12：JCS 不替数组排序——投影数组字段必须声明"有序语义"或
+    # canonicalSortKey：orderedArrays（有序，JCS 不重排）或 canonicalSortKeys
+    # （集合，先排序后求 digest）。by 仅允许 value|key；排序声明必须指向投影字段。
     sorts = profile.get("canonicalSortKeys") or {}
+    ordered = set(profile.get("orderedArrays") or [])
+    allowed_by = ("value", "key")
+    for p, spec in sorts.items():
+        if p not in (profile.get("immutablePayloadPointers") or []):
+            problems.append(
+                f"canonicalSortKeys 指针 {p} 不在 immutablePayloadPointers 中")
+        if spec.get("by") not in allowed_by:
+            problems.append(
+                f"canonicalSortKeys {p} by 仅允许 {'|'.join(allowed_by)}，"
+                f"实际 {spec.get('by')!r}")
     for p in profile.get("immutablePayloadPointers") or []:
         node = schema_at(p)
         if isinstance(node, dict) and node.get("type") == "array":
-            if p not in sorts:
-                problems.append(f"数组字段 {p} 必须声明 canonicalSortKeys（蓝图 §12）")
-            elif sorts[p].get("by") == "key" and not sorts[p].get("key"):
+            if p in ordered:
+                continue
+            spec = sorts.get(p)
+            if spec is None:
+                problems.append(
+                    f"集合数组 {p} 必须声明 canonicalSortKeys 或 orderedArrays（蓝图 §12）")
+            elif spec.get("by") == "key" and not spec.get("key"):
                 problems.append(f"canonicalSortKeys {p} by=key 必须提供 key")
     return problems
 

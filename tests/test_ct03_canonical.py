@@ -77,6 +77,23 @@ def test_canonical_layer_rejects_duplicates_by_key():
         canonical_payload(bad, profile)
 
 
+def test_canonical_layer_rejects_same_key_diff_digest():
+    """CT-03 双保险（key 模式）：相同 templateRef、不同 templateDigest ——
+    Schema uniqueItems 放行（元素不同），但 canonical 层按稳定键拒绝重复。"""
+    schema, profile, vectors = _load("task_spec")
+    obj = next(v for v in vectors if v["id"] == "pos-policy-refs-a")["object"]
+    bad = json.loads(json.dumps(obj))
+    bad["policyTemplateRefs"] = [
+        {"templateRef": "eval-tpl/001", "templateDigest": "sha256:" + "0" * 64},
+        {"templateRef": "eval-tpl/001", "templateDigest": "sha256:" + "1" * 64},
+    ]
+    # Schema 层不拦截（元素不同），证明 canonical 层是真正的唯一性守卫
+    from jsonschema import Draft202012Validator
+    assert Draft202012Validator(schema).is_valid(bad), "前置：Schema uniqueItems 应放行"
+    with pytest.raises(ContractError, match="duplicate"):
+        canonical_payload(bad, profile)
+
+
 def test_canonical_layer_rejects_missing_sort_key():
     """CT-03 排序键缺失（by=key 模式）：元素缺少 templateRef 即失败。"""
     schema, profile, vectors = _load("task_spec")

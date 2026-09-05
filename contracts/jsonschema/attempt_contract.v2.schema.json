@@ -41,7 +41,7 @@
       "type": "array",
       "items": { "type": "string", "enum": ["list_dir", "read_file", "write_file", "edit_file", "find_files", "grep", "run_command", "finish"] },
       "uniqueItems": true,
-      "description": "有序语义数组（元素顺序即声明顺序，JCS 不重新排序）"
+      "description": "集合语义数组（无序）：canonicalPayload 前按 canonicalSortKeys（元素值字节序）排序，乱序传入 digest 稳定；重复由 uniqueItems 与 canonical 层双保险拒绝（蓝图 §12：JCS 不替数组排序）"
     },
     "createdAt": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T" },
     "expiresAt": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T" },
