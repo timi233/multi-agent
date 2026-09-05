@@ -184,6 +184,9 @@ def validate_profile_consistency(schema: dict, profile: dict) -> list[str]:
     ordered = set(profile.get("orderedArrays") or [])
     allowed_by = ("value", "key")
     for p, spec in sorts.items():
+        if p in ordered:
+            problems.append(
+                f"数组 {p} 同时声明于 canonicalSortKeys 与 orderedArrays（互斥）")
         if p not in (profile.get("immutablePayloadPointers") or []):
             problems.append(
                 f"canonicalSortKeys 指针 {p} 不在 immutablePayloadPointers 中")

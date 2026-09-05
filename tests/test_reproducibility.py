@@ -183,6 +183,12 @@ def test_profile_consistency_ordered_arrays_semantics():
     problems4 = validate_profile_consistency(schema, p4)
     assert any("不在 immutablePayloadPointers" in x for x in problems4)
 
+    # 5) 同一指针同时声明于 canonicalSortKeys 与 orderedArrays → 互斥报问题
+    p5 = dict(base)
+    p5["orderedArrays"] = ["/policyTemplateRefs"]
+    problems5 = validate_profile_consistency(schema, p5)
+    assert any("互斥" in x for x in problems5)
+
 
 def test_profile_consistency_rejects_drift():
     """duplicateConsistencyPointers 防漂移（评审 nit-3）：错误指针/键必须报问题。"""
