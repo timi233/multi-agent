@@ -239,18 +239,47 @@ SIGNATURE_ENVELOPE_KEYS = (
 )
 
 
+def validate_signature_envelope(env: dict) -> None:
+    """校验组装后的签名信封字段（评审 nit-1）：值域/类型的 Schema 级约束。"""
+    if env.get("signatureAlgorithm") != "Ed25519":
+        raise ContractError(f"signatureAlgorithm must be Ed25519")
+    for key, label in (("keyId", "keyId"), ("issuer", "issuer"),
+                       ("issuerWorkloadIdentity", "issuerWorkloadIdentity"),
+                       ("objectType", "objectType")):
+        if not isinstance(env.get(key), str) or not env[key]:
+            raise ContractError(f"signature envelope {label} must be non-empty string")
+    if env.get("audience") is not None and not isinstance(env.get("audience"), str):
+        raise ContractError("signature envelope audience must be string or null")
+    if not isinstance(env.get("schemaVersion"), (str, int)):
+        raise ContractError("signature envelope schemaVersion invalid")
+    if not isinstance(env.get("controlPlaneEpoch"), int) or env["controlPlaneEpoch"] < 0:
+        raise ContractError("signature envelope controlPlaneEpoch must be int >= 0")
+    if not isinstance(env.get("signedAt"), str) or \
+            not re.match(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T", env.get("signedAt", "")):
+        raise ContractError("signature envelope signedAt must be ISO timestamp")
+    if not isinstance(env.get("payloadDigest"), str) or \
+            not re.match(r"^sha256:[a-f0-9]{64}$", env.get("payloadDigest", "")):
+        raise ContractError("signature envelope payloadDigest invalid")
+
+
 def build_signature_envelope(obj: dict, schema: dict, profile: dict,
                              meta: dict) -> tuple[dict, bytes, str]:
-    """原子签名信封构造（fail closed，评审 fix-1/fix-8）：
-    Schema 校验 → 重算 payloadDigest → 组装蓝图 §9.4 十字段信封 → 签名输入。
+    """原子签名信封构造（fail closed，评审 fix-1/fix-8/nit-1）：
+    Profile 一致性 → Schema 校验 → 重算 payloadDigest → 组装蓝图 §9.4
+    十字段信封 → 信封字段校验 → 签名输入。
 
     强制约束：
     - meta.objectType / meta.schemaVersion 必须等于 profile 的对象类型/版本
       （防止为错误对象域构造签名）；
     - 若 profile 声明 selfDigestPointer（对象顶层含 payloadDigest 派生字段，
-      如事件信封），其值必须等于重算结果（防止自指 digest 冲突/不一致对象被签）。
+      如事件信封），其值必须等于重算结果（防止自指 digest 冲突/不一致对象被签）；
+    - 组装后的信封字段必须满足值域约束（signatureAlgorithm、audience 等）。
     信封内的 payloadDigest 必然来自本对象重算，杜绝伪造 digest 签名。
     返回 (envelope, signature_input_bytes, payload_digest_str)。"""
+    problems = validate_profile_consistency(schema, profile)
+    if problems:
+        raise ContractError(
+            f"profile/schema inconsistent: {'; '.join(problems[:3])}")
     if meta.get("objectType") != profile.get("objectType"):
         raise ContractError(
             f"signature envelope objectType mismatch: "
@@ -276,4 +305,5 @@ def build_signature_envelope(obj: dict, schema: dict, profile: dict,
         raise ContractError(f"signature envelope meta missing fields: {missing}")
     envelope = {k: meta[k] for k in SIGNATURE_ENVELOPE_KEYS}
     envelope["payloadDigest"] = digest
+    validate_signature_envelope(envelope)
     return envelope, signature_input(b"", envelope), digest

@@ -104,6 +104,26 @@ def test_build_envelope_rejects_self_digest_mismatch():
         build_signature_envelope(bad, schema, profile, meta)
 
 
+def test_build_envelope_rejects_bad_field_values():
+    """组装后的信封字段必须通过值域校验（评审 nit-1）。"""
+    schema = load_schema("task_spec", "2")
+    profile = load_digest_profile("task_spec", "2")
+    data = json.loads((VEC / "task_spec" / "v2" / "vectors.json").read_text(encoding="utf-8"))
+    obj = next(v for v in data["vectors"] if v["id"] == "pos-minimal")["object"]
+    meta = {"objectType": "task_spec", "schemaVersion": "2",
+            "signatureAlgorithm": "Ed25519", "keyId": "sk-attempt",
+            "issuer": "attempt-service", "issuerWorkloadIdentity": "pi.x",
+            "audience": None, "controlPlaneEpoch": 0, "signedAt": "2026-09-05T08:01:00Z"}
+    with pytest.raises(ContractError):
+        build_signature_envelope(obj, schema, profile, {**meta, "signatureAlgorithm": "ECDSA"})
+    with pytest.raises(ContractError):
+        build_signature_envelope(obj, schema, profile, {**meta, "controlPlaneEpoch": -1})
+    with pytest.raises(ContractError):
+        build_signature_envelope(obj, schema, profile, {**meta, "keyId": ""})
+    with pytest.raises(ContractError):
+        build_signature_envelope(obj, schema, profile, {**meta, "signedAt": "not-a-time"})
+
+
 @pytest.mark.parametrize("object_type", ["attempt_contract", "task_spec",
                                          "event_envelope"])
 def test_profile_consistency(object_type):

@@ -233,10 +233,12 @@ if __name__ == "__main__":
             lines.append(line)
         lines.append("")
     ok = all_ok(results)
+    n_find = sum(len(c.findings) for checks in results.values() for c in checks)
     n_warn = count_warnings(results)
     verdict = "PASS" if ok else "FAIL"
     lines.append(
-        f"## 结论\n\n**{verdict}**（违规 0 项；已知差距 {n_warn} 项，不计入通过判定）\n")
+        f"## 结论\n\n**{verdict}**（违规 {n_find} 项；已知差距 {n_warn} 项"
+        f"{'，不计入通过判定' if n_warn else ''}）\n")
     lines.append("## 实现差距注记（记录，不阻塞）\n")
     lines.append("""- SM-03：StateDeadlinePolicy 出口动作真实存在（用户 `CANCELLED`、worker 失败收敛、启动恢复 `FAILED`/`TERMINAL_REPORTED`），但触发时机为调用/启动时，**无常驻定时器**；运行时 deadline 定时留待调度/Gateway 预算层（蓝图 Gateway Journal/Budget）。
 - Attempt 声明枚举 `RUNNING`/`FAILED` 为死枚举（`migrations/001_init.sql` 注释声明，worker 从未使用）；审计基线固化于 `tests/test_sm_model.py::test_dead_enum_audit_attempt`。对齐蓝图 Attempt 状态矩阵（CLAIMED/RUNNING/…/TERMINAL_REPORTED）时需扩充迁移点。
@@ -252,5 +254,7 @@ if __name__ == "__main__":
             detail = "; ".join(c.findings) if c.findings else ""
             warn = "; ".join(c.warnings)
             print(f"  {tag}: {detail}" + (f"  ⚠ {warn}" if warn else ""))
-    print("\n总体:", "PASS" if ok else "FAIL", f"（已知差距 {count_warnings(results)} 项）")
+    print("\n总体:", "PASS" if ok else "FAIL",
+          f"（违规 {sum(len(c.findings) for checks in results.values() for c in checks)} 项；"
+          f"已知差距 {count_warnings(results)} 项）")
     print("报告已写入:", out_dir / "report.md")
