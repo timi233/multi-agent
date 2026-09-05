@@ -1,0 +1,330 @@
+{
+  "objectType": "task_spec",
+  "schemaVersion": "2",
+  "vectors": [
+    {
+      "id": "pos-minimal",
+      "kind": "positive",
+      "note": "合法最小任务规格（无可选字段）",
+      "schemaValid": true,
+      "expectedError": null,
+      "schemaErrors": [],
+      "object": {
+        "schemaVersion": "2",
+        "taskId": "0123456789abcdef",
+        "specVersion": "1",
+        "userIdentity": {
+          "subjectId": "user-042",
+          "displayName": "测试用户"
+        },
+        "title": "整理周报",
+        "prompt": "读取 workspace 内 weekly.md，汇总为三要点。",
+        "workspace": {
+          "root": "workspaces/t001",
+          "writable": true
+        },
+        "requestedResources": {
+          "model": {
+            "provider": "cliproxy-local",
+            "name": "deepseek-v4-flash",
+            "thinking": "low"
+          },
+          "maxTurns": 8
+        },
+        "policyTemplateRefs": [
+          {
+            "templateRef": "eval-tpl/001",
+            "templateDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "createdAt": "2026-09-05T08:00:00Z"
+      },
+      "canonicalPayloadB64": "eyJjcmVhdGVkQXQiOiIyMDI2LTA5LTA1VDA4OjAwOjAwWiIsInBvbGljeVRlbXBsYXRlUmVmcyI6W3sidGVtcGxhdGVEaWdlc3QiOiJzaGEyNTY6MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsInRlbXBsYXRlUmVmIjoiZXZhbC10cGwvMDAxIn1dLCJwcm9tcHQiOiJcdThiZmJcdTUzZDYgd29ya3NwYWNlIFx1NTE4NSB3ZWVrbHkubWRcdWZmMGNcdTZjNDdcdTYwM2JcdTRlM2FcdTRlMDlcdTg5ODFcdTcwYjlcdTMwMDIiLCJyZXF1ZXN0ZWRSZXNvdXJjZXMvbWF4VHVybnMiOjgsInJlcXVlc3RlZFJlc291cmNlcy9tb2RlbC9uYW1lIjoiZGVlcHNlZWstdjQtZmxhc2giLCJyZXF1ZXN0ZWRSZXNvdXJjZXMvbW9kZWwvcHJvdmlkZXIiOiJjbGlwcm94eS1sb2NhbCIsInJlcXVlc3RlZFJlc291cmNlcy9tb2RlbC90aGlua2luZyI6ImxvdyIsInNjaGVtYVZlcnNpb24iOiIyIiwic3BlY1ZlcnNpb24iOiIxIiwidGFza0lkIjoiMDEyMzQ1Njc4OWFiY2RlZiIsInRpdGxlIjoiXHU2NTc0XHU3NDA2XHU1NDY4XHU2MmE1IiwidXNlcklkZW50aXR5L2Rpc3BsYXlOYW1lIjoiXHU2ZDRiXHU4YmQ1XHU3NTI4XHU2MjM3IiwidXNlcklkZW50aXR5L3N1YmplY3RJZCI6InVzZXItMDQyIiwid29ya3NwYWNlL3Jvb3QiOiJ3b3Jrc3BhY2VzL3QwMDEiLCJ3b3Jrc3BhY2Uvd3JpdGFibGUiOnRydWV9",
+      "payloadDigest": "sha256:cb67083fd292b539e6a2d58fab31432d2dcbe0d8b0b5e63303c1d559b4f5c5d0"
+    },
+    {
+      "id": "pos-full",
+      "kind": "positive",
+      "note": "全字段（含 displayName/thinking/maxTokens/expiresAt）",
+      "schemaValid": true,
+      "expectedError": null,
+      "schemaErrors": [],
+      "object": {
+        "schemaVersion": "2",
+        "taskId": "0123456789abcdef",
+        "specVersion": "1",
+        "userIdentity": {
+          "subjectId": "user-042",
+          "displayName": "张三"
+        },
+        "title": "整理周报",
+        "prompt": "读取 workspace 内 weekly.md，汇总为三要点。",
+        "workspace": {
+          "root": "workspaces/t001",
+          "writable": true
+        },
+        "requestedResources": {
+          "model": {
+            "provider": "cliproxy-local",
+            "name": "m",
+            "thinking": "high"
+          },
+          "maxTurns": 12,
+          "maxTokens": 4000
+        },
+        "policyTemplateRefs": [
+          {
+            "templateRef": "eval-tpl/001",
+            "templateDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "createdAt": "2026-09-05T08:00:00Z",
+        "expiresAt": "2026-09-06T08:00:00Z"
+      },
+      "canonicalPayloadB64": "eyJjcmVhdGVkQXQiOiIyMDI2LTA5LTA1VDA4OjAwOjAwWiIsImV4cGlyZXNBdCI6IjIwMjYtMDktMDZUMDg6MDA6MDBaIiwicG9saWN5VGVtcGxhdGVSZWZzIjpbeyJ0ZW1wbGF0ZURpZ2VzdCI6InNoYTI1NjowMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIiwidGVtcGxhdGVSZWYiOiJldmFsLXRwbC8wMDEifV0sInByb21wdCI6Ilx1OGJmYlx1NTNkNiB3b3Jrc3BhY2UgXHU1MTg1IHdlZWtseS5tZFx1ZmYwY1x1NmM0N1x1NjAzYlx1NGUzYVx1NGUwOVx1ODk4MVx1NzBiOVx1MzAwMiIsInJlcXVlc3RlZFJlc291cmNlcy9tYXhUb2tlbnMiOjQwMDAsInJlcXVlc3RlZFJlc291cmNlcy9tYXhUdXJucyI6MTIsInJlcXVlc3RlZFJlc291cmNlcy9tb2RlbC9uYW1lIjoibSIsInJlcXVlc3RlZFJlc291cmNlcy9tb2RlbC9wcm92aWRlciI6ImNsaXByb3h5LWxvY2FsIiwicmVxdWVzdGVkUmVzb3VyY2VzL21vZGVsL3RoaW5raW5nIjoiaGlnaCIsInNjaGVtYVZlcnNpb24iOiIyIiwic3BlY1ZlcnNpb24iOiIxIiwidGFza0lkIjoiMDEyMzQ1Njc4OWFiY2RlZiIsInRpdGxlIjoiXHU2NTc0XHU3NDA2XHU1NDY4XHU2MmE1IiwidXNlcklkZW50aXR5L2Rpc3BsYXlOYW1lIjoiXHU1ZjIwXHU0ZTA5IiwidXNlcklkZW50aXR5L3N1YmplY3RJZCI6InVzZXItMDQyIiwid29ya3NwYWNlL3Jvb3QiOiJ3b3Jrc3BhY2VzL3QwMDEiLCJ3b3Jrc3BhY2Uvd3JpdGFibGUiOnRydWV9",
+      "payloadDigest": "sha256:962a790bcd6e063fdd0b0a512e5da71a341839dd84403f51c8199876d5e2962a"
+    },
+    {
+      "id": "neg-unknown-field",
+      "kind": "negative",
+      "note": "未知字段必须拒绝",
+      "schemaValid": false,
+      "expectedError": "bogusField",
+      "schemaErrors": [
+        "Additional properties are not allowed ('bogusField' was unexpected)"
+      ],
+      "object": {
+        "schemaVersion": "2",
+        "taskId": "0123456789abcdef",
+        "specVersion": "1",
+        "userIdentity": {
+          "subjectId": "user-042",
+          "displayName": "测试用户"
+        },
+        "title": "整理周报",
+        "prompt": "读取 workspace 内 weekly.md，汇总为三要点。",
+        "workspace": {
+          "root": "workspaces/t001",
+          "writable": true
+        },
+        "requestedResources": {
+          "model": {
+            "provider": "cliproxy-local",
+            "name": "deepseek-v4-flash",
+            "thinking": "low"
+          },
+          "maxTurns": 8
+        },
+        "policyTemplateRefs": [
+          {
+            "templateRef": "eval-tpl/001",
+            "templateDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "createdAt": "2026-09-05T08:00:00Z",
+        "bogusField": "x"
+      }
+    },
+    {
+      "id": "neg-model-provider",
+      "kind": "negative",
+      "note": "枚举外 provider 必须拒绝",
+      "schemaValid": false,
+      "expectedError": "provider",
+      "schemaErrors": [
+        "'cliproxy-local' was expected"
+      ],
+      "object": {
+        "schemaVersion": "2",
+        "taskId": "0123456789abcdef",
+        "specVersion": "1",
+        "userIdentity": {
+          "subjectId": "user-042",
+          "displayName": "测试用户"
+        },
+        "title": "整理周报",
+        "prompt": "读取 workspace 内 weekly.md，汇总为三要点。",
+        "workspace": {
+          "root": "workspaces/t001",
+          "writable": true
+        },
+        "requestedResources": {
+          "model": {
+            "provider": "openai",
+            "name": "m"
+          },
+          "maxTurns": 1
+        },
+        "policyTemplateRefs": [
+          {
+            "templateRef": "eval-tpl/001",
+            "templateDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "createdAt": "2026-09-05T08:00:00Z"
+      }
+    },
+    {
+      "id": "neg-max-turns-zero",
+      "kind": "negative",
+      "note": "maxTurns<1 必须拒绝",
+      "schemaValid": false,
+      "expectedError": "maxTurns",
+      "schemaErrors": [
+        "0 is less than the minimum of 1"
+      ],
+      "object": {
+        "schemaVersion": "2",
+        "taskId": "0123456789abcdef",
+        "specVersion": "1",
+        "userIdentity": {
+          "subjectId": "user-042",
+          "displayName": "测试用户"
+        },
+        "title": "整理周报",
+        "prompt": "读取 workspace 内 weekly.md，汇总为三要点。",
+        "workspace": {
+          "root": "workspaces/t001",
+          "writable": true
+        },
+        "requestedResources": {
+          "model": {
+            "provider": "cliproxy-local",
+            "name": "m"
+          },
+          "maxTurns": 0
+        },
+        "policyTemplateRefs": [
+          {
+            "templateRef": "eval-tpl/001",
+            "templateDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "createdAt": "2026-09-05T08:00:00Z"
+      }
+    },
+    {
+      "id": "neg-missing-prompt",
+      "kind": "negative",
+      "note": "缺必需 prompt 必须拒绝",
+      "schemaValid": false,
+      "expectedError": "prompt",
+      "schemaErrors": [
+        "'prompt' is a required property"
+      ],
+      "object": {
+        "schemaVersion": "2",
+        "taskId": "0123456789abcdef",
+        "specVersion": "1",
+        "userIdentity": {
+          "subjectId": "user-042",
+          "displayName": "测试用户"
+        },
+        "title": "整理周报",
+        "workspace": {
+          "root": "workspaces/t001",
+          "writable": true
+        },
+        "requestedResources": {
+          "model": {
+            "provider": "cliproxy-local",
+            "name": "deepseek-v4-flash",
+            "thinking": "low"
+          },
+          "maxTurns": 8
+        },
+        "policyTemplateRefs": [
+          {
+            "templateRef": "eval-tpl/001",
+            "templateDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "createdAt": "2026-09-05T08:00:00Z"
+      }
+    },
+    {
+      "id": "neg-bad-template-digest",
+      "kind": "negative",
+      "note": "templateDigest 必须是 sha256: 格式",
+      "schemaValid": false,
+      "expectedError": "templateDigest",
+      "schemaErrors": [
+        "'md5:zz' does not match '^sha256:[a-f0-9]{64}$'"
+      ],
+      "object": {
+        "schemaVersion": "2",
+        "taskId": "0123456789abcdef",
+        "specVersion": "1",
+        "userIdentity": {
+          "subjectId": "user-042",
+          "displayName": "测试用户"
+        },
+        "title": "整理周报",
+        "prompt": "读取 workspace 内 weekly.md，汇总为三要点。",
+        "workspace": {
+          "root": "workspaces/t001",
+          "writable": true
+        },
+        "requestedResources": {
+          "model": {
+            "provider": "cliproxy-local",
+            "name": "deepseek-v4-flash",
+            "thinking": "low"
+          },
+          "maxTurns": 8
+        },
+        "policyTemplateRefs": [
+          {
+            "templateRef": "t",
+            "templateDigest": "md5:zz"
+          }
+        ],
+        "createdAt": "2026-09-05T08:00:00Z"
+      }
+    },
+    {
+      "id": "neg-policy-duplicate",
+      "kind": "negative",
+      "note": "policyTemplateRefs 重复引用必须拒绝",
+      "schemaValid": false,
+      "expectedError": "uniqueItems",
+      "schemaErrors": [
+        "[{'templateRef': 'a', 'templateDigest': 'sha256:0000000000000000000000000000000000000000000000000000000000000000'}, {'templateRef': 'a', 'templateDigest': 'sha256:0000000000000000000000000000000000000000000000000000000000000000'}] has non-unique elements"
+      ],
+      "object": {
+        "schemaVersion": "2",
+        "taskId": "0123456789abcdef",
+        "specVersion": "1",
+        "userIdentity": {
+          "subjectId": "user-042",
+          "displayName": "测试用户"
+        },
+        "title": "整理周报",
+        "prompt": "读取 workspace 内 weekly.md，汇总为三要点。",
+        "workspace": {
+          "root": "workspaces/t001",
+          "writable": true
+        },
+        "requestedResources": {
+          "model": {
+            "provider": "cliproxy-local",
+            "name": "deepseek-v4-flash",
+            "thinking": "low"
+          },
+          "maxTurns": 8
+        },
+        "policyTemplateRefs": [
+          {
+            "templateRef": "a",
+            "templateDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          },
+          {
+            "templateRef": "a",
+            "templateDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ],
+        "createdAt": "2026-09-05T08:00:00Z"
+      }
+    }
+  ]
+}

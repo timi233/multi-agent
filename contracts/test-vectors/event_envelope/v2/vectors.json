@@ -1,0 +1,292 @@
+{
+  "objectType": "event_envelope",
+  "schemaVersion": "2",
+  "vectors": [
+    {
+      "id": "pos-task-event",
+      "kind": "positive",
+      "note": "Task 作用域事件：仅 taskId，无 runId/attemptId",
+      "schemaValid": true,
+      "expectedError": null,
+      "schemaErrors": [],
+      "object": {
+        "schemaVersion": "2",
+        "eventId": "0199a00193d17abc8d11001122334455",
+        "eventType": "TaskSubmitted.v2",
+        "occurredAt": "2026-09-05T08:00:00.123456Z",
+        "producer": {
+          "serviceName": "task-api",
+          "instanceId": "api-01"
+        },
+        "trace": {
+          "traceId": "8f2b4fd756e3417fa2821d79b04f9231",
+          "spanId": "6f2b4fd756e3417f",
+          "taskId": "0123456789abcdef"
+        },
+        "aggregate": {
+          "type": "Task",
+          "id": "0123456789abcdef",
+          "version": 1
+        },
+        "controlPlaneEpoch": 42,
+        "operationIdempotencyKey": "task-submit:0123456789abcdef",
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "payload": {
+          "taskSpecDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      },
+      "canonicalPayloadB64": "eyJhZ2dyZWdhdGUvaWQiOiIwMTIzNDU2Nzg5YWJjZGVmIiwiYWdncmVnYXRlL3R5cGUiOiJUYXNrIiwiYWdncmVnYXRlL3ZlcnNpb24iOjEsImNvbnRyb2xQbGFuZUVwb2NoIjo0MiwiZXZlbnRJZCI6IjAxOTlhMDAxOTNkMTdhYmM4ZDExMDAxMTIyMzM0NDU1IiwiZXZlbnRUeXBlIjoiVGFza1N1Ym1pdHRlZC52MiIsIm9jY3VycmVkQXQiOiIyMDI2LTA5LTA1VDA4OjAwOjAwLjEyMzQ1NloiLCJvcGVyYXRpb25JZGVtcG90ZW5jeUtleSI6InRhc2stc3VibWl0OjAxMjM0NTY3ODlhYmNkZWYiLCJwYXlsb2FkIjp7InRhc2tTcGVjRGlnZXN0Ijoic2hhMjU2OjAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAifSwicHJvZHVjZXIvaW5zdGFuY2VJZCI6ImFwaS0wMSIsInByb2R1Y2VyL3NlcnZpY2VOYW1lIjoidGFzay1hcGkiLCJzY2hlbWFWZXJzaW9uIjoiMiIsInRyYWNlL3NwYW5JZCI6IjZmMmI0ZmQ3NTZlMzQxN2YiLCJ0cmFjZS90YXNrSWQiOiIwMTIzNDU2Nzg5YWJjZGVmIiwidHJhY2UvdHJhY2VJZCI6IjhmMmI0ZmQ3NTZlMzQxN2ZhMjgyMWQ3OWIwNGY5MjMxIn0=",
+      "payloadDigest": "sha256:5482bb87457d6eaf467ae8ddfc4fb99c7cba4294fbe016e52c0670b510f372f1"
+    },
+    {
+      "id": "pos-attempt-event",
+      "kind": "positive",
+      "note": "Attempt 作用域事件：要求 taskId+runId+attemptId（CT-08）",
+      "schemaValid": true,
+      "expectedError": null,
+      "schemaErrors": [],
+      "object": {
+        "schemaVersion": "2",
+        "eventId": "0199a00193d17abc8d11001122334455",
+        "eventType": "AttemptClaimed.v2",
+        "occurredAt": "2026-09-05T08:00:00.123456Z",
+        "producer": {
+          "serviceName": "task-api",
+          "instanceId": "api-01"
+        },
+        "trace": {
+          "traceId": "8f2b4fd756e3417fa2821d79b04f9231",
+          "taskId": "0123456789abcdef",
+          "runId": "1111111111111111",
+          "attemptId": "2222222222222222"
+        },
+        "aggregate": {
+          "type": "Attempt",
+          "id": "3333333333333333",
+          "version": 1
+        },
+        "controlPlaneEpoch": 42,
+        "operationIdempotencyKey": "attempt-claim:0123456789abcdef:1",
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "payload": {
+          "taskSpecDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      },
+      "canonicalPayloadB64": "eyJhZ2dyZWdhdGUvaWQiOiIzMzMzMzMzMzMzMzMzMzMzIiwiYWdncmVnYXRlL3R5cGUiOiJBdHRlbXB0IiwiYWdncmVnYXRlL3ZlcnNpb24iOjEsImNvbnRyb2xQbGFuZUVwb2NoIjo0MiwiZXZlbnRJZCI6IjAxOTlhMDAxOTNkMTdhYmM4ZDExMDAxMTIyMzM0NDU1IiwiZXZlbnRUeXBlIjoiQXR0ZW1wdENsYWltZWQudjIiLCJvY2N1cnJlZEF0IjoiMjAyNi0wOS0wNVQwODowMDowMC4xMjM0NTZaIiwib3BlcmF0aW9uSWRlbXBvdGVuY3lLZXkiOiJhdHRlbXB0LWNsYWltOjAxMjM0NTY3ODlhYmNkZWY6MSIsInBheWxvYWQiOnsidGFza1NwZWNEaWdlc3QiOiJzaGEyNTY6MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCJ9LCJwcm9kdWNlci9pbnN0YW5jZUlkIjoiYXBpLTAxIiwicHJvZHVjZXIvc2VydmljZU5hbWUiOiJ0YXNrLWFwaSIsInNjaGVtYVZlcnNpb24iOiIyIiwidHJhY2UvYXR0ZW1wdElkIjoiMjIyMjIyMjIyMjIyMjIyMiIsInRyYWNlL3J1bklkIjoiMTExMTExMTExMTExMTExMSIsInRyYWNlL3Rhc2tJZCI6IjAxMjM0NTY3ODlhYmNkZWYiLCJ0cmFjZS90cmFjZUlkIjoiOGYyYjRmZDc1NmUzNDE3ZmEyODIxZDc5YjA0ZjkyMzEifQ==",
+      "payloadDigest": "sha256:26e854cfdc6568afe5ea68beb2aebe9a97d9c5f17c2882a1ae9f2754e0a3dce7"
+    },
+    {
+      "id": "neg-unknown-field",
+      "kind": "negative",
+      "note": "未知字段必须拒绝",
+      "schemaValid": false,
+      "expectedError": "bogus",
+      "schemaErrors": [
+        "Additional properties are not allowed ('bogus' was unexpected)"
+      ],
+      "object": {
+        "schemaVersion": "2",
+        "eventId": "0199a00193d17abc8d11001122334455",
+        "eventType": "TaskSubmitted.v2",
+        "occurredAt": "2026-09-05T08:00:00.123456Z",
+        "producer": {
+          "serviceName": "task-api",
+          "instanceId": "api-01"
+        },
+        "trace": {
+          "traceId": "8f2b4fd756e3417fa2821d79b04f9231",
+          "spanId": "6f2b4fd756e3417f",
+          "taskId": "0123456789abcdef"
+        },
+        "aggregate": {
+          "type": "Task",
+          "id": "0123456789abcdef",
+          "version": 1
+        },
+        "controlPlaneEpoch": 42,
+        "operationIdempotencyKey": "task-submit:0123456789abcdef",
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "payload": {
+          "taskSpecDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "bogus": 1
+      }
+    },
+    {
+      "id": "neg-task-missing-trace-task",
+      "kind": "negative",
+      "note": "trace 必填 taskId",
+      "schemaValid": false,
+      "expectedError": "taskId",
+      "schemaErrors": [
+        "'taskId' is a required property"
+      ],
+      "object": {
+        "schemaVersion": "2",
+        "eventId": "0199a00193d17abc8d11001122334455",
+        "eventType": "TaskSubmitted.v2",
+        "occurredAt": "2026-09-05T08:00:00.123456Z",
+        "producer": {
+          "serviceName": "task-api",
+          "instanceId": "api-01"
+        },
+        "trace": {
+          "spanId": "6f2b4fd756e3417f"
+        },
+        "aggregate": {
+          "type": "Task",
+          "id": "0123456789abcdef",
+          "version": 1
+        },
+        "controlPlaneEpoch": 42,
+        "operationIdempotencyKey": "task-submit:0123456789abcdef",
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "payload": {
+          "taskSpecDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      }
+    },
+    {
+      "id": "neg-attempt-missing-run",
+      "kind": "negative",
+      "note": "Attempt 事件缺 runId 必须拒绝（CT-08）",
+      "schemaValid": false,
+      "expectedError": "runId",
+      "schemaErrors": [
+        "'runId' is a required property"
+      ],
+      "object": {
+        "schemaVersion": "2",
+        "eventId": "0199a00193d17abc8d11001122334455",
+        "eventType": "AttemptClaimed.v2",
+        "occurredAt": "2026-09-05T08:00:00.123456Z",
+        "producer": {
+          "serviceName": "task-api",
+          "instanceId": "api-01"
+        },
+        "trace": {
+          "taskId": "0123456789abcdef",
+          "attemptId": "2222222222222222"
+        },
+        "aggregate": {
+          "type": "Task",
+          "id": "0123456789abcdef",
+          "version": 1
+        },
+        "controlPlaneEpoch": 42,
+        "operationIdempotencyKey": "task-submit:0123456789abcdef",
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "payload": {
+          "taskSpecDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      }
+    },
+    {
+      "id": "neg-attempt-missing-attempt",
+      "kind": "negative",
+      "note": "Attempt 事件缺 attemptId 必须拒绝（CT-08）",
+      "schemaValid": false,
+      "expectedError": "attemptId",
+      "schemaErrors": [
+        "'attemptId' is a required property"
+      ],
+      "object": {
+        "schemaVersion": "2",
+        "eventId": "0199a00193d17abc8d11001122334455",
+        "eventType": "AttemptRunning.v2",
+        "occurredAt": "2026-09-05T08:00:00.123456Z",
+        "producer": {
+          "serviceName": "task-api",
+          "instanceId": "api-01"
+        },
+        "trace": {
+          "taskId": "0123456789abcdef",
+          "runId": "1111111111111111"
+        },
+        "aggregate": {
+          "type": "Task",
+          "id": "0123456789abcdef",
+          "version": 1
+        },
+        "controlPlaneEpoch": 42,
+        "operationIdempotencyKey": "task-submit:0123456789abcdef",
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "payload": {
+          "taskSpecDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      }
+    },
+    {
+      "id": "neg-bad-event-type",
+      "kind": "negative",
+      "note": "eventType 命名非法必须拒绝",
+      "schemaValid": false,
+      "expectedError": "eventType",
+      "schemaErrors": [
+        "'artifact published' does not match '^(Task|Attempt|Run|Artifact|Evidence|Budget)[A-Z][A-Za-z0-9]*(\\\\.[A-Za-z0-9]+)?$'"
+      ],
+      "object": {
+        "schemaVersion": "2",
+        "eventId": "0199a00193d17abc8d11001122334455",
+        "eventType": "artifact published",
+        "occurredAt": "2026-09-05T08:00:00.123456Z",
+        "producer": {
+          "serviceName": "task-api",
+          "instanceId": "api-01"
+        },
+        "trace": {
+          "traceId": "8f2b4fd756e3417fa2821d79b04f9231",
+          "spanId": "6f2b4fd756e3417f",
+          "taskId": "0123456789abcdef"
+        },
+        "aggregate": {
+          "type": "Task",
+          "id": "0123456789abcdef",
+          "version": 1
+        },
+        "controlPlaneEpoch": 42,
+        "operationIdempotencyKey": "task-submit:0123456789abcdef",
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "payload": {
+          "taskSpecDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      }
+    },
+    {
+      "id": "neg-bad-payload-digest",
+      "kind": "negative",
+      "note": "payloadDigest 非 sha256 格式必须拒绝",
+      "schemaValid": false,
+      "expectedError": "payloadDigest",
+      "schemaErrors": [
+        "'md5:abc' does not match '^sha256:[a-f0-9]{64}$'"
+      ],
+      "object": {
+        "schemaVersion": "2",
+        "eventId": "0199a00193d17abc8d11001122334455",
+        "eventType": "TaskSubmitted.v2",
+        "occurredAt": "2026-09-05T08:00:00.123456Z",
+        "producer": {
+          "serviceName": "task-api",
+          "instanceId": "api-01"
+        },
+        "trace": {
+          "traceId": "8f2b4fd756e3417fa2821d79b04f9231",
+          "spanId": "6f2b4fd756e3417f",
+          "taskId": "0123456789abcdef"
+        },
+        "aggregate": {
+          "type": "Task",
+          "id": "0123456789abcdef",
+          "version": 1
+        },
+        "controlPlaneEpoch": 42,
+        "operationIdempotencyKey": "task-submit:0123456789abcdef",
+        "payloadDigest": "md5:abc",
+        "payload": {
+          "taskSpecDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      }
+    }
+  ]
+}

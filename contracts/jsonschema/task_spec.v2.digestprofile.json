@@ -1,0 +1,26 @@
+{
+  "objectType": "task_spec",
+  "schemaVersion": "2",
+  "description": "task_spec 提交即冻结：全部业务字段为不可变事实。数据库可变字段（状态/更新时间等）不在 task_spec 契约对象内。",
+  "immutablePayloadPointers": [
+    "/schemaVersion",
+    "/taskId",
+    "/specVersion",
+    "/userIdentity/subjectId",
+    "/userIdentity/displayName",
+    "/title",
+    "/prompt",
+    "/workspace/root",
+    "/workspace/writable",
+    "/requestedResources/model/provider",
+    "/requestedResources/model/name",
+    "/requestedResources/model/thinking",
+    "/requestedResources/maxTurns",
+    "/requestedResources/maxTokens",
+    "/policyTemplateRefs",
+    "/createdAt",
+    "/expiresAt"
+  ],
+  "mutableDatabasePointers": [],
+  "signatureEnvelopePointers": ["/signature"]
+}

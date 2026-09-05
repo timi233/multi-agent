@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pi.local/contracts/event_envelope/v2",
+  "title": "event_envelope",
+  "description": "通用事件信封（蓝图 §13.4）：trace 内作用域必填 ID 依 eventType 决定（CT-08）——Task 事件不要求 runId/attemptId；Attempt 事件与对象级事件要求 taskId/runId/attemptId 三者。",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": "2" },
+    "eventId": { "type": "string", "pattern": "^[a-f0-9]{32}$" },
+    "eventType": { "type": "string", "pattern": "^(Task|Attempt|Run|Artifact|Evidence|Budget)[A-Z][A-Za-z0-9]*(\\.[A-Za-z0-9]+)?$" },
+    "occurredAt": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T" },
+    "producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["serviceName", "instanceId"],
+      "properties": {
+        "serviceName": { "type": "string", "minLength": 1 },
+        "instanceId": { "type": "string", "minLength": 1 }
+      }
+    },
+    "trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "traceId": { "type": "string", "pattern": "^[a-f0-9]{32}$" },
+        "spanId": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+        "parentSpanId": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+        "taskId": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+        "runId": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+        "attemptId": { "type": "string", "pattern": "^[a-f0-9]{16}$" }
+      },
+      "required": ["taskId"]
+    },
+    "aggregate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id", "version"],
+      "properties": {
+        "type": { "type": "string", "minLength": 1 },
+        "id": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+        "version": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "controlPlaneEpoch": { "type": "integer", "minimum": 0 },
+    "operationIdempotencyKey": { "type": "string", "minLength": 1 },
+    "payloadDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "payload": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "业务事实（对象级 payload；其自身可再带 digest/引用）。投影按 /payload 整体进 canonicalPayload。"
+    },
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "signatureAlgorithm": { "const": "Ed25519" },
+        "keyId": { "type": "string" },
+        "issuer": { "type": "string" },
+        "issuerWorkloadIdentity": { "type": "string" },
+        "audience": { "type": ["string", "null"] },
+        "objectType": { "const": "event_envelope" },
+        "schemaVersion": { "const": "2" },
+        "payloadDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "controlPlaneEpoch": { "type": "integer", "minimum": 0 },
+        "signedAt": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T" },
+        "value": { "type": "string", "pattern": "^[a-f0-9]{128}$" }
+      },
+      "required": [
+        "signatureAlgorithm", "keyId", "issuer", "issuerWorkloadIdentity",
+        "audience", "objectType", "schemaVersion", "payloadDigest",
+        "controlPlaneEpoch", "signedAt", "value"
+      ]
+    }
+  },
+  "required": [
+    "schemaVersion", "eventId", "eventType", "occurredAt", "producer",
+    "trace", "aggregate", "controlPlaneEpoch", "operationIdempotencyKey",
+    "payloadDigest", "payload"
+  ],
+  "allOf": [
+    {
+      "if": { "properties": { "eventType": { "pattern": "^(Attempt|Run|Artifact|Evidence|Budget)[A-Z]" } } },
+      "then": {
+        "properties": { "trace": { "required": ["taskId", "runId", "attemptId"] } }
+      }
+    }
+  ]
+}

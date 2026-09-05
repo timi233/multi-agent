@@ -40,9 +40,15 @@ BASE = {
 
 CASES = [
     ("pos-minimal", True, "合法最小对象（无 signature）", dict(), None),
-    ("pos-signed", True, "合法对象含 Ed25519 签名信封", {"signature": {
-        "algorithm": "Ed25519", "keyId": "sk-attempt", "issuer": "attempt-service",
-        "signedAt": "2026-09-05T08:01:00Z", "value": "c" * 128}}, None),
+    ("pos-signed", True, "合法对象含 Ed25519 签名信封（蓝图 §9.4 十字段信封）", {"signature": {
+        "signatureAlgorithm": "Ed25519", "keyId": "sk-attempt", "issuer": "attempt-service",
+        "issuerWorkloadIdentity": "pi.attempt", "audience": "pi.platform",
+        "objectType": "attempt_contract", "schemaVersion": "2",
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "controlPlaneEpoch": 0, "signedAt": "2026-09-05T08:01:00Z", "value": "c" * 128}}, None),
+    ("pos-unicode", True, "含非 ASCII（BMP 中文）与非 BMP（emoji）字符串",
+     {"model": {"provider": "cliproxy-local", "name": "测试模型-α", "thinking": "low"},
+      "workspaceConstraints": {"root": "工作区/任务/emoji🚀"}}, None),
     ("neg-unknown-field", False, "未知字段必须拒绝", {"bogusField": "x"}, "unknown field"),
     ("neg-enum-thinking", False, "枚举外 thinking 必须拒绝", {"model": {"provider": "cliproxy-local", "name": "m", "thinking": "ultra"}}, "enum"),
     ("neg-max-turns-over", False, "超上限 maxTurns=999 必须拒绝", {"resourceLimits": {"maxTurns": 999, "commandTimeoutSeconds": 60, "maxOutputBytes": 65536}}, "maximum"),

@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pi.local/contracts/task_spec/v2",
+  "title": "task_spec",
+  "description": "Task 契约视图：用户向 Task API 提交的不可变规格（蓝图 §7 TaskSpec 内容、POST /api/v2/tasks）。提交即冻结；Lifecycle 与 Agent 只读。首版基线字段集合，后续按蓝图工作流章节扩充。",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": "2" },
+    "taskId": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+    "specVersion": { "const": "1", "description": "task_spec 对象自身版本（对象冻结后不可变）" },
+    "userIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["subjectId"],
+      "properties": {
+        "subjectId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "displayName": { "type": "string", "maxLength": 128 }
+      }
+    },
+    "title": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "prompt": { "type": "string", "minLength": 1, "maxLength": 100000 },
+    "workspace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["root", "writable"],
+      "properties": {
+        "root": { "type": "string", "minLength": 1 },
+        "writable": { "type": "boolean" }
+      }
+    },
+    "requestedResources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model", "maxTurns"],
+      "properties": {
+        "model": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["provider", "name"],
+          "properties": {
+            "provider": { "const": "cliproxy-local" },
+            "name": { "type": "string", "minLength": 1 },
+            "thinking": { "enum": ["off", "low", "medium", "high"] }
+          }
+        },
+        "maxTurns": { "type": "integer", "minimum": 1, "maximum": 100 },
+        "maxTokens": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "policyTemplateRefs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["templateRef", "templateDigest"],
+        "properties": {
+          "templateRef": { "type": "string", "minLength": 1 },
+          "templateDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+        }
+      }
+    },
+    "createdAt": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T" },
+    "expiresAt": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T" }
+  },
+  "required": [
+    "schemaVersion", "taskId", "specVersion", "userIdentity", "title",
+    "prompt", "workspace", "requestedResources", "createdAt"
+  ]
+}

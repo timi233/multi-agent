@@ -1,0 +1,27 @@
+{
+  "objectType": "event_envelope",
+  "schemaVersion": "2",
+  "description": "通用事件信封：除 payloadDigest（投影结果的派生字段）与签名信封外的全部字段为不可变事实（蓝图 §13.4/§9.4）。",
+  "immutablePayloadPointers": [
+    "/schemaVersion",
+    "/eventId",
+    "/eventType",
+    "/occurredAt",
+    "/producer/serviceName",
+    "/producer/instanceId",
+    "/trace/traceId",
+    "/trace/spanId",
+    "/trace/parentSpanId",
+    "/trace/taskId",
+    "/trace/runId",
+    "/trace/attemptId",
+    "/aggregate/type",
+    "/aggregate/id",
+    "/aggregate/version",
+    "/controlPlaneEpoch",
+    "/operationIdempotencyKey",
+    "/payload"
+  ],
+  "mutableDatabasePointers": [],
+  "signatureEnvelopePointers": ["/signature"]
+}
