@@ -31,6 +31,7 @@ from app.contracts.codec import (  # noqa: E402
     payload_digest,
 )
 from app.runtime.budget import ROOT_DIGEST, _entry_digest  # noqa: E402
+from app.security import keys as node_keys  # noqa: E402
 
 OUT_DEFAULT = ROOT / "contracts" / "test-vectors" / "budget_grant" / "v2"
 OUT = Path(os.environ.get("PI_VEC_OUT", OUT_DEFAULT))
@@ -142,6 +143,8 @@ def main() -> int:
                     {k: obj["signature"][k] for k in SIGNATURE_ENVELOPE_KEYS
                      if k in obj["signature"]})
                 entry["signatureInputB64"] = base64.b64encode(sig_in).decode()
+                # 真实 Ed25519 签名（评审 warn-fix：非占位；用 Runtime 密钥）
+                entry["object"]["signature"]["value"] = node_keys.sign(sig_in)
             else:
                 entry["signatureInputB64"] = None
         else:

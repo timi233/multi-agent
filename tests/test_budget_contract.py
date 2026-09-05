@@ -58,6 +58,10 @@ def test_positive_digests_recomputable():
 
 
 def test_pos_signed_envelope_self_consistent():
+    """pos-signed：信封 meta 重算得同一 signatureInput/payloadDigest；
+    value 为真实 Ed25519 签名（可验签，评审 warn-fix）。"""
+    from app.security import keys as node_keys
+
     v = _vec("pos-signed")
     obj = v["object"]
     meta = {k: obj["signature"][k] for k in SIGNATURE_ENVELOPE_KEYS
@@ -66,6 +70,8 @@ def test_pos_signed_envelope_self_consistent():
     assert env["payloadDigest"] == v["payloadDigest"]
     assert obj["signature"]["payloadDigest"] == v["payloadDigest"]
     assert base64.b64encode(sig_in).decode() == v["signatureInputB64"]
+    assert node_keys.verify(sig_in, obj["signature"]["value"]) is True
+    assert node_keys.verify(b"tampered", obj["signature"]["value"]) is False
 
 
 def test_journal_chain_is_real_digests():
@@ -124,6 +130,17 @@ def test_verified_function_accepts_positive_rejects_tamper():
     tampered6["journal"].append(dup)
     assert any("重复终结" in p
                for p in BudgetDomain.verified_budget_grant(tampered6))
+
+
+def test_verified_combines_schema_first():
+    """verified_budget_grant 先 Schema 后语义：形状损坏（缺必填）返回形状问题，
+    不因语义容错而误判通过（评审 warn-fix）。"""
+    base = _vec("pos-chain-settled")["object"]
+    broken = json.loads(json.dumps(base))
+    del broken["totalBudgetTokens"]  # Schema required 缺失
+    problems = BudgetDomain.verified_budget_grant(broken)
+    assert problems  # 非空
+    assert not any("链断裂" in p for p in problems)  # 不落入语义误判
 
 
 def test_db_flow_matches_vector_fields():

@@ -455,7 +455,7 @@
           "payloadDigest": "sha256:d42d48284a03801457fd198b239cca62fc1750464f89066acff56c7b5f0567a4",
           "controlPlaneEpoch": 1,
           "signedAt": "2026-09-05T08:01:00Z",
-          "value": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc=="
+          "value": "XJt5bvEzH+xxKyK2PztVcpvlJWPcSKE+rIJ+p9P87Ky2U0SsHSyUwfinJTNMy92vuOlnQ4lpV+NA/f8RAINLBg=="
         }
       },
       "calculateOnLoad": true,

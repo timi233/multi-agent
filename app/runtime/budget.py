@@ -185,10 +185,18 @@ class BudgetDomain:
 
     @staticmethod
     def verified_budget_grant(report: dict) -> list[str]:
-        """校验 BudgetGrant 契约快照的事实一致性（评审 fix：schema 形状之外
-        的语义——seq 连续/链连续/条 digest 真实/consumed 对账）。
+        """校验 BudgetGrant 契约快照的完整一致性：先 Schema（形状），再语义
+        （seq 连续/链连续/条 digest 真实/按 invocation 重放协议/账目对账）。
+        返回问题列表；空 = 合法快照。"""
+        from app.contracts.codec import load_schema, validate
 
-        返回问题列表；空 = 合法快照。供正/负向量与验收使用。"""
+        schema_problems = validate(report, load_schema("budget_grant", "2"))
+        if schema_problems:
+            return schema_problems  # 形状无效时语义校验会误判，先报形状
+        return BudgetDomain._semantic_checks(report)
+
+    @staticmethod
+    def _semantic_checks(report: dict) -> list[str]:
         problems: list[str] = []
         journal = report.get("journal") or []
         grant_id = report.get("grantId") or ""
