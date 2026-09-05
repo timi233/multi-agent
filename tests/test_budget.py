@@ -311,6 +311,26 @@ def test_agent_missing_usage_keeps_reservation(conn, task):
     assert bal["consumed"] == 0
 
 
+def test_cancel_settles_grant_without_worker(conn, task):
+    """API 直接取消：同事务结算 Grant——worker 不再运行也不留 ACTIVE
+    （终审 should-fix：取消闭环）。"""
+    from app.control.api import cancel_task
+
+    b = _g(conn, task, total=100)
+    with conn.cursor() as cur:
+        cur.execute(
+            "UPDATE pi_tasks SET status='RUNNING', started_at=now() "
+            "WHERE id=%s", (TASK_ID,))
+    conn.commit()
+    cancel_task(TASK_ID)
+    with conn.cursor() as cur:
+        cur.execute("SELECT status FROM pi_tasks WHERE id=%s", (TASK_ID,))
+        assert cur.fetchone()["status"] == "CANCELLED"
+        cur.execute("SELECT status FROM gw_budget_grants WHERE id=%s",
+                    (b.grant_id,))
+        assert cur.fetchone()["status"] == "SETTLED"
+
+
 def test_worker_budget_grant_chain_clean(conn, task, monkeypatch):
     """正常预算任务完成路径（fake run_attempt 成功）：grant SETTLED、链完整。"""
     import app.runtime.agent as agent_mod

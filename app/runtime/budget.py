@@ -95,7 +95,14 @@ class BudgetDomain:
     def reserve(self, conn, invocation_id: str, request_digest: str,
                 tokens: int) -> None:
         """调用前持久化预留：可用不足即 BudgetExceeded；同 invocationId
-        不同 requestDigest 拒绝（GW-06）。"""
+        不同 requestDigest 拒绝（GW-06）。
+
+        并发安全（评审 fix-blocking-2）：grant 行 FOR UPDATE 锁定至调用方
+        提交，两个并发连接不可能同时看到同一余额后双双预留超总额。
+
+        调用契约：成功路径调用方 commit；**异常（BudgetExceeded 等）路径
+        调用方必须 rollback**（行锁随事务释放；生产 worker 已在 except 分支
+        rollback，测试连接 close 时未提交事务亦自动回滚）。"""
         if tokens <= 0:
             raise BudgetError("reserve tokens must be > 0")
         with conn.cursor() as cur:

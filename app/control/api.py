@@ -94,6 +94,11 @@ def cancel_task(task_id: str):
                 "'TASK_CANCELLED', %s::jsonb)",
                 (task_id, task_id, json.dumps({"from": old}, ensure_ascii=False)),
             )
+            cur.execute(  # 取消同事务结算 Grant：worker 即使不再运行也不留 ACTIVE
+                "UPDATE gw_budget_grants SET status='SETTLED', settled_at=now() "
+                "WHERE task_id=%s AND status='ACTIVE'",
+                (task_id,),
+            )
         conn.commit()
     finally:
         conn.close()
