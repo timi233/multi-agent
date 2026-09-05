@@ -36,6 +36,13 @@
 | CT-04 必须签名对象正反向量 | PASS（attempt_contract 起步）：有效签名验通、篡改信封任一字段失败、错 keyId 失败；签名信封不改变 payloadDigest |
 | CT-08 事件信封作用域必填 ID | PASS：Task 事件仅要求 taskId（无 runId/attemptId 合法）；Attempt 事件要求 taskId+runId+attemptId 三者，缺一即拒 |
 
+## 状态机模型检查（对齐手册 §13.1 SM-xx）
+
+- 模型与检查器：`scripts/sm_model.py`（Task 白名单直接取自 `app/control/lifecycle.py`；Attempt 模型从 `app/worker.py` 条件 UPDATE 提取）；报告 `contracts/sm-model/report.md`（可复现）。
+- 固化断言：`tests/test_sm_model.py`（11 项）。
+- 结果：SM-01 白名单穷举（25 对 + 套件全查）PASS；SM-02 终态闭合 PASS；SM-03 每个可达非终态存在 StateDeadlinePolicy 出口且在白名单内 PASS；SM-08 转移-事件同事务绑定 PASS；死枚举审计：Attempt `RUNNING`/`FAILED` 为声明未用（基线固化）。
+- 差距注记：deadline 出口触发为非定时（调用/启动收敛），运行时时限留待 Gateway 预算层。
+
 ## 已知边界（记录，不视为缺陷）
 
 - canonical 编码为 "RFC8785-JCS-lite"：数字仅整数（浮点规范化差异规避）、键全 ASCII、`ensure_ascii` 转义约定——两实现已按同一规范逐字节一致；若蓝图后续引入浮点或非 ASCII 键，需按 RFC 8785 完整语义评估。
