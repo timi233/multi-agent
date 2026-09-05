@@ -62,6 +62,15 @@
 - 链式 Journal：RESERVED/SENT/SETTLED/FAILED/UNKNOWN 条目含 `previousEntryDigest/entryDigest`（首条根锚 `pi-budget-root-v1`），向量链为 `_entry_digest` **逐条真实计算**；有序性/逐条 digest/consumed 对账由 `BudgetDomain.verified_budget_grant()` 语义校验入口保证（测试覆盖篡改断链/伪造 digest/对账不符）。
 - 双实现：Node 参考实现逐字节一致（CT-01 PASS，15 正向量 0 不一致）。
 
+## 执行计划契约 execution_plan_snapshot v2（G1 编排/Run 状态机，蓝图 §10.5.1 单机子集）
+
+- 产物：`contracts/jsonschema/execution_plan_snapshot.v2.{schema,digestprofile}.json`、`scripts/gen_execution_plan_vectors.py`（10 向量：单步/多步/仅 READ_ONLY/含 taskSpecDigest/pos-signed + 5 负例）、`scripts/verify_vectors_node.js` 已含该对象（CT-01 20 正向量 0 不一致）、`tests/test_execution_plan_contract.py`（13 项）、`app/runtime/plans.py::verified_execution_plan()`。
+- 对象边界（蓝图 §10.5.1）：Task 进入执行前必须发布**不可变、签名**的执行计划——`plannedAttemptInputs[]`（runKind=IMPLEMENTATION/REVIEW/READ_ONLY、deliverableKind）为**集合归一化**数组：canonical sort 按 `plannedAttemptInputId`，语义层按该键拒绝重复（同 ID 不同内容由 `verified_execution_plan` 显式检查拒收，不依赖 `uniqueItems`）；`canonicalPlannedInputsDigest = sha256(JCS(排序后数组))` 这类广播摘要属不可变签名段（内容变化必变、顺序无关等价）。
+- 语义校验 `verified_execution_plan()`（先 Schema 后语义，返回问题列表）：canonicalPlannedInputsDigest 重算相等、顶层 `payloadDigest` self 重算一致、`planKind=INITIAL` 时 `parentExecutionPlanSnapshotId` 必须显式 null、`plannedAttemptInputId` 全局唯一（重复即拒收）、`upstreamBindings[].producerNodeId` 必须指向同计划内已存在 workflowNodeId（禁悬垂引用）；digest 重算全程异常收敛为问题列表（不逃逸）。
+- 快照 ID：`executionPlanSnapshotId = sha256(JCS(完整不可变快照前缀，除 ID/self-digest/signature))[:32]`——taskSpecDigest/父计划/inputs/编译器任一变化必变 ID（正向量两两唯一，生成器自检 + 测试回归）。
+- 签名信封：issuer=`orchestrator-test`、keyId=`sk-orchestrator-vector`（seed 派生确定性测试密钥，fingerprint `9064b45b...` 已登记 `deploy/keys/keys.lock.json`，`allowedObjectTypes=["execution_plan_snapshots"]`）；pos-signed 向量真实 Ed25519 验签通过。
+- 简化差距（记录）：REVIEW runKind 与 CommitBundle/Git 侧阶段（OUTPUT_STAGED→COMMIT_ASSEMBLING）随 G5 补齐；REPAIR planKind 为蓝图保留名且 Schema enum 已收紧为仅 `INITIAL`（Repair 契约字段落地前不签发）；plannedAttemptInputs 内联 promptContent（无 prompt bundle 引用）；run/deliverable 组合不做蓝图级枚举约束。
+
 ## Gateway 预算与 Journal（蓝图 §18.2/§18.3、手册 GW-xx）
 
 - 产物：`migrations/002_gateway_budget.sql`（`gw_budget_grants` + `gw_journal` 链式表）、`app/runtime/budget.py`（`BudgetDomain`）、`tests/test_budget.py`（15 项）。

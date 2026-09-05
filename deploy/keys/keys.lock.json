@@ -102,6 +102,16 @@
       "privateKeyFile": "SEED-DERIVED（无文件，确定性派生）",
       "publicKeyFile": "SEED-DERIVED（无文件，确定性派生）"
     },
+    "sk-orchestrator-vector": {
+      "purpose": "ExecutionPlanSnapshot 契约向量测试签名（确定性 seed 派生，非生产；scripts/gen_execution_plan_vectors.py TEST_KEY_SEED）",
+      "issuer": "orchestrator-test",
+      "allowedObjectTypes": [
+        "execution_plan_snapshots"
+      ],
+      "pubFingerprintSha256": "9064b45b3e0fb33b851a2e994e8bbf6f60ef5c1579301e88719cc13ae3153aec",
+      "privateKeyFile": "SEED-DERIVED（无文件，确定性派生）",
+      "publicKeyFile": "SEED-DERIVED（无文件，确定性派生）"
+    },
     "sk-skill": {
       "purpose": "Skill Signer",
       "issuer": "skill-governance",

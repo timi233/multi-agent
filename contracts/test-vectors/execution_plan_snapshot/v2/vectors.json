@@ -1,0 +1,393 @@
+{
+  "objectType": "execution_plan_snapshot",
+  "schemaVersion": "2",
+  "canonicalEncoding": "RFC8785-JCS-lite",
+  "vectors": [
+    {
+      "id": "pos-single-step",
+      "kind": "positive",
+      "expectedSchemaValid": true,
+      "note": "单步 IMPLEMENTATION 计划（最简）",
+      "expectedError": null,
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.orchestrator",
+        "executionPlanSnapshotId": "bec7f5ff504735598aa7e604473a5ffb",
+        "taskId": "0123456789abcdef",
+        "compilerId": "pi-orchestrator",
+        "compilerVersion": "0.1.0",
+        "planKind": "INITIAL",
+        "plannedAttemptInputs": [
+          {
+            "plannedAttemptInputId": "1010101010101010",
+            "workflowNodeId": "step-1",
+            "runKind": "IMPLEMENTATION",
+            "deliverableKind": "CODE_CHANGE",
+            "promptContent": "实现：在 work.md 写入标题与三行要点，并用 run_command 验证文件存在"
+          }
+        ],
+        "canonicalPlannedInputsDigest": "sha256:1ac3972d408d9d1d02beee38d9fb7767e37b3a4612140393f2d707d7479c17ae",
+        "parentExecutionPlanSnapshotId": null,
+        "compiledBy": "pi-orchestrator@0.1.0",
+        "compiledAt": "2026-09-05T08:00:00Z",
+        "payloadDigest": "sha256:482e1a34ce1eaf35197a3f9a099efa38693dc0f34ef0995d67235e19355ca42a"
+      },
+      "calculateOnLoad": true,
+      "canonicalPayloadB64": "eyJjYW5vbmljYWxQbGFubmVkSW5wdXRzRGlnZXN0Ijoic2hhMjU2OjFhYzM5NzJkNDA4ZDlkMWQwMmJlZWUzOGQ5ZmI3NzY3ZTM3YjNhNDYxMjE0MDM5M2YyZDcwN2Q3NDc5YzE3YWUiLCJjb21waWxlZEF0IjoiMjAyNi0wOS0wNVQwODowMDowMFoiLCJjb21waWxlZEJ5IjoicGktb3JjaGVzdHJhdG9yQDAuMS4wIiwiY29tcGlsZXJJZCI6InBpLW9yY2hlc3RyYXRvciIsImNvbXBpbGVyVmVyc2lvbiI6IjAuMS4wIiwiY29udHJhY3RWZXJzaW9uIjoiMiIsImV4ZWN1dGlvblBsYW5TbmFwc2hvdElkIjoiYmVjN2Y1ZmY1MDQ3MzU1OThhYTdlNjA0NDczYTVmZmIiLCJwYXJlbnRFeGVjdXRpb25QbGFuU25hcHNob3RJZCI6bnVsbCwicGxhbktpbmQiOiJJTklUSUFMIiwicGxhbm5lZEF0dGVtcHRJbnB1dHMiOlt7ImRlbGl2ZXJhYmxlS2luZCI6IkNPREVfQ0hBTkdFIiwicGxhbm5lZEF0dGVtcHRJbnB1dElkIjoiMTAxMDEwMTAxMDEwMTAxMCIsInByb21wdENvbnRlbnQiOiJcdTViOWVcdTczYjBcdWZmMWFcdTU3Mjggd29yay5tZCBcdTUxOTlcdTUxNjVcdTY4MDdcdTk4OThcdTRlMGVcdTRlMDlcdTg4NGNcdTg5ODFcdTcwYjlcdWZmMGNcdTVlNzZcdTc1MjggcnVuX2NvbW1hbmQgXHU5YThjXHU4YmMxXHU2NTg3XHU0ZWY2XHU1YjU4XHU1NzI4IiwicnVuS2luZCI6IklNUExFTUVOVEFUSU9OIiwid29ya2Zsb3dOb2RlSWQiOiJzdGVwLTEifV0sInRhc2tJZCI6IjAxMjM0NTY3ODlhYmNkZWYiLCJ3b3JrbG9hZElkZW50aXR5IjoicGkub3JjaGVzdHJhdG9yIn0=",
+      "payloadDigest": "sha256:482e1a34ce1eaf35197a3f9a099efa38693dc0f34ef0995d67235e19355ca42a",
+      "signatureInputB64": null
+    },
+    {
+      "id": "pos-multi-step",
+      "kind": "positive",
+      "expectedSchemaValid": true,
+      "note": "三步计划：IMPLEMENTATION→READ_ONLY 验收→IMPLEMENTATION，含 upstreamBindings",
+      "expectedError": null,
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.orchestrator",
+        "executionPlanSnapshotId": "664bd68d9a00e0535cca2eec502d7cd4",
+        "taskId": "0123456789abcdef",
+        "compilerId": "pi-orchestrator",
+        "compilerVersion": "0.1.0",
+        "planKind": "INITIAL",
+        "plannedAttemptInputs": [
+          {
+            "plannedAttemptInputId": "1010101010101010",
+            "workflowNodeId": "step-1",
+            "runKind": "IMPLEMENTATION",
+            "deliverableKind": "CODE_CHANGE",
+            "promptContent": "实现：在 work.md 写入标题与三行要点，并用 run_command 验证文件存在"
+          },
+          {
+            "plannedAttemptInputId": "2020202020202020",
+            "workflowNodeId": "step-2",
+            "runKind": "READ_ONLY",
+            "deliverableKind": "READ_ONLY_EVIDENCE",
+            "promptContent": "只读验收：读 work.md 确认标题与要点齐全，给出 ok=true 的结论",
+            "upstreamBindings": [
+              {
+                "slotId": "step1-output",
+                "producerNodeId": "step-1",
+                "required": true
+              }
+            ]
+          },
+          {
+            "plannedAttemptInputId": "3030303030303030",
+            "workflowNodeId": "step-3",
+            "runKind": "IMPLEMENTATION",
+            "deliverableKind": "CODE_CHANGE",
+            "promptContent": "补充：追加一行版本号并运行 python3 -m py_compile 自检",
+            "upstreamBindings": [
+              {
+                "slotId": "step2-verdict",
+                "producerNodeId": "step-2",
+                "required": true
+              }
+            ]
+          }
+        ],
+        "canonicalPlannedInputsDigest": "sha256:df94a2ad2537b50908851d7db59e5c7c7851da279400120fb8540c96785be562",
+        "parentExecutionPlanSnapshotId": null,
+        "compiledBy": "pi-orchestrator@0.1.0",
+        "compiledAt": "2026-09-05T08:00:00Z",
+        "payloadDigest": "sha256:331d635429cba355670d5439038d44c49067c0074fef9a77eedf952045708a26"
+      },
+      "calculateOnLoad": true,
+      "canonicalPayloadB64": "eyJjYW5vbmljYWxQbGFubmVkSW5wdXRzRGlnZXN0Ijoic2hhMjU2OmRmOTRhMmFkMjUzN2I1MDkwODg1MWQ3ZGI1OWU1YzdjNzg1MWRhMjc5NDAwMTIwZmI4NTQwYzk2Nzg1YmU1NjIiLCJjb21waWxlZEF0IjoiMjAyNi0wOS0wNVQwODowMDowMFoiLCJjb21waWxlZEJ5IjoicGktb3JjaGVzdHJhdG9yQDAuMS4wIiwiY29tcGlsZXJJZCI6InBpLW9yY2hlc3RyYXRvciIsImNvbXBpbGVyVmVyc2lvbiI6IjAuMS4wIiwiY29udHJhY3RWZXJzaW9uIjoiMiIsImV4ZWN1dGlvblBsYW5TbmFwc2hvdElkIjoiNjY0YmQ2OGQ5YTAwZTA1MzVjY2EyZWVjNTAyZDdjZDQiLCJwYXJlbnRFeGVjdXRpb25QbGFuU25hcHNob3RJZCI6bnVsbCwicGxhbktpbmQiOiJJTklUSUFMIiwicGxhbm5lZEF0dGVtcHRJbnB1dHMiOlt7ImRlbGl2ZXJhYmxlS2luZCI6IkNPREVfQ0hBTkdFIiwicGxhbm5lZEF0dGVtcHRJbnB1dElkIjoiMTAxMDEwMTAxMDEwMTAxMCIsInByb21wdENvbnRlbnQiOiJcdTViOWVcdTczYjBcdWZmMWFcdTU3Mjggd29yay5tZCBcdTUxOTlcdTUxNjVcdTY4MDdcdTk4OThcdTRlMGVcdTRlMDlcdTg4NGNcdTg5ODFcdTcwYjlcdWZmMGNcdTVlNzZcdTc1MjggcnVuX2NvbW1hbmQgXHU5YThjXHU4YmMxXHU2NTg3XHU0ZWY2XHU1YjU4XHU1NzI4IiwicnVuS2luZCI6IklNUExFTUVOVEFUSU9OIiwid29ya2Zsb3dOb2RlSWQiOiJzdGVwLTEifSx7ImRlbGl2ZXJhYmxlS2luZCI6IlJFQURfT05MWV9FVklERU5DRSIsInBsYW5uZWRBdHRlbXB0SW5wdXRJZCI6IjIwMjAyMDIwMjAyMDIwMjAiLCJwcm9tcHRDb250ZW50IjoiXHU1M2VhXHU4YmZiXHU5YThjXHU2NTM2XHVmZjFhXHU4YmZiIHdvcmsubWQgXHU3ODZlXHU4YmE0XHU2ODA3XHU5ODk4XHU0ZTBlXHU4OTgxXHU3MGI5XHU5ZjUwXHU1MTY4XHVmZjBjXHU3ZWQ5XHU1MWZhIG9rPXRydWUgXHU3Njg0XHU3ZWQzXHU4YmJhIiwicnVuS2luZCI6IlJFQURfT05MWSIsInVwc3RyZWFtQmluZGluZ3MiOlt7InByb2R1Y2VyTm9kZUlkIjoic3RlcC0xIiwicmVxdWlyZWQiOnRydWUsInNsb3RJZCI6InN0ZXAxLW91dHB1dCJ9XSwid29ya2Zsb3dOb2RlSWQiOiJzdGVwLTIifSx7ImRlbGl2ZXJhYmxlS2luZCI6IkNPREVfQ0hBTkdFIiwicGxhbm5lZEF0dGVtcHRJbnB1dElkIjoiMzAzMDMwMzAzMDMwMzAzMCIsInByb21wdENvbnRlbnQiOiJcdTg4NjVcdTUxNDVcdWZmMWFcdThmZmRcdTUyYTBcdTRlMDBcdTg4NGNcdTcyNDhcdTY3MmNcdTUzZjdcdTVlNzZcdThmZDBcdTg4NGMgcHl0aG9uMyAtbSBweV9jb21waWxlIFx1ODFlYVx1NjhjMCIsInJ1bktpbmQiOiJJTVBMRU1FTlRBVElPTiIsInVwc3RyZWFtQmluZGluZ3MiOlt7InByb2R1Y2VyTm9kZUlkIjoic3RlcC0yIiwicmVxdWlyZWQiOnRydWUsInNsb3RJZCI6InN0ZXAyLXZlcmRpY3QifV0sIndvcmtmbG93Tm9kZUlkIjoic3RlcC0zIn1dLCJ0YXNrSWQiOiIwMTIzNDU2Nzg5YWJjZGVmIiwid29ya2xvYWRJZGVudGl0eSI6InBpLm9yY2hlc3RyYXRvciJ9",
+      "payloadDigest": "sha256:331d635429cba355670d5439038d44c49067c0074fef9a77eedf952045708a26",
+      "signatureInputB64": null
+    },
+    {
+      "id": "pos-readonly-step",
+      "kind": "positive",
+      "expectedSchemaValid": true,
+      "note": "单步 READ_ONLY（只读证据，无上游引用）",
+      "expectedError": null,
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.orchestrator",
+        "executionPlanSnapshotId": "fe14e4d9eb72d85c93d0a1594b8b9d00",
+        "taskId": "0123456789abcdef",
+        "compilerId": "pi-orchestrator",
+        "compilerVersion": "0.1.0",
+        "planKind": "INITIAL",
+        "plannedAttemptInputs": [
+          {
+            "plannedAttemptInputId": "2020202020202020",
+            "workflowNodeId": "step-2",
+            "runKind": "READ_ONLY",
+            "deliverableKind": "READ_ONLY_EVIDENCE",
+            "promptContent": "只读验收：读 work.md 确认标题与要点齐全，给出 ok=true 的结论"
+          }
+        ],
+        "canonicalPlannedInputsDigest": "sha256:92b332c18542267295c8187f878828986e5e1e9ff410b3e3601e4c9acb780a93",
+        "parentExecutionPlanSnapshotId": null,
+        "compiledBy": "pi-orchestrator@0.1.0",
+        "compiledAt": "2026-09-05T08:00:00Z",
+        "payloadDigest": "sha256:0c0e1db55da75acb53e1be0216c527919bf635d7c4a63995b6438238c553e887"
+      },
+      "calculateOnLoad": true,
+      "canonicalPayloadB64": "eyJjYW5vbmljYWxQbGFubmVkSW5wdXRzRGlnZXN0Ijoic2hhMjU2OjkyYjMzMmMxODU0MjI2NzI5NWM4MTg3Zjg3ODgyODk4NmU1ZTFlOWZmNDEwYjNlMzYwMWU0YzlhY2I3ODBhOTMiLCJjb21waWxlZEF0IjoiMjAyNi0wOS0wNVQwODowMDowMFoiLCJjb21waWxlZEJ5IjoicGktb3JjaGVzdHJhdG9yQDAuMS4wIiwiY29tcGlsZXJJZCI6InBpLW9yY2hlc3RyYXRvciIsImNvbXBpbGVyVmVyc2lvbiI6IjAuMS4wIiwiY29udHJhY3RWZXJzaW9uIjoiMiIsImV4ZWN1dGlvblBsYW5TbmFwc2hvdElkIjoiZmUxNGU0ZDllYjcyZDg1YzkzZDBhMTU5NGI4YjlkMDAiLCJwYXJlbnRFeGVjdXRpb25QbGFuU25hcHNob3RJZCI6bnVsbCwicGxhbktpbmQiOiJJTklUSUFMIiwicGxhbm5lZEF0dGVtcHRJbnB1dHMiOlt7ImRlbGl2ZXJhYmxlS2luZCI6IlJFQURfT05MWV9FVklERU5DRSIsInBsYW5uZWRBdHRlbXB0SW5wdXRJZCI6IjIwMjAyMDIwMjAyMDIwMjAiLCJwcm9tcHRDb250ZW50IjoiXHU1M2VhXHU4YmZiXHU5YThjXHU2NTM2XHVmZjFhXHU4YmZiIHdvcmsubWQgXHU3ODZlXHU4YmE0XHU2ODA3XHU5ODk4XHU0ZTBlXHU4OTgxXHU3MGI5XHU5ZjUwXHU1MTY4XHVmZjBjXHU3ZWQ5XHU1MWZhIG9rPXRydWUgXHU3Njg0XHU3ZWQzXHU4YmJhIiwicnVuS2luZCI6IlJFQURfT05MWSIsIndvcmtmbG93Tm9kZUlkIjoic3RlcC0yIn1dLCJ0YXNrSWQiOiIwMTIzNDU2Nzg5YWJjZGVmIiwid29ya2xvYWRJZGVudGl0eSI6InBpLm9yY2hlc3RyYXRvciJ9",
+      "payloadDigest": "sha256:0c0e1db55da75acb53e1be0216c527919bf635d7c4a63995b6438238c553e887",
+      "signatureInputB64": null
+    },
+    {
+      "id": "pos-with-spec-parent-null",
+      "kind": "positive",
+      "expectedSchemaValid": true,
+      "note": "含 taskSpecDigest、parent=null（INITIAL）",
+      "expectedError": null,
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.orchestrator",
+        "executionPlanSnapshotId": "b59bf071f159abcafaeb3015c0d8c617",
+        "taskId": "0123456789abcdef",
+        "compilerId": "pi-orchestrator",
+        "compilerVersion": "0.1.0",
+        "planKind": "INITIAL",
+        "plannedAttemptInputs": [
+          {
+            "plannedAttemptInputId": "1010101010101010",
+            "workflowNodeId": "step-1",
+            "runKind": "IMPLEMENTATION",
+            "deliverableKind": "CODE_CHANGE",
+            "promptContent": "实现：在 work.md 写入标题与三行要点，并用 run_command 验证文件存在"
+          }
+        ],
+        "canonicalPlannedInputsDigest": "sha256:1ac3972d408d9d1d02beee38d9fb7767e37b3a4612140393f2d707d7479c17ae",
+        "parentExecutionPlanSnapshotId": null,
+        "compiledBy": "pi-orchestrator@0.1.0",
+        "compiledAt": "2026-09-05T08:00:00Z",
+        "payloadDigest": "sha256:5eef68a56182d94a13ff81d76aa16b5a3eac0255b271c1996c273cb2a7f21279",
+        "taskSpecDigest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "calculateOnLoad": true,
+      "canonicalPayloadB64": "eyJjYW5vbmljYWxQbGFubmVkSW5wdXRzRGlnZXN0Ijoic2hhMjU2OjFhYzM5NzJkNDA4ZDlkMWQwMmJlZWUzOGQ5ZmI3NzY3ZTM3YjNhNDYxMjE0MDM5M2YyZDcwN2Q3NDc5YzE3YWUiLCJjb21waWxlZEF0IjoiMjAyNi0wOS0wNVQwODowMDowMFoiLCJjb21waWxlZEJ5IjoicGktb3JjaGVzdHJhdG9yQDAuMS4wIiwiY29tcGlsZXJJZCI6InBpLW9yY2hlc3RyYXRvciIsImNvbXBpbGVyVmVyc2lvbiI6IjAuMS4wIiwiY29udHJhY3RWZXJzaW9uIjoiMiIsImV4ZWN1dGlvblBsYW5TbmFwc2hvdElkIjoiYjU5YmYwNzFmMTU5YWJjYWZhZWIzMDE1YzBkOGM2MTciLCJwYXJlbnRFeGVjdXRpb25QbGFuU25hcHNob3RJZCI6bnVsbCwicGxhbktpbmQiOiJJTklUSUFMIiwicGxhbm5lZEF0dGVtcHRJbnB1dHMiOlt7ImRlbGl2ZXJhYmxlS2luZCI6IkNPREVfQ0hBTkdFIiwicGxhbm5lZEF0dGVtcHRJbnB1dElkIjoiMTAxMDEwMTAxMDEwMTAxMCIsInByb21wdENvbnRlbnQiOiJcdTViOWVcdTczYjBcdWZmMWFcdTU3Mjggd29yay5tZCBcdTUxOTlcdTUxNjVcdTY4MDdcdTk4OThcdTRlMGVcdTRlMDlcdTg4NGNcdTg5ODFcdTcwYjlcdWZmMGNcdTVlNzZcdTc1MjggcnVuX2NvbW1hbmQgXHU5YThjXHU4YmMxXHU2NTg3XHU0ZWY2XHU1YjU4XHU1NzI4IiwicnVuS2luZCI6IklNUExFTUVOVEFUSU9OIiwid29ya2Zsb3dOb2RlSWQiOiJzdGVwLTEifV0sInRhc2tJZCI6IjAxMjM0NTY3ODlhYmNkZWYiLCJ0YXNrU3BlY0RpZ2VzdCI6InNoYTI1NjpiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiIiwid29ya2xvYWRJZGVudGl0eSI6InBpLm9yY2hlc3RyYXRvciJ9",
+      "payloadDigest": "sha256:5eef68a56182d94a13ff81d76aa16b5a3eac0255b271c1996c273cb2a7f21279",
+      "signatureInputB64": null
+    },
+    {
+      "id": "pos-signed",
+      "kind": "positive",
+      "expectedSchemaValid": true,
+      "note": "含 §9.4 签名信封（确定性测试密钥真实签名）",
+      "expectedError": null,
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.orchestrator",
+        "executionPlanSnapshotId": "15b661b5b0cd299bc5c6ef519dcdb5bd",
+        "taskId": "0123456789abcdef",
+        "compilerId": "pi-orchestrator",
+        "compilerVersion": "0.1.0",
+        "planKind": "INITIAL",
+        "plannedAttemptInputs": [
+          {
+            "plannedAttemptInputId": "1010101010101010",
+            "workflowNodeId": "step-1",
+            "runKind": "IMPLEMENTATION",
+            "deliverableKind": "CODE_CHANGE",
+            "promptContent": "实现：在 work.md 写入标题与三行要点，并用 run_command 验证文件存在"
+          },
+          {
+            "plannedAttemptInputId": "2020202020202020",
+            "workflowNodeId": "step-2",
+            "runKind": "READ_ONLY",
+            "deliverableKind": "READ_ONLY_EVIDENCE",
+            "promptContent": "只读验收：读 work.md 确认标题与要点齐全，给出 ok=true 的结论"
+          }
+        ],
+        "canonicalPlannedInputsDigest": "sha256:b031233c0a9b3a5a9b4b300b88e74da1da43561c9211d0ed9a0e382e8b7a7227",
+        "parentExecutionPlanSnapshotId": null,
+        "compiledBy": "pi-orchestrator@0.1.0",
+        "compiledAt": "2026-09-05T08:00:00Z",
+        "payloadDigest": "sha256:49ae68dfdf581201284f1ec3e89e428329734b6396107344c9310d5d39660981",
+        "signature": {
+          "objectType": "execution_plan_snapshot",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-orchestrator-vector",
+          "issuer": "orchestrator-test",
+          "issuerWorkloadIdentity": "pi.orchestrator",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-05T08:01:00Z",
+          "payloadDigest": "sha256:49ae68dfdf581201284f1ec3e89e428329734b6396107344c9310d5d39660981",
+          "value": "vSeBchf/01SW5IPBO3L1rn+rpX46OvTJydWgPM6j+8tS7Kcn0wS5iTspqjhPLWRFdou0GpuyCBOF/PXtwBIIAA=="
+        }
+      },
+      "calculateOnLoad": true,
+      "canonicalPayloadB64": "eyJjYW5vbmljYWxQbGFubmVkSW5wdXRzRGlnZXN0Ijoic2hhMjU2OmIwMzEyMzNjMGE5YjNhNWE5YjRiMzAwYjg4ZTc0ZGExZGE0MzU2MWM5MjExZDBlZDlhMGUzODJlOGI3YTcyMjciLCJjb21waWxlZEF0IjoiMjAyNi0wOS0wNVQwODowMDowMFoiLCJjb21waWxlZEJ5IjoicGktb3JjaGVzdHJhdG9yQDAuMS4wIiwiY29tcGlsZXJJZCI6InBpLW9yY2hlc3RyYXRvciIsImNvbXBpbGVyVmVyc2lvbiI6IjAuMS4wIiwiY29udHJhY3RWZXJzaW9uIjoiMiIsImV4ZWN1dGlvblBsYW5TbmFwc2hvdElkIjoiMTViNjYxYjViMGNkMjk5YmM1YzZlZjUxOWRjZGI1YmQiLCJwYXJlbnRFeGVjdXRpb25QbGFuU25hcHNob3RJZCI6bnVsbCwicGxhbktpbmQiOiJJTklUSUFMIiwicGxhbm5lZEF0dGVtcHRJbnB1dHMiOlt7ImRlbGl2ZXJhYmxlS2luZCI6IkNPREVfQ0hBTkdFIiwicGxhbm5lZEF0dGVtcHRJbnB1dElkIjoiMTAxMDEwMTAxMDEwMTAxMCIsInByb21wdENvbnRlbnQiOiJcdTViOWVcdTczYjBcdWZmMWFcdTU3Mjggd29yay5tZCBcdTUxOTlcdTUxNjVcdTY4MDdcdTk4OThcdTRlMGVcdTRlMDlcdTg4NGNcdTg5ODFcdTcwYjlcdWZmMGNcdTVlNzZcdTc1MjggcnVuX2NvbW1hbmQgXHU5YThjXHU4YmMxXHU2NTg3XHU0ZWY2XHU1YjU4XHU1NzI4IiwicnVuS2luZCI6IklNUExFTUVOVEFUSU9OIiwid29ya2Zsb3dOb2RlSWQiOiJzdGVwLTEifSx7ImRlbGl2ZXJhYmxlS2luZCI6IlJFQURfT05MWV9FVklERU5DRSIsInBsYW5uZWRBdHRlbXB0SW5wdXRJZCI6IjIwMjAyMDIwMjAyMDIwMjAiLCJwcm9tcHRDb250ZW50IjoiXHU1M2VhXHU4YmZiXHU5YThjXHU2NTM2XHVmZjFhXHU4YmZiIHdvcmsubWQgXHU3ODZlXHU4YmE0XHU2ODA3XHU5ODk4XHU0ZTBlXHU4OTgxXHU3MGI5XHU5ZjUwXHU1MTY4XHVmZjBjXHU3ZWQ5XHU1MWZhIG9rPXRydWUgXHU3Njg0XHU3ZWQzXHU4YmJhIiwicnVuS2luZCI6IlJFQURfT05MWSIsIndvcmtmbG93Tm9kZUlkIjoic3RlcC0yIn1dLCJ0YXNrSWQiOiIwMTIzNDU2Nzg5YWJjZGVmIiwid29ya2xvYWRJZGVudGl0eSI6InBpLm9yY2hlc3RyYXRvciJ9",
+      "payloadDigest": "sha256:49ae68dfdf581201284f1ec3e89e428329734b6396107344c9310d5d39660981",
+      "signatureInputB64": "eyJhdWRpZW5jZSI6InBpLnBsYXRmb3JtIiwiY29udHJvbFBsYW5lRXBvY2giOjAsImlzc3VlciI6Im9yY2hlc3RyYXRvci10ZXN0IiwiaXNzdWVyV29ya2xvYWRJZGVudGl0eSI6InBpLm9yY2hlc3RyYXRvciIsImtleUlkIjoic2stb3JjaGVzdHJhdG9yLXZlY3RvciIsIm9iamVjdFR5cGUiOiJleGVjdXRpb25fcGxhbl9zbmFwc2hvdCIsInBheWxvYWREaWdlc3QiOiJzaGEyNTY6NDlhZTY4ZGZkZjU4MTIwMTI4NGYxZWMzZTg5ZTQyODMyOTczNGI2Mzk2MTA3MzQ0YzkzMTBkNWQzOTY2MDk4MSIsInNjaGVtYVZlcnNpb24iOiIyIiwic2lnbmF0dXJlQWxnb3JpdGhtIjoiRWQyNTUxOSIsInNpZ25hdHVyZUNvbnRleHQiOiJwaS5jb250cmFjdC5zaWduYXR1cmUudjEiLCJzaWduZWRBdCI6IjIwMjYtMDktMDVUMDg6MDE6MDBaIn0="
+    },
+    {
+      "id": "neg-dup-input-id",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "plannedAttemptInputId 重复必须拒绝",
+      "expectedError": "uniqueItems",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.orchestrator",
+        "executionPlanSnapshotId": "82e93a5e3221abb614f0abb3d26d0650",
+        "taskId": "0123456789abcdef",
+        "compilerId": "pi-orchestrator",
+        "compilerVersion": "0.1.0",
+        "planKind": "INITIAL",
+        "plannedAttemptInputs": [
+          {
+            "plannedAttemptInputId": "1010101010101010",
+            "workflowNodeId": "step-1",
+            "runKind": "IMPLEMENTATION",
+            "deliverableKind": "CODE_CHANGE",
+            "promptContent": "实现：在 work.md 写入标题与三行要点，并用 run_command 验证文件存在"
+          },
+          {
+            "plannedAttemptInputId": "1010101010101010",
+            "workflowNodeId": "step-1",
+            "runKind": "IMPLEMENTATION",
+            "deliverableKind": "CODE_CHANGE",
+            "promptContent": "实现：在 work.md 写入标题与三行要点，并用 run_command 验证文件存在"
+          }
+        ],
+        "canonicalPlannedInputsDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "parentExecutionPlanSnapshotId": null,
+        "compiledBy": "pi-orchestrator@0.1.0",
+        "compiledAt": "2026-09-05T08:00:00Z",
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "uniqueItems"
+    },
+    {
+      "id": "neg-run-kind-enum",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "runKind 枚举外必须拒绝",
+      "expectedError": "enum",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.orchestrator",
+        "executionPlanSnapshotId": "cf7bc8ce04bf196681dec34ddfe27b2e",
+        "taskId": "0123456789abcdef",
+        "compilerId": "pi-orchestrator",
+        "compilerVersion": "0.1.0",
+        "planKind": "INITIAL",
+        "plannedAttemptInputs": [
+          {
+            "plannedAttemptInputId": "1010101010101010",
+            "workflowNodeId": "step-1",
+            "runKind": "SCRIPT",
+            "deliverableKind": "CODE_CHANGE",
+            "promptContent": "实现：在 work.md 写入标题与三行要点，并用 run_command 验证文件存在"
+          }
+        ],
+        "canonicalPlannedInputsDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "parentExecutionPlanSnapshotId": null,
+        "compiledBy": "pi-orchestrator@0.1.0",
+        "compiledAt": "2026-09-05T08:00:00Z",
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "enum"
+    },
+    {
+      "id": "neg-missing-required",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "plannedAttemptInput 缺 deliverableKind 必须拒绝",
+      "expectedError": "required",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.orchestrator",
+        "executionPlanSnapshotId": "e9b86acdebfb76ad9da8806cff78509e",
+        "taskId": "0123456789abcdef",
+        "compilerId": "pi-orchestrator",
+        "compilerVersion": "0.1.0",
+        "planKind": "INITIAL",
+        "plannedAttemptInputs": [
+          {
+            "plannedAttemptInputId": "1010101010101010",
+            "workflowNodeId": "step-1",
+            "runKind": "IMPLEMENTATION",
+            "promptContent": "实现：在 work.md 写入标题与三行要点，并用 run_command 验证文件存在"
+          }
+        ],
+        "canonicalPlannedInputsDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "parentExecutionPlanSnapshotId": null,
+        "compiledBy": "pi-orchestrator@0.1.0",
+        "compiledAt": "2026-09-05T08:00:00Z",
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "required"
+    },
+    {
+      "id": "neg-bad-inputs-digest",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "canonicalPlannedInputsDigest 非 sha256:64hex 必须拒绝",
+      "expectedError": "pattern",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.orchestrator",
+        "executionPlanSnapshotId": "bec7f5ff504735598aa7e604473a5ffb",
+        "taskId": "0123456789abcdef",
+        "compilerId": "pi-orchestrator",
+        "compilerVersion": "0.1.0",
+        "planKind": "INITIAL",
+        "plannedAttemptInputs": [
+          {
+            "plannedAttemptInputId": "1010101010101010",
+            "workflowNodeId": "step-1",
+            "runKind": "IMPLEMENTATION",
+            "deliverableKind": "CODE_CHANGE",
+            "promptContent": "实现：在 work.md 写入标题与三行要点，并用 run_command 验证文件存在"
+          }
+        ],
+        "canonicalPlannedInputsDigest": "sha256:zz",
+        "parentExecutionPlanSnapshotId": null,
+        "compiledBy": "pi-orchestrator@0.1.0",
+        "compiledAt": "2026-09-05T08:00:00Z",
+        "payloadDigest": "sha256:482e1a34ce1eaf35197a3f9a099efa38693dc0f34ef0995d67235e19355ca42a"
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "pattern"
+    },
+    {
+      "id": "neg-unknown-field",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "未知字段必须拒绝",
+      "expectedError": "unknown field",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.orchestrator",
+        "executionPlanSnapshotId": "bec7f5ff504735598aa7e604473a5ffb",
+        "taskId": "0123456789abcdef",
+        "compilerId": "pi-orchestrator",
+        "compilerVersion": "0.1.0",
+        "planKind": "INITIAL",
+        "plannedAttemptInputs": [
+          {
+            "plannedAttemptInputId": "1010101010101010",
+            "workflowNodeId": "step-1",
+            "runKind": "IMPLEMENTATION",
+            "deliverableKind": "CODE_CHANGE",
+            "promptContent": "实现：在 work.md 写入标题与三行要点，并用 run_command 验证文件存在"
+          }
+        ],
+        "canonicalPlannedInputsDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "parentExecutionPlanSnapshotId": null,
+        "compiledBy": "pi-orchestrator@0.1.0",
+        "compiledAt": "2026-09-05T08:00:00Z",
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "bogusField": "x"
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "unknown field"
+    }
+  ]
+}

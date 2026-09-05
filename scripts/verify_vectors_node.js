@@ -1,7 +1,8 @@
 // 独立参考实现比对：对 contracts/test-vectors 下全部契约对象的正向量，
 // 用 Node 参考实现重算 canonicalPayloadB64 / payloadDigest，与固化向量逐字节比对。
 // 任一不一致即退出码 1（对应手册 CT-01：主实现与独立参考实现逐字节一致）。
-// 覆盖对象：attempt_contract / task_spec / event_envelope（含 CT-03 canonical 排序）。
+// 覆盖对象：attempt_contract / task_spec / event_envelope（含 CT-03 canonical 排序）/
+// budget_grant / execution_plan_snapshot。
 'use strict';
 const fs = require('fs');
 const path = require('path');
@@ -14,6 +15,7 @@ const OBJECTS = [
   ['task_spec', 'task_spec'],
   ['event_envelope', 'event_envelope'],
   ['budget_grant', 'budget_grant'],
+  ['execution_plan_snapshot', 'execution_plan_snapshot'],
 ];
 
 let checked = 0;

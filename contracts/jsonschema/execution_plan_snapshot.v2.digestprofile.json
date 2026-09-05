@@ -1,0 +1,29 @@
+{
+  "$id": "https://pi.local/contracts/jsonschema/execution_plan_snapshot/v2/digestprofile",
+  "schemaVersion": "2",
+  "objectType": "execution_plan_snapshot",
+  "digestAlgorithm": "sha256",
+  "canonicalEncoding": "RFC8785-JCS-lite",
+  "immutablePayloadPointers": [
+    "/executionPlanSnapshotId",
+    "/contractVersion",
+    "/workloadIdentity",
+    "/taskId",
+    "/taskSpecDigest",
+    "/compilerId",
+    "/compilerVersion",
+    "/planKind",
+    "/plannedAttemptInputs",
+    "/canonicalPlannedInputsDigest",
+    "/parentExecutionPlanSnapshotId",
+    "/compiledBy",
+    "/compiledAt"
+  ],
+  "optionalImmutablePointers": ["/taskSpecDigest"],
+  "canonicalSortKeys": {
+    "/plannedAttemptInputs": { "by": "key", "key": "plannedAttemptInputId" }
+  },
+  "selfDigestPointer": "/payloadDigest",
+  "signatureEnvelopePointers": ["/signature"],
+  "notes": "ExecutionPlanSnapshot（蓝图 §10.5.1 单机子集）：Task 进入执行前发布的不可变签名执行计划。plannedAttemptInputs 为对象集合数组按 plannedAttemptInputId 排序，语义层按该键拒绝重复（同 ID 不同内容不得通过，verified_execution_plan 显式检查）；taskSpecDigest 为可选指针；父计划指针为必填字段，INITIAL 显式为 null（REPAIR 为蓝图保留名，本版 Schema 不签发，enum 仅 INITIAL）；顶层 payloadDigest 为 self-digest（build 时校验等于重算值）；任何输入变更创建新计划、绝不改写旧计划。"
+}
