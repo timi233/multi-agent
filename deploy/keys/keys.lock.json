@@ -142,6 +142,16 @@
       "privateKeyFile": "SEED-DERIVED（无文件，确定性派生）",
       "publicKeyFile": "SEED-DERIVED（无文件，确定性派生）"
     },
+    "sk-git-staging-vector": {
+      "purpose": "GitStagingResult 契约向量测试签名（确定性 seed 派生，非生产；scripts/gen_git_staging_vectors.py TEST_KEY_SEED）",
+      "issuer": "git-stager-test",
+      "allowedObjectTypes": [
+        "git_staging_results"
+      ],
+      "pubFingerprintSha256": "ce237e0aec2bf5d9a94fa2b4bda147d12913b7e9a697a0db9d92eb5664a623a4",
+      "privateKeyFile": "SEED-DERIVED（无文件，确定性派生）",
+      "publicKeyFile": "SEED-DERIVED（无文件，确定性派生）"
+    },
     "sk-skill": {
       "purpose": "Skill Signer",
       "issuer": "skill-governance",

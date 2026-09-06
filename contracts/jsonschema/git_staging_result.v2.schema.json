@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pi.local/contracts/jsonschema/git_staging_result/v2",
+  "title": "GitStagingResult v2（蓝图 §11 Git staging 证明 单机子集：本地 delivery repo 读回证据）",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "contractVersion": { "const": "2" },
+    "workloadIdentity": { "const": "pi.git-stager" },
+    "gitStagingResultId": { "type": "string", "pattern": "^[a-f0-9]{32}$" },
+    "commitBundleId": { "type": "string", "pattern": "^[a-f0-9]{32}$" },
+    "commitBundleDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "repositoryId": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+    "candidateRef": { "type": "string", "pattern": "^refs/heads/[a-zA-Z0-9._/-]+$" },
+    "expectedRefGitObjectId": {
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "algorithm": { "const": "sha1" },
+            "hex": { "type": "string", "pattern": "^[a-f0-9]{40}$" }
+          },
+          "required": ["algorithm", "hex"]
+        }
+      ],
+      "description": "staging 前读回的 ref 值；null=该 ref 当前必须不存在（首提 CAS）"
+    },
+    "appliedCommitGitObjectId": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "algorithm": { "const": "sha1" },
+        "hex": { "type": "string", "pattern": "^[a-f0-9]{40}$" }
+      },
+      "required": ["algorithm", "hex"]
+    },
+    "controlPlaneEpoch": { "const": 0 },
+    "gitStagingEpoch": { "type": "integer", "minimum": 1 },
+    "revocationEpoch": { "const": 0 },
+    "operationIdempotencyKey": { "type": "string", "pattern": "^[a-f0-9]{32}$" },
+    "stagedAt": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T" },
+    "payloadDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "objectType": { "const": "git_staging_result" },
+        "schemaVersion": { "const": "2" },
+        "signatureAlgorithm": { "const": "Ed25519" },
+        "keyId": { "type": "string", "minLength": 1 },
+        "issuer": { "type": "string", "minLength": 1 },
+        "issuerWorkloadIdentity": { "const": "pi.git-stager" },
+        "audience": { "type": "string" },
+        "controlPlaneEpoch": { "type": "integer", "minimum": 0 },
+        "signedAt": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T" },
+        "payloadDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "value": { "type": "string", "pattern": "^[A-Za-z0-9+/]{86}==$" }
+      },
+      "required": [
+        "objectType", "schemaVersion", "signatureAlgorithm", "keyId",
+        "issuer", "issuerWorkloadIdentity", "audience", "controlPlaneEpoch",
+        "signedAt", "payloadDigest", "value"
+      ]
+    }
+  },
+  "required": [
+    "contractVersion", "workloadIdentity", "gitStagingResultId", "commitBundleId",
+    "commitBundleDigest", "repositoryId", "candidateRef", "expectedRefGitObjectId",
+    "appliedCommitGitObjectId", "controlPlaneEpoch", "gitStagingEpoch",
+    "revocationEpoch", "operationIdempotencyKey", "stagedAt", "payloadDigest",
+    "signature"
+  ]
+}

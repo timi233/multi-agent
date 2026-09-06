@@ -22,3 +22,4 @@ workspaces/
 # ---- OS / IDE / 会话 ----
 .DS_Store
 .reasonix/
+deliveries/

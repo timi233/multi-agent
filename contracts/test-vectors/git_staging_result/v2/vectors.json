@@ -1,0 +1,398 @@
+{
+  "objectType": "git_staging_result",
+  "schemaVersion": "2",
+  "canonicalEncoding": "RFC8785-JCS-lite",
+  "vectors": [
+    {
+      "id": "pos-initial-staging",
+      "kind": "positive",
+      "expectedSchemaValid": true,
+      "note": "首提：expectedRef=null（ref 必须不存在）",
+      "expectedError": null,
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.git-stager",
+        "gitStagingResultId": "ff7bd4777ed76cd9047a696eb3262cdb",
+        "commitBundleId": "abcd1234abcd1234abcd1234abcd1234",
+        "commitBundleDigest": "sha256:5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e",
+        "repositoryId": "00aa11bb22cc33dd",
+        "candidateRef": "refs/heads/main",
+        "expectedRefGitObjectId": null,
+        "appliedCommitGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+        },
+        "controlPlaneEpoch": 0,
+        "gitStagingEpoch": 1,
+        "revocationEpoch": 0,
+        "operationIdempotencyKey": "11221122112211221122112211221122",
+        "stagedAt": "2026-09-07T10:00:00Z",
+        "payloadDigest": "sha256:2fbcb560c20c2aae0098cc7d0f2e5dfbe13c343ae8e800442b3a105c869478ec",
+        "signature": {
+          "objectType": "git_staging_result",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-git-staging-vector",
+          "issuer": "git-stager-test",
+          "issuerWorkloadIdentity": "pi.git-stager",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-07T10:01:00Z",
+          "payloadDigest": "sha256:2fbcb560c20c2aae0098cc7d0f2e5dfbe13c343ae8e800442b3a105c869478ec",
+          "value": "4r7uAn9th62UMhTVO6rtsV1LvszGS9ktRkuBPZ6a4gIqah5Uvh1CFoP6n4XGqa8krqS84QBHgf7718VzlJ5nCg=="
+        }
+      },
+      "calculateOnLoad": true,
+      "canonicalPayloadB64": "eyJhcHBsaWVkQ29tbWl0R2l0T2JqZWN0SWQvYWxnb3JpdGhtIjoic2hhMSIsImFwcGxpZWRDb21taXRHaXRPYmplY3RJZC9oZXgiOiJjZGNkY2RjZGNkY2RjZGNkY2RjZGNkY2RjZGNkY2RjZGNkY2RjZGNkIiwiY2FuZGlkYXRlUmVmIjoicmVmcy9oZWFkcy9tYWluIiwiY29tbWl0QnVuZGxlRGlnZXN0Ijoic2hhMjU2OjVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWUiLCJjb21taXRCdW5kbGVJZCI6ImFiY2QxMjM0YWJjZDEyMzRhYmNkMTIzNGFiY2QxMjM0IiwiY29udHJhY3RWZXJzaW9uIjoiMiIsImNvbnRyb2xQbGFuZUVwb2NoIjowLCJleHBlY3RlZFJlZkdpdE9iamVjdElkIjpudWxsLCJnaXRTdGFnaW5nRXBvY2giOjEsImdpdFN0YWdpbmdSZXN1bHRJZCI6ImZmN2JkNDc3N2VkNzZjZDkwNDdhNjk2ZWIzMjYyY2RiIiwib3BlcmF0aW9uSWRlbXBvdGVuY3lLZXkiOiIxMTIyMTEyMjExMjIxMTIyMTEyMjExMjIxMTIyMTEyMiIsInJlcG9zaXRvcnlJZCI6IjAwYWExMWJiMjJjYzMzZGQiLCJyZXZvY2F0aW9uRXBvY2giOjAsInN0YWdlZEF0IjoiMjAyNi0wOS0wN1QxMDowMDowMFoiLCJ3b3JrbG9hZElkZW50aXR5IjoicGkuZ2l0LXN0YWdlciJ9",
+      "payloadDigest": "sha256:2fbcb560c20c2aae0098cc7d0f2e5dfbe13c343ae8e800442b3a105c869478ec"
+    },
+    {
+      "id": "pos-append-staging",
+      "kind": "positive",
+      "expectedSchemaValid": true,
+      "note": "追加提交：expectedRef=上一读回",
+      "expectedError": null,
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.git-stager",
+        "gitStagingResultId": "9276548599f4e4baf4d7a798a47e4c15",
+        "commitBundleId": "abcd1234abcd1234abcd1234abcd1234",
+        "commitBundleDigest": "sha256:5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e",
+        "repositoryId": "00aa11bb22cc33dd",
+        "candidateRef": "refs/heads/main",
+        "expectedRefGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "abababababababababababababababababababab"
+        },
+        "appliedCommitGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+        },
+        "controlPlaneEpoch": 0,
+        "gitStagingEpoch": 2,
+        "revocationEpoch": 0,
+        "operationIdempotencyKey": "11221122112211221122112211221122",
+        "stagedAt": "2026-09-07T10:00:00Z",
+        "payloadDigest": "sha256:afc03ed1cd5fbd52070b27de32c5a5ddc75be7626f36d4308a433b9f05885438",
+        "signature": {
+          "objectType": "git_staging_result",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-git-staging-vector",
+          "issuer": "git-stager-test",
+          "issuerWorkloadIdentity": "pi.git-stager",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-07T10:01:00Z",
+          "payloadDigest": "sha256:afc03ed1cd5fbd52070b27de32c5a5ddc75be7626f36d4308a433b9f05885438",
+          "value": "2MLLnvJoNo/UY2sT17PUmQsPYFSRPbdYH3vHU/CTTwkNUXSsbUb0Bnpp8BELgPtnkJJHZ339aDRWcPBtWflEBg=="
+        }
+      },
+      "calculateOnLoad": true,
+      "canonicalPayloadB64": "eyJhcHBsaWVkQ29tbWl0R2l0T2JqZWN0SWQvYWxnb3JpdGhtIjoic2hhMSIsImFwcGxpZWRDb21taXRHaXRPYmplY3RJZC9oZXgiOiJjZGNkY2RjZGNkY2RjZGNkY2RjZGNkY2RjZGNkY2RjZGNkY2RjZGNkIiwiY2FuZGlkYXRlUmVmIjoicmVmcy9oZWFkcy9tYWluIiwiY29tbWl0QnVuZGxlRGlnZXN0Ijoic2hhMjU2OjVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWUiLCJjb21taXRCdW5kbGVJZCI6ImFiY2QxMjM0YWJjZDEyMzRhYmNkMTIzNGFiY2QxMjM0IiwiY29udHJhY3RWZXJzaW9uIjoiMiIsImNvbnRyb2xQbGFuZUVwb2NoIjowLCJleHBlY3RlZFJlZkdpdE9iamVjdElkIjp7ImFsZ29yaXRobSI6InNoYTEiLCJoZXgiOiJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiIn0sImdpdFN0YWdpbmdFcG9jaCI6MiwiZ2l0U3RhZ2luZ1Jlc3VsdElkIjoiOTI3NjU0ODU5OWY0ZTRiYWY0ZDdhNzk4YTQ3ZTRjMTUiLCJvcGVyYXRpb25JZGVtcG90ZW5jeUtleSI6IjExMjIxMTIyMTEyMjExMjIxMTIyMTEyMjExMjIxMTIyIiwicmVwb3NpdG9yeUlkIjoiMDBhYTExYmIyMmNjMzNkZCIsInJldm9jYXRpb25FcG9jaCI6MCwic3RhZ2VkQXQiOiIyMDI2LTA5LTA3VDEwOjAwOjAwWiIsIndvcmtsb2FkSWRlbnRpdHkiOiJwaS5naXQtc3RhZ2VyIn0=",
+      "payloadDigest": "sha256:afc03ed1cd5fbd52070b27de32c5a5ddc75be7626f36d4308a433b9f05885438"
+    },
+    {
+      "id": "pos-distinct-opkey",
+      "kind": "positive",
+      "expectedSchemaValid": true,
+      "note": "专用操作键（幂等键参与派生）",
+      "expectedError": null,
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.git-stager",
+        "gitStagingResultId": "14c1bb49e42f0548b1a58f8ee9113e43",
+        "commitBundleId": "abcd1234abcd1234abcd1234abcd1234",
+        "commitBundleDigest": "sha256:5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e",
+        "repositoryId": "00aa11bb22cc33dd",
+        "candidateRef": "refs/heads/main",
+        "expectedRefGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "abababababababababababababababababababab"
+        },
+        "appliedCommitGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+        },
+        "controlPlaneEpoch": 0,
+        "gitStagingEpoch": 3,
+        "revocationEpoch": 0,
+        "operationIdempotencyKey": "99aa99aa99aa99aa99aa99aa99aa99aa",
+        "stagedAt": "2026-09-07T10:00:00Z",
+        "payloadDigest": "sha256:5f1343a53c0235005e780e21a6f15691e0d6f16830f4ba0c8a20d7235d370f9d",
+        "signature": {
+          "objectType": "git_staging_result",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-git-staging-vector",
+          "issuer": "git-stager-test",
+          "issuerWorkloadIdentity": "pi.git-stager",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-07T10:01:00Z",
+          "payloadDigest": "sha256:5f1343a53c0235005e780e21a6f15691e0d6f16830f4ba0c8a20d7235d370f9d",
+          "value": "lOmvCr8ydkBL5DlTcRBnY7iTXPtngJVBsJE5lMRmC/Y1IUYfaJik3F7etbZc2E0Sq6tDcMGoKahkrtVfZVIOAQ=="
+        }
+      },
+      "calculateOnLoad": true,
+      "canonicalPayloadB64": "eyJhcHBsaWVkQ29tbWl0R2l0T2JqZWN0SWQvYWxnb3JpdGhtIjoic2hhMSIsImFwcGxpZWRDb21taXRHaXRPYmplY3RJZC9oZXgiOiJjZGNkY2RjZGNkY2RjZGNkY2RjZGNkY2RjZGNkY2RjZGNkY2RjZGNkIiwiY2FuZGlkYXRlUmVmIjoicmVmcy9oZWFkcy9tYWluIiwiY29tbWl0QnVuZGxlRGlnZXN0Ijoic2hhMjU2OjVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWUiLCJjb21taXRCdW5kbGVJZCI6ImFiY2QxMjM0YWJjZDEyMzRhYmNkMTIzNGFiY2QxMjM0IiwiY29udHJhY3RWZXJzaW9uIjoiMiIsImNvbnRyb2xQbGFuZUVwb2NoIjowLCJleHBlY3RlZFJlZkdpdE9iamVjdElkIjp7ImFsZ29yaXRobSI6InNoYTEiLCJoZXgiOiJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiIn0sImdpdFN0YWdpbmdFcG9jaCI6MywiZ2l0U3RhZ2luZ1Jlc3VsdElkIjoiMTRjMWJiNDllNDJmMDU0OGIxYTU4ZjhlZTkxMTNlNDMiLCJvcGVyYXRpb25JZGVtcG90ZW5jeUtleSI6Ijk5YWE5OWFhOTlhYTk5YWE5OWFhOTlhYTk5YWE5OWFhIiwicmVwb3NpdG9yeUlkIjoiMDBhYTExYmIyMmNjMzNkZCIsInJldm9jYXRpb25FcG9jaCI6MCwic3RhZ2VkQXQiOiIyMDI2LTA5LTA3VDEwOjAwOjAwWiIsIndvcmtsb2FkSWRlbnRpdHkiOiJwaS5naXQtc3RhZ2VyIn0=",
+      "payloadDigest": "sha256:5f1343a53c0235005e780e21a6f15691e0d6f16830f4ba0c8a20d7235d370f9d"
+    },
+    {
+      "id": "pos-signed",
+      "kind": "positive",
+      "expectedSchemaValid": true,
+      "note": "含 §9.4 签名信封（确定性测试密钥真实签名）",
+      "expectedError": null,
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.git-stager",
+        "gitStagingResultId": "fa22ae5710b8aff57bac5fd1da5c3e92",
+        "commitBundleId": "abcd1234abcd1234abcd1234abcd1234",
+        "commitBundleDigest": "sha256:5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e",
+        "repositoryId": "00aa11bb22cc33dd",
+        "candidateRef": "refs/heads/main",
+        "expectedRefGitObjectId": null,
+        "appliedCommitGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+        },
+        "controlPlaneEpoch": 0,
+        "gitStagingEpoch": 1,
+        "revocationEpoch": 0,
+        "operationIdempotencyKey": "bbccbbccbbccbbccbbccbbccbbccbbcc",
+        "stagedAt": "2026-09-07T10:00:00Z",
+        "payloadDigest": "sha256:be0a57d51e12997e167671fceac3311955ec961465572ea5362c4858dd6a33d4",
+        "signature": {
+          "objectType": "git_staging_result",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-git-staging-vector",
+          "issuer": "git-stager-test",
+          "issuerWorkloadIdentity": "pi.git-stager",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-07T10:01:00Z",
+          "payloadDigest": "sha256:be0a57d51e12997e167671fceac3311955ec961465572ea5362c4858dd6a33d4",
+          "value": "M1JEhcu7TXE8s9W3NbiDu73nnS3q0s77J5CIqRpxephk6TIgvUBrEba/HxXfK8GTY2yoIFqGEvsFIetKv0AbBg=="
+        }
+      },
+      "calculateOnLoad": true,
+      "canonicalPayloadB64": "eyJhcHBsaWVkQ29tbWl0R2l0T2JqZWN0SWQvYWxnb3JpdGhtIjoic2hhMSIsImFwcGxpZWRDb21taXRHaXRPYmplY3RJZC9oZXgiOiJjZGNkY2RjZGNkY2RjZGNkY2RjZGNkY2RjZGNkY2RjZGNkY2RjZGNkIiwiY2FuZGlkYXRlUmVmIjoicmVmcy9oZWFkcy9tYWluIiwiY29tbWl0QnVuZGxlRGlnZXN0Ijoic2hhMjU2OjVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWU1ZTVlNWUiLCJjb21taXRCdW5kbGVJZCI6ImFiY2QxMjM0YWJjZDEyMzRhYmNkMTIzNGFiY2QxMjM0IiwiY29udHJhY3RWZXJzaW9uIjoiMiIsImNvbnRyb2xQbGFuZUVwb2NoIjowLCJleHBlY3RlZFJlZkdpdE9iamVjdElkIjpudWxsLCJnaXRTdGFnaW5nRXBvY2giOjEsImdpdFN0YWdpbmdSZXN1bHRJZCI6ImZhMjJhZTU3MTBiOGFmZjU3YmFjNWZkMWRhNWMzZTkyIiwib3BlcmF0aW9uSWRlbXBvdGVuY3lLZXkiOiJiYmNjYmJjY2JiY2NiYmNjYmJjY2JiY2NiYmNjYmJjYyIsInJlcG9zaXRvcnlJZCI6IjAwYWExMWJiMjJjYzMzZGQiLCJyZXZvY2F0aW9uRXBvY2giOjAsInN0YWdlZEF0IjoiMjAyNi0wOS0wN1QxMDowMDowMFoiLCJ3b3JrbG9hZElkZW50aXR5IjoicGkuZ2l0LXN0YWdlciJ9",
+      "payloadDigest": "sha256:be0a57d51e12997e167671fceac3311955ec961465572ea5362c4858dd6a33d4"
+    },
+    {
+      "id": "neg-expected-algorithm",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "expectedRef 算法非 sha1 必须拒绝",
+      "expectedError": "enum",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.git-stager",
+        "gitStagingResultId": "a9351197665eb5489639e65ebc6e2692",
+        "commitBundleId": "abcd1234abcd1234abcd1234abcd1234",
+        "commitBundleDigest": "sha256:5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e",
+        "repositoryId": "00aa11bb22cc33dd",
+        "candidateRef": "refs/heads/main",
+        "expectedRefGitObjectId": {
+          "algorithm": "sha256",
+          "hex": "abababababababababababababababababababab"
+        },
+        "appliedCommitGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+        },
+        "controlPlaneEpoch": 0,
+        "gitStagingEpoch": 1,
+        "revocationEpoch": 0,
+        "operationIdempotencyKey": "11221122112211221122112211221122",
+        "stagedAt": "2026-09-07T10:00:00Z",
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "signature": {
+          "objectType": "git_staging_result",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-git-staging-vector",
+          "issuer": "git-stager-test",
+          "issuerWorkloadIdentity": "pi.git-stager",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-07T10:00:00Z",
+          "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "value": "eQLyGRLIl3DBVbHk+ptsCttgriFlyUbqhdSTi0Z/IVc4JmfAS19xtxaAffBnB/DuLxdIyG3c3AexMH2ionEJAw=="
+        }
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "enum"
+    },
+    {
+      "id": "neg-missing-required",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "缺 candidateRef 字段必须拒绝",
+      "expectedError": "required",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.git-stager",
+        "gitStagingResultId": "ff7bd4777ed76cd9047a696eb3262cdb",
+        "commitBundleId": "abcd1234abcd1234abcd1234abcd1234",
+        "commitBundleDigest": "sha256:5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e",
+        "repositoryId": "00aa11bb22cc33dd",
+        "expectedRefGitObjectId": null,
+        "appliedCommitGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+        },
+        "controlPlaneEpoch": 0,
+        "gitStagingEpoch": 1,
+        "revocationEpoch": 0,
+        "operationIdempotencyKey": "11221122112211221122112211221122",
+        "stagedAt": "2026-09-07T10:00:00Z",
+        "payloadDigest": "sha256:2fbcb560c20c2aae0098cc7d0f2e5dfbe13c343ae8e800442b3a105c869478ec",
+        "signature": {
+          "objectType": "git_staging_result",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-git-staging-vector",
+          "issuer": "git-stager-test",
+          "issuerWorkloadIdentity": "pi.git-stager",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-07T10:00:00Z",
+          "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "value": "eQLyGRLIl3DBVbHk+ptsCttgriFlyUbqhdSTi0Z/IVc4JmfAS19xtxaAffBnB/DuLxdIyG3c3AexMH2ionEJAw=="
+        }
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "required"
+    },
+    {
+      "id": "neg-bad-ref-pattern",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "candidateRef 非 refs/heads/ 前缀必须拒绝",
+      "expectedError": "pattern",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.git-stager",
+        "gitStagingResultId": "ff7bd4777ed76cd9047a696eb3262cdb",
+        "commitBundleId": "abcd1234abcd1234abcd1234abcd1234",
+        "commitBundleDigest": "sha256:5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e",
+        "repositoryId": "00aa11bb22cc33dd",
+        "candidateRef": "not-ref",
+        "expectedRefGitObjectId": null,
+        "appliedCommitGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+        },
+        "controlPlaneEpoch": 0,
+        "gitStagingEpoch": 1,
+        "revocationEpoch": 0,
+        "operationIdempotencyKey": "11221122112211221122112211221122",
+        "stagedAt": "2026-09-07T10:00:00Z",
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "signature": {
+          "objectType": "git_staging_result",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-git-staging-vector",
+          "issuer": "git-stager-test",
+          "issuerWorkloadIdentity": "pi.git-stager",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-07T10:00:00Z",
+          "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "value": "eQLyGRLIl3DBVbHk+ptsCttgriFlyUbqhdSTi0Z/IVc4JmfAS19xtxaAffBnB/DuLxdIyG3c3AexMH2ionEJAw=="
+        }
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "pattern"
+    },
+    {
+      "id": "neg-bad-opkey",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "operationIdempotencyKey 非 32hex 必须拒绝",
+      "expectedError": "pattern",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.git-stager",
+        "gitStagingResultId": "a5aceedb6ed0a5c42a5f923fb1ea3141",
+        "commitBundleId": "abcd1234abcd1234abcd1234abcd1234",
+        "commitBundleDigest": "sha256:5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e",
+        "repositoryId": "00aa11bb22cc33dd",
+        "candidateRef": "refs/heads/main",
+        "expectedRefGitObjectId": null,
+        "appliedCommitGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+        },
+        "controlPlaneEpoch": 0,
+        "gitStagingEpoch": 1,
+        "revocationEpoch": 0,
+        "operationIdempotencyKey": "xxx",
+        "stagedAt": "2026-09-07T10:00:00Z",
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "signature": {
+          "objectType": "git_staging_result",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-git-staging-vector",
+          "issuer": "git-stager-test",
+          "issuerWorkloadIdentity": "pi.git-stager",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-07T10:00:00Z",
+          "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "value": "eQLyGRLIl3DBVbHk+ptsCttgriFlyUbqhdSTi0Z/IVc4JmfAS19xtxaAffBnB/DuLxdIyG3c3AexMH2ionEJAw=="
+        }
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "pattern"
+    },
+    {
+      "id": "neg-unknown-field",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "未知字段必须拒绝",
+      "expectedError": "unknown field",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.git-stager",
+        "gitStagingResultId": "ff7bd4777ed76cd9047a696eb3262cdb",
+        "commitBundleId": "abcd1234abcd1234abcd1234abcd1234",
+        "commitBundleDigest": "sha256:5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e",
+        "repositoryId": "00aa11bb22cc33dd",
+        "candidateRef": "refs/heads/main",
+        "expectedRefGitObjectId": null,
+        "appliedCommitGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+        },
+        "controlPlaneEpoch": 0,
+        "gitStagingEpoch": 1,
+        "revocationEpoch": 0,
+        "operationIdempotencyKey": "11221122112211221122112211221122",
+        "stagedAt": "2026-09-07T10:00:00Z",
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "bogus": true,
+        "signature": {
+          "objectType": "git_staging_result",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-git-staging-vector",
+          "issuer": "git-stager-test",
+          "issuerWorkloadIdentity": "pi.git-stager",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-07T10:00:00Z",
+          "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "value": "eQLyGRLIl3DBVbHk+ptsCttgriFlyUbqhdSTi0Z/IVc4JmfAS19xtxaAffBnB/DuLxdIyG3c3AexMH2ionEJAw=="
+        }
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "unknown field"
+    }
+  ]
+}

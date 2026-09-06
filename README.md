@@ -46,6 +46,8 @@
 | POST | `/api/v1/tasks` | 创建任务（body: `{title, prompt, model?}`） |
 | GET | `/api/v1/tasks` / `/api/v1/tasks/{id}` | 列表 / 详情 |
 | POST | `/api/v1/tasks/{id}/cancel` | 取消（QUEUED/RUNNING） |
+| POST | `/api/v1/tasks/{id}/staging:commit` | Git 交付：确定性本地提交 + 读回证明（body: `{operationIdempotencyKey?, attemptId?}`，同键幂等） |
+| GET | `/api/v1/tasks/{id}/staging-results` | GitStagingResult 归档列表（commitBundleId/应用 commit/epoch/verified） |
 | GET | `/api/v1/tasks/{id}/events` | 事件流（traceId、工具调用、结果） |
 | GET | `/api/v1/tasks/{id}/workspace`、`.../workspace/file?path=` | 只读浏览工作区产物 |
 | GET | `/healthz` | 健康检查 |
@@ -63,7 +65,7 @@
 ## 测试
 
 ```bash
-./scripts/run.sh test   # pytest：状态机、契约/向量、工具安全边界、CAS/证据、Skill 供应链、worker 并发/恢复/竞争（215 项）
+./scripts/run.sh test   # pytest：状态机、契约/向量、工具安全边界、CAS/证据、Skill 供应链、Git 交付、worker 并发/恢复/竞争（250 项）
 ```
 
 ## 与蓝图的关系（有意简化，供后续演进）
@@ -73,12 +75,12 @@
 | 控制面/Lease/Fencing | 简化 | 状态机白名单 + 领取互斥（SKIP LOCKED）；Lease TTK、撤销、预算未实现 |
 | Runtime 工具 | 有 | 文件操作工具集（工作区 root 约束） |
 | 沙箱隔离 | 简化 | 目录级 root 约束 + 命令 deny list（特权/系统变更/网络外联/全局包管）+ setuid 拒绝 + 超时/进程组终止 + 最小 env 白名单 + READ_ONLY 只读工具集；**未做**完全断网/namespace/用户隔离 |
-| 契约/digest/签名 | 简化 | 8 类对象 Schema+digestprofile+确定性向量+verified（attempt_contract/task_spec/event_envelope/budget_grant/runtime_capability_report/execution_plan_snapshot/attempt_terminal_envelope/skill_bundle_snapshot）；§9.4 其余对象（node_state/lease/route 等）未覆盖去中心生成——json 契约双实现 |
+| 契约/digest/签名 | 简化 | 9 类对象 Schema+digestprofile+确定性向量+verified（attempt_contract/task_spec/event_envelope/budget_grant/runtime_capability_report/execution_plan_snapshot/attempt_terminal_envelope/skill_bundle_snapshot/commit_bundle/git_staging_result——后两对象见 G5 行）；§9.4 其余对象（node_state/lease/route 等）未覆盖去中心生成——json 契约双实现 |
 | 事件序列 | 简化（Outbox 未接） | `pi_events` 表 + 轮询 API |
 | Artifact/Evidence | 部分 | **本地 CAS**（`data/cas`，sha256 内容寻址，替代 MinIO）+ `attempt_terminal_envelope.v2` 终态信封（Node 来源、CAS 摘要、`pi_artifacts`/`pi_terminal_envelopes` 归档、`GET /api/v1/tasks/{id}/artifacts`、`/terminal-envelopes`）；OutputArtifactManifest/EvidenceManifest/EvaluationVerdict 未实现（G5） |
 | Skill 供应链 | 部分 | `skill_bundle_snapshot.v2`（确定性 tar+文件树摘要+只读静态挂载策略）+ 审批链（`/skills/proposals` 双 approver 槽 UNIQUE+veto+quorum+ApprovalSet）+ `/skills/publications:advance` ACTIVE 指针 + worker 注入技能说明；无 CANARY/隔离/Revocation（恢复经新版本新审批） |
 | Gateway 预算/Journal | 简化 | 每尝试 BudgetGrant 预留/结算；Journal 未实现 |
-| 交付 | 本地工作区 | 产物在 `workspaces/task-<id>/`；Git 交付未接 |
+| 交付 | 部分 | **本地 Git 交付**（G5，蓝图 §10.10 单机子集）：每任务独立 `deliveries/<task_id>/` 仓库（gitignore 排除），由 `pi_artifacts` 产物重建工作树 → `write-tree`，确定性 commit（固定 author/committer/时间戳 0，`X-Platform-Operation-Key` trailer 参与 commit 对象）→ `commit_bundle.v2`（assembler 签名，含 tree/commit 双表示与路径政策常量）→ `git hash-object -w` 实际写出并强校验**预计算 === 读回** → `git_staging_result.v2`（git-stager 签名：expectedRef CAS 基线/applied 读回/gitStagingEpoch/operationIdempotencyKey 幂等）归档 `pi_git_staging_results`；`POST /tasks/{id}/staging:commit` 控制面触发；**未做** DeliveryAuthorization/GitStagingLease/CommitIntent 契约（DB 内 commitBundleId+opKey 记录替代，`expectedRefGitObjectId` 承担 CAS 语义）、无 Git Provider 上传（GT-xx 不做） |
 | 观测 | 事件表 + 日志 | 未接 OTel 链路（S1 的 collector 可后续接） |
 
 **风险提示（实验配置）**：`run_command` 在任务工作区内执行命令——已做加固（**无 shell 执行**、命令 deny list、git 外联子命令拒绝、setuid/长度拒绝、最小环境白名单防凭据泄露、root 路径约束、超时/进程组终止、READ_ONLY 步骤只读工具集+服务端授权白名单、默认仅监听 `127.0.0.1`）；但**不可对抗恶意提示词**（可读工作区外绝对路径、可访问本机网络——无 namespace/用户隔离）。不要把本系统暴露到不可信网络，不要提交不可信来源的任务。

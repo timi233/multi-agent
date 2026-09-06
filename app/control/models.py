@@ -81,6 +81,27 @@ class TerminalEnvelopeOut(BaseModel):
     created_at: datetime
 
 
+# ---------- G5：Git 交付（蓝图 §10.10/§11 单机子集） ----------
+
+class StagingCommitRequest(BaseModel):
+    operationIdempotencyKey: str | None = None  # 32hex；缺省按 task 派生
+    attemptId: str | None = None
+
+
+class GitStagingResultOut(BaseModel):
+    result_id: str
+    task_id: str
+    commit_bundle_id: str
+    commit_bundle_digest: str
+    operation_idempotency_key: str
+    repository_id: str
+    candidate_ref: str
+    applied_commit_id: str
+    git_staging_epoch: int
+    verified_ok: bool
+    created_at: datetime
+
+
 class WorkspaceEntry(BaseModel):
     path: str
     kind: str  # file|dir

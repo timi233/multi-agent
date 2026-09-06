@@ -28,13 +28,14 @@ VEC = ROOT / "contracts" / "test-vectors"
 GEN_SCRIPTS = ["gen_contract_vectors.py", "gen_signature_vectors.py",
                "gen_protocol_vectors.py", "gen_budget_vectors.py",
                "gen_execution_plan_vectors.py", "gen_terminal_envelope_vectors.py",
-               "gen_skill_bundle_vectors.py", "gen_commit_bundle_vectors.py"]
+               "gen_skill_bundle_vectors.py", "gen_commit_bundle_vectors.py",
+               "gen_git_staging_vectors.py"]
 # gen_contract/gen_signature 的 OUT 就是 attempt_contract/v2 目录；
 # gen_protocol 的 OUT 是 test-vectors 根（写 <obj>/v2/...）
 INDEPENDENT_SCRIPTS = ["gen_contract_vectors.py", "gen_protocol_vectors.py",
                        "gen_budget_vectors.py", "gen_execution_plan_vectors.py",
                        "gen_terminal_envelope_vectors.py", "gen_skill_bundle_vectors.py",
-                       "gen_commit_bundle_vectors.py"]
+                       "gen_commit_bundle_vectors.py", "gen_git_staging_vectors.py"]
 
 
 @pytest.mark.parametrize("script", INDEPENDENT_SCRIPTS)
@@ -77,6 +78,8 @@ def test_generators_output_via_tmp_identical():
              VEC / "skill_bundle_snapshot" / "v2" / "vectors.json"),
             (Path(tmp) / "commit_bundle" / "v2" / "vectors.json",
              VEC / "commit_bundle" / "v2" / "vectors.json"),
+            (Path(tmp) / "git_staging_result" / "v2" / "vectors.json",
+             VEC / "git_staging_result" / "v2" / "vectors.json"),
         ]
         for fresh, tracked in pairs:
             assert fresh.read_bytes() == tracked.read_bytes(), \

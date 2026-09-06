@@ -14,6 +14,7 @@ DEPLOY_DIR = BASE_DIR / "deploy"
 COMPOSE_ENV = DEPLOY_DIR / "compose" / ".env"
 CLIPROXY_CONFIG = Path.home() / "global-memory" / "cliproxy" / "config.yaml"
 WORKSPACES_DIR = BASE_DIR / "workspaces"
+DELIVERIES_DIR = BASE_DIR / "deliveries"  # G5：本地交付 git 仓库（gitignore 已排除）
 
 
 def _load_dotenv(path: Path) -> dict[str, str]:
@@ -70,6 +71,7 @@ class Settings:
 
     # 运行时
     workspaces_dir: Path = WORKSPACES_DIR
+    deliveries_dir: Path = DELIVERIES_DIR  # G5：本地 delivery repo 根（每 task 一个仓库目录）
     cas_dir: Path = field(default_factory=lambda: BASE_DIR / "data" / "cas")  # G3：内容寻址 Blob 目录（gitignore 已排除 data/）
     max_turns: int = int(os.environ.get("PI_MAX_TURNS", "40"))
     max_tool_output_chars: int = int(os.environ.get("PI_MAX_TOOL_OUTPUT", "6000"))

@@ -1,0 +1,29 @@
+{
+  "$id": "https://pi.local/contracts/jsonschema/git_staging_result/v2/digestprofile",
+  "schemaVersion": "2",
+  "objectType": "git_staging_result",
+  "digestAlgorithm": "sha256",
+  "canonicalEncoding": "RFC8785-JCS-lite",
+  "immutablePayloadPointers": [
+    "/contractVersion",
+    "/workloadIdentity",
+    "/gitStagingResultId",
+    "/commitBundleId",
+    "/commitBundleDigest",
+    "/repositoryId",
+    "/candidateRef",
+    "/expectedRefGitObjectId",
+    "/appliedCommitGitObjectId/algorithm",
+    "/appliedCommitGitObjectId/hex",
+    "/controlPlaneEpoch",
+    "/gitStagingEpoch",
+    "/revocationEpoch",
+    "/operationIdempotencyKey",
+    "/stagedAt"
+  ],
+  "optionalImmutablePointers": [],
+  "canonicalSortKeys": {},
+  "selfDigestPointer": "/payloadDigest",
+  "signatureEnvelopePointers": ["/signature"],
+  "notes": "GitStagingResult（蓝图 §11 Git staging 证明 单机子集）：本地 delivery repo 读回证据——commitBundleId/commitBundleDigest 绑定被交付的不可变提交包；repositoryId+candidateRef 定位仓库与 ref；expectedRefGitObjectId（null=首提 CAS 基线，非空=必须与 staging 前读回一致）/appliedCommitGitObjectId（写 ref 后读回）逐对象绑定；controlPlaneEpoch/revocationEpoch 单机恒 0，gitStagingEpoch=操作代次；operationIdempotencyKey 幂等（同键重试复用结果）；stagedAt 为运行事实但不进 ID 派生（幂等语义：同数据重试 ID 稳定）。expectedRef 字段恒在（含 null），故不列 optionalImmutablePointers。ID 派生含 expectedRef 与 appliedCommit 等不可变字段。"
+}

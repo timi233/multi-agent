@@ -169,6 +169,45 @@ def list_terminal_envelopes(task_id: str):
     return [models.TerminalEnvelopeOut(**r) for r in rows]
 
 
+# ---------- Git 交付（蓝图 §10.10/§11 单机子集，G5） ----------
+
+@router.post("/tasks/{task_id}/staging:commit")
+def commit_staging(task_id: str, body: models.StagingCommitRequest) -> dict:
+    """确定性本地 git 交付：CommitBundle（assembler 签名）+ 读回证据
+    GitStagingResult（git-stager 签名）。同 opKey 幂等复用既有证明。"""
+    from ..runtime.gitstager import GitStagingError, stage_commit
+    if not execute_one("SELECT 1 FROM pi_tasks WHERE id=%s", (task_id,)):
+        raise HTTPException(404, f"task {task_id} not found")
+    if body.operationIdempotencyKey is not None and (
+            len(body.operationIdempotencyKey) != 32 or
+            not all(c in "0123456789abcdef" for c in body.operationIdempotencyKey)):
+        raise HTTPException(422, "operationIdempotencyKey 必须为 32hex")
+    try:
+        return stage_commit(task_id, attempt_id=body.attemptId,
+                            op_key=body.operationIdempotencyKey)
+    except GitStagingError as exc:
+        msg = str(exc)
+        if "无产物" in msg:
+            raise HTTPException(409, msg) from exc
+        raise HTTPException(500, msg) from exc
+
+
+@router.get("/tasks/{task_id}/staging-results",
+            response_model=list[models.GitStagingResultOut])
+def list_staging_results(task_id: str):
+    if not execute_one("SELECT 1 FROM pi_tasks WHERE id=%s", (task_id,)):
+        raise HTTPException(404, f"task {task_id} not found")
+    rows = execute(
+        "SELECT result_id, task_id, commit_bundle_id, commit_bundle_digest, "
+        "operation_idempotency_key, repository_id, candidate_ref, "
+        "applied_commit_id, git_staging_epoch, verified_ok, created_at "
+        "FROM pi_git_staging_results WHERE task_id=%s "
+        "ORDER BY git_staging_epoch",
+        (task_id,),
+    )
+    return [models.GitStagingResultOut(**r) for r in rows]
+
+
 # ---------- Skill 供应链（蓝图 §12.3 单机子集，G4） ----------
 
 @router.post("/skills/packages", response_model=models.SkillPackageOut)

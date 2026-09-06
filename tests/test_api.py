@@ -77,3 +77,77 @@ def test_workspace_listing_and_file(client):
         import shutil
 
         shutil.rmtree(root, ignore_errors=True)
+
+
+# ---------- G5 Git 交付 API ----------
+
+def _seed_staged_task(client, title="g5", files=("a.txt", b"data\n")):
+    import dataclasses
+    import uuid as _uuid
+    import app.runtime.gitstager as gs
+    from app.db import connect
+    from app.runtime.cas import put_bytes
+
+    tid = client.post("/api/v1/tasks", json={"title": title, "prompt": "p"}
+                      ).json()["id"]
+    rel, data = files
+    with connect() as conn:
+        digest = put_bytes(data)
+        conn.execute(
+            "INSERT INTO pi_artifacts (artifact_id, task_id, step_index, "
+            "path, digest, size, kind) VALUES (%s, %s, 1, %s, %s, %s, 'file')",
+            (_uuid.uuid4().hex[:16], tid, rel, digest, len(data)))
+    return tid
+
+
+def test_git_staging_commit_idempotent_and_list(client, tmp_path, monkeypatch):
+    import dataclasses
+    import app.runtime.gitstager as gs
+    monkeypatch.setattr(gs, "_settings", dataclasses.replace(
+        __import__("app.config", fromlist=["settings"]).settings,
+        deliveries_dir=tmp_path / "deliveries"))
+    tid = _seed_staged_task(client)
+    op = "abcd" * 8
+    r1 = client.post(f"/api/v1/tasks/{tid}/staging:commit",
+                     json={"operationIdempotencyKey": op})
+    assert r1.status_code == 200, r1.text
+    res = r1.json()
+    assert res["workloadIdentity"] == "pi.git-stager"
+    assert len(res["appliedCommitGitObjectId"]["hex"]) == 40
+    assert res["signature"]["issuerWorkloadIdentity"] == "pi.git-stager"
+
+    # 同 opKey 幂等：同 result_id，不新增
+    r2 = client.post(f"/api/v1/tasks/{tid}/staging:commit",
+                     json={"operationIdempotencyKey": op})
+    assert r2.status_code == 200
+    assert r2.json()["gitStagingResultId"] == res["gitStagingResultId"]
+
+    # 列表
+    lst = client.get(f"/api/v1/tasks/{tid}/staging-results")
+    assert lst.status_code == 200
+    rows = lst.json()
+    assert len(rows) == 1 and rows[0]["applied_commit_id"] == \
+        res["appliedCommitGitObjectId"]["hex"]
+    assert rows[0]["verified_ok"] is True
+
+
+def test_git_staging_409_without_artifacts(client, tmp_path, monkeypatch):
+    import dataclasses
+    import app.runtime.gitstager as gs
+    monkeypatch.setattr(gs, "_settings", dataclasses.replace(
+        __import__("app.config", fromlist=["settings"]).settings,
+        deliveries_dir=tmp_path / "deliveries"))
+    tid = client.post("/api/v1/tasks", json={
+        "title": "no", "prompt": "p"}).json()["id"]
+    r = client.post(f"/api/v1/tasks/{tid}/staging:commit", json={})
+    assert r.status_code == 409
+
+
+def test_git_staging_404_unknown_task(client, tmp_path, monkeypatch):
+    import dataclasses
+    import app.runtime.gitstager as gs
+    monkeypatch.setattr(gs, "_settings", dataclasses.replace(
+        __import__("app.config", fromlist=["settings"]).settings,
+        deliveries_dir=tmp_path / "deliveries"))
+    r = client.post("/api/v1/tasks/beefbeefbeefbeef/staging:commit", json={})
+    assert r.status_code == 404
