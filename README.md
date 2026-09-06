@@ -65,8 +65,23 @@
 ## 测试
 
 ```bash
-./scripts/run.sh test   # pytest：状态机、契约/向量、工具安全边界、CAS/证据、Skill 供应链、Git 交付、worker 并发/恢复/竞争（250 项）
+./scripts/run.sh test   # pytest：状态机、契约/向量、工具安全边界、CAS/证据、Skill 供应链、Git 交付、worker 并发/恢复/竞争、G6 验收硬指标（故障矩阵 327 / 乱序 10k / 崩溃 100 / 正向 231≥219 固化节点名单）
 ```
+
+## 验收硬指标（G6，手册附录 A 单机可行子集）
+
+| 指标 | 目标 | 实测/现状 | 承载 |
+|---|---|---|---|
+| 故障场景 | 200 | **327**（9 对象 × Schema 驱动故障变体，全部真实拒绝） | `tests/test_gate_fault_matrix.py` + 固化清单 `contracts/acceptance/gates/fault_matrix.json` |
+| 乱序收敛 | 10k 事件 | **10000**（100 Run × 100 事件乱序落库 → 重排收敛全 VERIFIED + 幂等） | `tests/test_gate_out_of_order.py` |
+| 崩溃循环 | 100 | **100/100**（8 崩溃点 × 12 种子 + 4 边界，每轮确定收敛：复用或明确拒绝） | `tests/test_gate_crash_loop.py` |
+| 正向链路 | 219 | **231**（固化正向节点名单 `contracts/acceptance/gates/positive_nodes.json` ∪ 防对抗混入审计；新增测试需显式 regen 才入榜） | `tests/test_gate_positive_audit.py` + `scripts/acceptance_gates.py::regen_positive_nodes` |
+| 8h 并发 | 可运行 | 脚本就绪（`--hours 8`）；报告不固化冒烟数字——当次实测见运行 JSON（ok/轮数/交付/收敛/健康检查） | `scripts/acceptance_longrun.py` |
+| 7d 稳定性 | 可运行 | 脚本就绪（`--days 7`）；长时实测需挂机执行，如实未达 | `scripts/acceptance_longrun.py` |
+
+- 汇总报告：`.venv/bin/python scripts/acceptance_report.py --json out.json`（hardGates 段六项指标 + 证据；PASS 必须带可定位证据，不虚报）。
+- 长跑/时长类指标为运行期验证：`--hours 8` / `--days 7` 供 CI 或使用者按排程执行，退出码即断言（错误/健康检查失败/无交付 → 非 0）。
+- G6 之前完成面：G1 编排 ✅、G2 沙箱硬化 ✅、G3 Artifact/CAS/Evidence ✅、G4 Skill 供应链与审批 ✅、G5 Git 闭环 ✅（详见上文交付/契约/测试各节）。
 
 ## 与蓝图的关系（有意简化，供后续演进）
 

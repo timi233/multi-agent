@@ -19,6 +19,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+from scripts.acceptance_gates import (  # noqa: E402,F401
+    fault_scenario_count,
+    load_gate_run,
+    positive_scenario_count,
+)
+
 ENTRIES: list[dict] = [
     # ---------- 契约层（Phase 0）----------
     {"id": "CT-01", "label": "canonicalPayload 主实现与独立参考实现逐字节一致",
@@ -132,8 +138,31 @@ PHASE0_MISSING = [e["id"] for e in ENTRIES
                   if e["phase"] == "Phase 0" and e["status"] != "PASS"]
 
 
-def build_report() -> dict:
+def _gate_status(gate: str) -> dict:
+    """机器可验证（评审 block-6）：只信运行 artifact——缺失 NOT_RUN、失败 FAIL。"""
+    run = load_gate_run(gate)
+    if run is None:
+        return {"measured": None, "status": "NOT_RUN",
+                "evidence": [f"contracts/acceptance/gates/run.{gate}.json（缺失）"],
+                "note": "运行 artifact 缺失：以 scripts/acceptance_report.py --gates auto 生成（现场跑对应 pytest 文件）。"}
+    if not run["ok"]:
+        return {"measured": run["measured"], "status": "FAIL",
+                "evidence": [f"contracts/acceptance/gates/run.{gate}.json",
+                             run.get("testFile", "")],
+                "note": f"运行失败 rc={run['rc']}：" + (run.get("stderrTail", "")[-200:])}
+    return {"measured": run["measured"], "status": "PASS",
+            "evidence": [f"contracts/acceptance/gates/run.{gate}.json",
+                         run.get("testFile", "")],
+            "note": f"现场运行通过（pytest rc=0），measured={run['measured']}。"}
+
+
+def build_report(gates_mode: str = "cache") -> dict:
     phase0_missing = sorted(set(PHASE0_MISSING))
+    positive, _negative = positive_scenario_count()
+    faults = fault_scenario_count()
+    g_fault = _gate_status("fault")
+    g_o3 = _gate_status("out_of_order")
+    g_crash = _gate_status("crash")
     return {
         "report": "pi-platform acceptance (③ 验收基准)",
         "generatedAt": None,  # 复现性：不含时间戳（由调用方决定是否覆盖）
@@ -144,6 +173,54 @@ def build_report() -> dict:
             "note": "手册 §18.2：Phase 0 全 PASS（GT+RT-01~06）才可声明 CONTRACT_VALIDATED；"
                     "当前如实标注：未达（GT 未实现、RT-01/02/03/04/05 未达、RT-06 部分）。"
                     "平台实际可运行（E2E 冒烟、真实 LLM 链路），但正式门槛未越。",
+        },
+        "hardGates": {
+            "note": "附录 A 单机可行子集硬指标（G6）。八小时并发/七天稳定性为时长类指标："
+                    "提供可运行脚本（scripts/acceptance_longrun.py --hours 8 / --days 7，"
+                    "真实 8h/7d 由 CI 或使用者按需执行），本轮实测短时长冒烟；其余四项为"
+                    "自动化断言并给出实测数字。任何指标未达即不得称 100%（如实）。",
+            "gates": {
+                "faultScenarios": {
+                    "target": 200, "measured": g_fault["measured"],
+                    "status": g_fault["status"],
+                    "evidence": g_fault["evidence"],
+                    "note": g_fault["note"]},
+                "outOfOrderEvents": {
+                    "target": 10000, "measured": g_o3["measured"],
+                    "status": g_o3["status"],
+                    "evidence": g_o3["evidence"],
+                    "note": g_o3["note"]},
+                "crashCycles": {
+                    "target": 100, "measured": g_crash["measured"],
+                    "status": g_crash["status"],
+                    "evidence": g_crash["evidence"],
+                    "note": g_crash["note"]},
+                "positiveScenarios": {
+                    "target": 219, "measured": positive,
+                    "status": "PASS" if positive >= 219 else "FAIL",
+                    "evidence": ["tests/test_gate_positive_audit.py（allowlist 审计）",
+                                 "tests/test_gate_positive.py（正向链路批量用例）"],
+                    "note": f"allowlist 正向链路场景计数 {positive}（≥219）；"
+                            "仅统计显式白名单文件，新增无关测试不抬高数字。"},
+                "concurrentLongrun": {
+                    "target": "8h 并发稳定性（可运行）",
+                    "measured": "脚本就绪（scripts/acceptance_longrun.py --hours 8）；"
+                                "每次运行的实测（轮数/交付/事件收敛/健康检查/ok）"
+                                "见当次运行 JSON，报告不固化陈旧数字",
+                    "status": "SCRIPT_READY",
+                    "evidence": ["scripts/acceptance_longrun.py（并发 stage_commit+"
+                                 "幂等复用+读回强校验+事件乱序重放+健康检查"
+                                 "（计数单调/归档==ref/cat-file），输出 JSON 退出码即断言）"],
+                    "note": "真实 8h 由执行方按 CI/排程运行（长时指标如实；"
+                            "归档存在但 repo 缺失视为健康检查失败）。"},
+                "stability7d": {
+                    "target": "7d 连续稳定（可运行）",
+                    "measured": "脚本就绪（--days 7）；本机未实测满 7 天",
+                    "status": "SCRIPT_READY",
+                    "evidence": ["scripts/acceptance_longrun.py（--days 7）"],
+                    "note": "泄露/漂移面：每个 task 独立 deliveries repo + DB 计数"
+                            "单调一致由健康检查断言；长时间实测需挂机，如实披露。"},
+            },
         },
         "entries": ENTRIES,
         "summary": {
@@ -159,8 +236,19 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Pi 平台验收基准报告")
     parser.add_argument("--json", metavar="FILE", default=None,
                         help="写入 JSON 文件（默认 stdout）")
+    parser.add_argument("--gates", choices=("auto", "cache"), default="auto",
+                        help="auto：三项可运行门禁（故障矩阵/10k 乱序/100 崩溃）"
+                             "artifact 缺失或失败时现场重跑生成（约 1 分钟）；"
+                             "cache：只读已固化的 run.<gate>.json，缺失标记 NOT_RUN")
     args = parser.parse_args()
-    report = build_report()
+    if args.gates == "auto":
+        from scripts.acceptance_gates import run_gate
+        # 评审 block-6 复评：auto 必须**始终现场运行**（不比对旧 artifact），
+        # 防止代码回归后陈旧 PASS 被永久复用；artifact 每次都由本次运行覆盖。
+        for gate in ("fault", "out_of_order", "crash"):
+            print(f"[gates] 运行 {gate} ...", flush=True)
+            run_gate(gate)
+    report = build_report(gates_mode=args.gates)
     if args.json:
         out = Path(args.json)
         out.parent.mkdir(parents=True, exist_ok=True)

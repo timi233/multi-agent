@@ -325,11 +325,16 @@ def _task_artifacts(task_id: str) -> list[dict]:
 def _repo_path(task_id: str) -> _Path:
     repo = _settings.deliveries_dir / task_id
     repo.mkdir(parents=True, exist_ok=True)
-    if not (repo / ".git").exists():
-        _git(repo, "init", "-q")
-        _git(repo, "config", "user.name", "Pi Platform")
-        _git(repo, "config", "user.email", "pi@localhost")
-        _git(repo, "symbolic-ref", "HEAD", "refs/heads/main")
+    # init 竞态（评审 block-3 边界验证暴露）：并发首提同一 repo 时两个进程
+    # 同时 git init 会互相复制 templates 冲突——init 段也用同一文件锁串行。
+    lock_path = repo.parent / f"{task_id}.init.lock"
+    with open(lock_path, "a+") as lf:
+        _fcntl.flock(lf.fileno(), _fcntl.LOCK_EX)
+        if not (repo / ".git").exists():
+            _git(repo, "init", "-q")
+            _git(repo, "config", "user.name", "Pi Platform")
+            _git(repo, "config", "user.email", "pi@localhost")
+            _git(repo, "symbolic-ref", "HEAD", "refs/heads/main")
     return repo
 
 
@@ -636,6 +641,10 @@ def stage_commit(task_id: str, attempt_id: str | None = None,
     if not task_id or len(task_id) != 16 or \
             not all(c in "0123456789abcdef" for c in task_id):
         raise GitStagingError(f"task_id 非法: {task_id!r}（必须 16hex，防路径穿越）")
+    if op_key is not None and (
+            len(op_key) != 32 or not all(c in "0123456789abcdef" for c in op_key)):
+        raise GitStagingError("operationIdempotencyKey 必须为 32hex（确定性拒绝，"
+                              "评审 block-3 边界：非法键在服务层即拒）")
     op_key = op_key or hashlib.sha256(f"{task_id}:staging".encode()).hexdigest()[:32]
     attempt_id = attempt_id or hashlib.sha256(f"attempt:{task_id}".encode()).hexdigest()[:16]
 

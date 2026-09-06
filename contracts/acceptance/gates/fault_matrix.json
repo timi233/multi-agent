@@ -1,0 +1,1998 @@
+{
+  "objectType": "acceptance-fault-matrix",
+  "generatedFrom": "tests/test_gate_fault_matrix.py（Schema 驱动 + 预检剔除无约束变体）",
+  "scenarioCount": 327,
+  "objects": [
+    "attempt_contract",
+    "attempt_terminal_envelope",
+    "budget_grant",
+    "commit_bundle",
+    "event_envelope",
+    "execution_plan_snapshot",
+    "git_staging_result",
+    "skill_bundle_snapshot",
+    "task_spec"
+  ],
+  "scenarios": [
+    {
+      "id": "attempt_contract.type.contractId",
+      "fault": "type",
+      "field": "/contractId",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_contract.type.contractVersion",
+      "fault": "type",
+      "field": "/contractVersion",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_contract.type.workloadIdentity",
+      "fault": "type",
+      "field": "/workloadIdentity",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_contract.type.taskId",
+      "fault": "type",
+      "field": "/taskId",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_contract.type.attemptNumber",
+      "fault": "type",
+      "field": "/attemptNumber",
+      "tampered": "not-an-int"
+    },
+    {
+      "id": "attempt_contract.type.sourceBundleDigest",
+      "fault": "type",
+      "field": "/sourceBundleDigest",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_contract.type.model",
+      "fault": "type",
+      "field": "/model",
+      "tampered": "boom"
+    },
+    {
+      "id": "attempt_contract.type.model/provider",
+      "fault": "type",
+      "field": "/model/provider",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_contract.type.model/name",
+      "fault": "type",
+      "field": "/model/name",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_contract.type.model/thinking",
+      "fault": "type",
+      "field": "/model/thinking",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_contract.type.resourceLimits",
+      "fault": "type",
+      "field": "/resourceLimits",
+      "tampered": "boom"
+    },
+    {
+      "id": "attempt_contract.type.resourceLimits/maxTurns",
+      "fault": "type",
+      "field": "/resourceLimits/maxTurns",
+      "tampered": "not-an-int"
+    },
+    {
+      "id": "attempt_contract.type.resourceLimits/commandTimeoutSeconds",
+      "fault": "type",
+      "field": "/resourceLimits/commandTimeoutSeconds",
+      "tampered": "not-an-int"
+    },
+    {
+      "id": "attempt_contract.type.resourceLimits/maxOutputBytes",
+      "fault": "type",
+      "field": "/resourceLimits/maxOutputBytes",
+      "tampered": "not-an-int"
+    },
+    {
+      "id": "attempt_contract.type.workspaceConstraints",
+      "fault": "type",
+      "field": "/workspaceConstraints",
+      "tampered": "boom"
+    },
+    {
+      "id": "attempt_contract.type.workspaceConstraints/root",
+      "fault": "type",
+      "field": "/workspaceConstraints/root",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_contract.type.toolAllowlist",
+      "fault": "type",
+      "field": "/toolAllowlist",
+      "tampered": "boom"
+    },
+    {
+      "id": "attempt_contract.type.toolAllowlist/0",
+      "fault": "type",
+      "field": "/toolAllowlist/0",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_contract.type.toolAllowlist/1",
+      "fault": "type",
+      "field": "/toolAllowlist/1",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_contract.type.toolAllowlist/2",
+      "fault": "type",
+      "field": "/toolAllowlist/2",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_contract.type.toolAllowlist/3",
+      "fault": "type",
+      "field": "/toolAllowlist/3",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_contract.type.createdAt",
+      "fault": "type",
+      "field": "/createdAt",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_contract.type.expiresAt",
+      "fault": "type",
+      "field": "/expiresAt",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_contract.pattern.contractId",
+      "fault": "pattern",
+      "field": "/contractId",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "attempt_contract.pattern.taskId",
+      "fault": "pattern",
+      "field": "/taskId",
+      "tampered": "!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "attempt_contract.pattern.sourceBundleDigest",
+      "fault": "pattern",
+      "field": "/sourceBundleDigest",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "attempt_contract.digest.sourceBundleDigest",
+      "fault": "digest-pattern",
+      "field": "/sourceBundleDigest",
+      "tampered": "sha256:zzbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    {
+      "id": "attempt_contract.pattern.createdAt",
+      "fault": "pattern",
+      "field": "/createdAt",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "attempt_contract.pattern.expiresAt",
+      "fault": "pattern",
+      "field": "/expiresAt",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "attempt_contract.const.contractVersion",
+      "fault": "const",
+      "field": "/contractVersion",
+      "tampered": "violated"
+    },
+    {
+      "id": "attempt_contract.minimum.attemptNumber",
+      "fault": "minimum",
+      "field": "/attemptNumber",
+      "tampered": 0
+    },
+    {
+      "id": "attempt_contract.unknown-field",
+      "fault": "unknown",
+      "field": "(root)",
+      "tampered": {
+        "__evil__": true
+      }
+    },
+    {
+      "id": "attempt_contract.missing-required.attemptNumber",
+      "fault": "missing",
+      "field": "/attemptNumber",
+      "tampered": null
+    },
+    {
+      "id": "task_spec.type.schemaVersion",
+      "fault": "type",
+      "field": "/schemaVersion",
+      "tampered": 123
+    },
+    {
+      "id": "task_spec.type.taskId",
+      "fault": "type",
+      "field": "/taskId",
+      "tampered": 123
+    },
+    {
+      "id": "task_spec.type.specVersion",
+      "fault": "type",
+      "field": "/specVersion",
+      "tampered": 123
+    },
+    {
+      "id": "task_spec.type.userIdentity",
+      "fault": "type",
+      "field": "/userIdentity",
+      "tampered": "boom"
+    },
+    {
+      "id": "task_spec.type.userIdentity/subjectId",
+      "fault": "type",
+      "field": "/userIdentity/subjectId",
+      "tampered": 123
+    },
+    {
+      "id": "task_spec.type.userIdentity/displayName",
+      "fault": "type",
+      "field": "/userIdentity/displayName",
+      "tampered": 123
+    },
+    {
+      "id": "task_spec.type.title",
+      "fault": "type",
+      "field": "/title",
+      "tampered": 123
+    },
+    {
+      "id": "task_spec.type.prompt",
+      "fault": "type",
+      "field": "/prompt",
+      "tampered": 123
+    },
+    {
+      "id": "task_spec.type.workspace",
+      "fault": "type",
+      "field": "/workspace",
+      "tampered": "boom"
+    },
+    {
+      "id": "task_spec.type.workspace/root",
+      "fault": "type",
+      "field": "/workspace/root",
+      "tampered": 123
+    },
+    {
+      "id": "task_spec.type.workspace/writable",
+      "fault": "type",
+      "field": "/workspace/writable",
+      "tampered": "not-an-int"
+    },
+    {
+      "id": "task_spec.type.requestedResources",
+      "fault": "type",
+      "field": "/requestedResources",
+      "tampered": "boom"
+    },
+    {
+      "id": "task_spec.type.requestedResources/model",
+      "fault": "type",
+      "field": "/requestedResources/model",
+      "tampered": "boom"
+    },
+    {
+      "id": "task_spec.type.requestedResources/model/provider",
+      "fault": "type",
+      "field": "/requestedResources/model/provider",
+      "tampered": 123
+    },
+    {
+      "id": "task_spec.type.requestedResources/model/name",
+      "fault": "type",
+      "field": "/requestedResources/model/name",
+      "tampered": 123
+    },
+    {
+      "id": "task_spec.type.requestedResources/model/thinking",
+      "fault": "type",
+      "field": "/requestedResources/model/thinking",
+      "tampered": 123
+    },
+    {
+      "id": "task_spec.type.requestedResources/maxTurns",
+      "fault": "type",
+      "field": "/requestedResources/maxTurns",
+      "tampered": "not-an-int"
+    },
+    {
+      "id": "task_spec.type.policyTemplateRefs",
+      "fault": "type",
+      "field": "/policyTemplateRefs",
+      "tampered": "boom"
+    },
+    {
+      "id": "task_spec.type.policyTemplateRefs/0/templateRef",
+      "fault": "type",
+      "field": "/policyTemplateRefs/0/templateRef",
+      "tampered": 123
+    },
+    {
+      "id": "task_spec.type.policyTemplateRefs/0/templateDigest",
+      "fault": "type",
+      "field": "/policyTemplateRefs/0/templateDigest",
+      "tampered": 123
+    },
+    {
+      "id": "task_spec.type.createdAt",
+      "fault": "type",
+      "field": "/createdAt",
+      "tampered": 123
+    },
+    {
+      "id": "task_spec.pattern.taskId",
+      "fault": "pattern",
+      "field": "/taskId",
+      "tampered": "!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "task_spec.pattern.createdAt",
+      "fault": "pattern",
+      "field": "/createdAt",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "task_spec.const.schemaVersion",
+      "fault": "const",
+      "field": "/schemaVersion",
+      "tampered": "violated"
+    },
+    {
+      "id": "task_spec.const.specVersion",
+      "fault": "const",
+      "field": "/specVersion",
+      "tampered": "violated"
+    },
+    {
+      "id": "task_spec.unknown-field",
+      "fault": "unknown",
+      "field": "(root)",
+      "tampered": {
+        "__evil__": true
+      }
+    },
+    {
+      "id": "task_spec.missing-required.createdAt",
+      "fault": "missing",
+      "field": "/createdAt",
+      "tampered": null
+    },
+    {
+      "id": "event_envelope.type.schemaVersion",
+      "fault": "type",
+      "field": "/schemaVersion",
+      "tampered": 123
+    },
+    {
+      "id": "event_envelope.type.eventId",
+      "fault": "type",
+      "field": "/eventId",
+      "tampered": 123
+    },
+    {
+      "id": "event_envelope.type.eventType",
+      "fault": "type",
+      "field": "/eventType",
+      "tampered": 123
+    },
+    {
+      "id": "event_envelope.type.occurredAt",
+      "fault": "type",
+      "field": "/occurredAt",
+      "tampered": 123
+    },
+    {
+      "id": "event_envelope.type.producer",
+      "fault": "type",
+      "field": "/producer",
+      "tampered": "boom"
+    },
+    {
+      "id": "event_envelope.type.producer/serviceName",
+      "fault": "type",
+      "field": "/producer/serviceName",
+      "tampered": 123
+    },
+    {
+      "id": "event_envelope.type.producer/instanceId",
+      "fault": "type",
+      "field": "/producer/instanceId",
+      "tampered": 123
+    },
+    {
+      "id": "event_envelope.type.trace",
+      "fault": "type",
+      "field": "/trace",
+      "tampered": "boom"
+    },
+    {
+      "id": "event_envelope.type.trace/traceId",
+      "fault": "type",
+      "field": "/trace/traceId",
+      "tampered": 123
+    },
+    {
+      "id": "event_envelope.type.trace/spanId",
+      "fault": "type",
+      "field": "/trace/spanId",
+      "tampered": 123
+    },
+    {
+      "id": "event_envelope.type.trace/taskId",
+      "fault": "type",
+      "field": "/trace/taskId",
+      "tampered": 123
+    },
+    {
+      "id": "event_envelope.type.aggregate",
+      "fault": "type",
+      "field": "/aggregate",
+      "tampered": "boom"
+    },
+    {
+      "id": "event_envelope.type.aggregate/type",
+      "fault": "type",
+      "field": "/aggregate/type",
+      "tampered": 123
+    },
+    {
+      "id": "event_envelope.type.aggregate/id",
+      "fault": "type",
+      "field": "/aggregate/id",
+      "tampered": 123
+    },
+    {
+      "id": "event_envelope.type.aggregate/version",
+      "fault": "type",
+      "field": "/aggregate/version",
+      "tampered": "not-an-int"
+    },
+    {
+      "id": "event_envelope.type.controlPlaneEpoch",
+      "fault": "type",
+      "field": "/controlPlaneEpoch",
+      "tampered": "not-an-int"
+    },
+    {
+      "id": "event_envelope.type.operationIdempotencyKey",
+      "fault": "type",
+      "field": "/operationIdempotencyKey",
+      "tampered": 123
+    },
+    {
+      "id": "event_envelope.type.payload",
+      "fault": "type",
+      "field": "/payload",
+      "tampered": "boom"
+    },
+    {
+      "id": "event_envelope.pattern.eventId",
+      "fault": "pattern",
+      "field": "/eventId",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "event_envelope.pattern.eventType",
+      "fault": "pattern",
+      "field": "/eventType",
+      "tampered": "!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "event_envelope.pattern.occurredAt",
+      "fault": "pattern",
+      "field": "/occurredAt",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "event_envelope.pattern.payloadDigest",
+      "fault": "pattern",
+      "field": "/payloadDigest",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "event_envelope.digest.payloadDigest",
+      "fault": "digest-pattern",
+      "field": "/payloadDigest",
+      "tampered": "sha256:zz5482bb87457d6eaf467ae8ddfc4fb99c7cba4294fbe016e52c0670b510f372f1"
+    },
+    {
+      "id": "event_envelope.const.schemaVersion",
+      "fault": "const",
+      "field": "/schemaVersion",
+      "tampered": "violated"
+    },
+    {
+      "id": "event_envelope.minimum.controlPlaneEpoch",
+      "fault": "minimum",
+      "field": "/controlPlaneEpoch",
+      "tampered": -1
+    },
+    {
+      "id": "event_envelope.unknown-field",
+      "fault": "unknown",
+      "field": "(root)",
+      "tampered": {
+        "__evil__": true
+      }
+    },
+    {
+      "id": "event_envelope.missing-required.aggregate",
+      "fault": "missing",
+      "field": "/aggregate",
+      "tampered": null
+    },
+    {
+      "id": "budget_grant.type.contractId",
+      "fault": "type",
+      "field": "/contractId",
+      "tampered": 123
+    },
+    {
+      "id": "budget_grant.type.contractVersion",
+      "fault": "type",
+      "field": "/contractVersion",
+      "tampered": 123
+    },
+    {
+      "id": "budget_grant.type.workloadIdentity",
+      "fault": "type",
+      "field": "/workloadIdentity",
+      "tampered": 123
+    },
+    {
+      "id": "budget_grant.type.grantId",
+      "fault": "type",
+      "field": "/grantId",
+      "tampered": 123
+    },
+    {
+      "id": "budget_grant.type.taskId",
+      "fault": "type",
+      "field": "/taskId",
+      "tampered": 123
+    },
+    {
+      "id": "budget_grant.type.attemptId",
+      "fault": "type",
+      "field": "/attemptId",
+      "tampered": 123
+    },
+    {
+      "id": "budget_grant.type.totalBudgetTokens",
+      "fault": "type",
+      "field": "/totalBudgetTokens",
+      "tampered": "not-an-int"
+    },
+    {
+      "id": "budget_grant.type.consumedTokens",
+      "fault": "type",
+      "field": "/consumedTokens",
+      "tampered": "not-an-int"
+    },
+    {
+      "id": "budget_grant.type.status",
+      "fault": "type",
+      "field": "/status",
+      "tampered": 123
+    },
+    {
+      "id": "budget_grant.type.journal",
+      "fault": "type",
+      "field": "/journal",
+      "tampered": "boom"
+    },
+    {
+      "id": "budget_grant.type.createdAt",
+      "fault": "type",
+      "field": "/createdAt",
+      "tampered": 123
+    },
+    {
+      "id": "budget_grant.pattern.contractId",
+      "fault": "pattern",
+      "field": "/contractId",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "budget_grant.pattern.grantId",
+      "fault": "pattern",
+      "field": "/grantId",
+      "tampered": "!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "budget_grant.pattern.taskId",
+      "fault": "pattern",
+      "field": "/taskId",
+      "tampered": "!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "budget_grant.pattern.attemptId",
+      "fault": "pattern",
+      "field": "/attemptId",
+      "tampered": "!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "budget_grant.pattern.createdAt",
+      "fault": "pattern",
+      "field": "/createdAt",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "budget_grant.const.contractVersion",
+      "fault": "const",
+      "field": "/contractVersion",
+      "tampered": "violated"
+    },
+    {
+      "id": "budget_grant.const.workloadIdentity",
+      "fault": "const",
+      "field": "/workloadIdentity",
+      "tampered": "violated"
+    },
+    {
+      "id": "budget_grant.minimum.totalBudgetTokens",
+      "fault": "minimum",
+      "field": "/totalBudgetTokens",
+      "tampered": -1
+    },
+    {
+      "id": "budget_grant.minimum.consumedTokens",
+      "fault": "minimum",
+      "field": "/consumedTokens",
+      "tampered": -1
+    },
+    {
+      "id": "budget_grant.unknown-field",
+      "fault": "unknown",
+      "field": "(root)",
+      "tampered": {
+        "__evil__": true
+      }
+    },
+    {
+      "id": "budget_grant.missing-required.attemptId",
+      "fault": "missing",
+      "field": "/attemptId",
+      "tampered": null
+    },
+    {
+      "id": "execution_plan_snapshot.type.contractVersion",
+      "fault": "type",
+      "field": "/contractVersion",
+      "tampered": 123
+    },
+    {
+      "id": "execution_plan_snapshot.type.workloadIdentity",
+      "fault": "type",
+      "field": "/workloadIdentity",
+      "tampered": 123
+    },
+    {
+      "id": "execution_plan_snapshot.type.executionPlanSnapshotId",
+      "fault": "type",
+      "field": "/executionPlanSnapshotId",
+      "tampered": 123
+    },
+    {
+      "id": "execution_plan_snapshot.type.taskId",
+      "fault": "type",
+      "field": "/taskId",
+      "tampered": 123
+    },
+    {
+      "id": "execution_plan_snapshot.type.compilerId",
+      "fault": "type",
+      "field": "/compilerId",
+      "tampered": 123
+    },
+    {
+      "id": "execution_plan_snapshot.type.compilerVersion",
+      "fault": "type",
+      "field": "/compilerVersion",
+      "tampered": 123
+    },
+    {
+      "id": "execution_plan_snapshot.type.planKind",
+      "fault": "type",
+      "field": "/planKind",
+      "tampered": 123
+    },
+    {
+      "id": "execution_plan_snapshot.type.plannedAttemptInputs",
+      "fault": "type",
+      "field": "/plannedAttemptInputs",
+      "tampered": "boom"
+    },
+    {
+      "id": "execution_plan_snapshot.type.plannedAttemptInputs/0/plannedAttemptInputId",
+      "fault": "type",
+      "field": "/plannedAttemptInputs/0/plannedAttemptInputId",
+      "tampered": 123
+    },
+    {
+      "id": "execution_plan_snapshot.type.plannedAttemptInputs/0/workflowNodeId",
+      "fault": "type",
+      "field": "/plannedAttemptInputs/0/workflowNodeId",
+      "tampered": 123
+    },
+    {
+      "id": "execution_plan_snapshot.type.plannedAttemptInputs/0/runKind",
+      "fault": "type",
+      "field": "/plannedAttemptInputs/0/runKind",
+      "tampered": 123
+    },
+    {
+      "id": "execution_plan_snapshot.type.plannedAttemptInputs/0/deliverableKind",
+      "fault": "type",
+      "field": "/plannedAttemptInputs/0/deliverableKind",
+      "tampered": 123
+    },
+    {
+      "id": "execution_plan_snapshot.type.plannedAttemptInputs/0/promptContent",
+      "fault": "type",
+      "field": "/plannedAttemptInputs/0/promptContent",
+      "tampered": 123
+    },
+    {
+      "id": "execution_plan_snapshot.type.canonicalPlannedInputsDigest",
+      "fault": "type",
+      "field": "/canonicalPlannedInputsDigest",
+      "tampered": 123
+    },
+    {
+      "id": "execution_plan_snapshot.type.compiledBy",
+      "fault": "type",
+      "field": "/compiledBy",
+      "tampered": 123
+    },
+    {
+      "id": "execution_plan_snapshot.type.compiledAt",
+      "fault": "type",
+      "field": "/compiledAt",
+      "tampered": 123
+    },
+    {
+      "id": "execution_plan_snapshot.pattern.executionPlanSnapshotId",
+      "fault": "pattern",
+      "field": "/executionPlanSnapshotId",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "execution_plan_snapshot.pattern.taskId",
+      "fault": "pattern",
+      "field": "/taskId",
+      "tampered": "!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "execution_plan_snapshot.pattern.canonicalPlannedInputsDigest",
+      "fault": "pattern",
+      "field": "/canonicalPlannedInputsDigest",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "execution_plan_snapshot.digest.canonicalPlannedInputsDigest",
+      "fault": "digest-pattern",
+      "field": "/canonicalPlannedInputsDigest",
+      "tampered": "sha256:zz1ac3972d408d9d1d02beee38d9fb7767e37b3a4612140393f2d707d7479c17ae"
+    },
+    {
+      "id": "execution_plan_snapshot.pattern.compiledAt",
+      "fault": "pattern",
+      "field": "/compiledAt",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "execution_plan_snapshot.pattern.payloadDigest",
+      "fault": "pattern",
+      "field": "/payloadDigest",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "execution_plan_snapshot.digest.payloadDigest",
+      "fault": "digest-pattern",
+      "field": "/payloadDigest",
+      "tampered": "sha256:zz482e1a34ce1eaf35197a3f9a099efa38693dc0f34ef0995d67235e19355ca42a"
+    },
+    {
+      "id": "execution_plan_snapshot.const.contractVersion",
+      "fault": "const",
+      "field": "/contractVersion",
+      "tampered": "violated"
+    },
+    {
+      "id": "execution_plan_snapshot.const.workloadIdentity",
+      "fault": "const",
+      "field": "/workloadIdentity",
+      "tampered": "violated"
+    },
+    {
+      "id": "execution_plan_snapshot.const.compilerId",
+      "fault": "const",
+      "field": "/compilerId",
+      "tampered": "violated"
+    },
+    {
+      "id": "execution_plan_snapshot.unknown-field",
+      "fault": "unknown",
+      "field": "(root)",
+      "tampered": {
+        "__evil__": true
+      }
+    },
+    {
+      "id": "execution_plan_snapshot.missing-required.canonicalPlannedInputsDigest",
+      "fault": "missing",
+      "field": "/canonicalPlannedInputsDigest",
+      "tampered": null
+    },
+    {
+      "id": "execution_plan_snapshot.self-digest",
+      "fault": "self-digest",
+      "field": "/payloadDigest",
+      "tampered": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "id": "attempt_terminal_envelope.type.contractVersion",
+      "fault": "type",
+      "field": "/contractVersion",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_terminal_envelope.type.workloadIdentity",
+      "fault": "type",
+      "field": "/workloadIdentity",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_terminal_envelope.type.terminalEnvelopeId",
+      "fault": "type",
+      "field": "/terminalEnvelopeId",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_terminal_envelope.type.taskId",
+      "fault": "type",
+      "field": "/taskId",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_terminal_envelope.type.attemptId",
+      "fault": "type",
+      "field": "/attemptId",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_terminal_envelope.type.runId",
+      "fault": "type",
+      "field": "/runId",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_terminal_envelope.type.stepIndex",
+      "fault": "type",
+      "field": "/stepIndex",
+      "tampered": "not-an-int"
+    },
+    {
+      "id": "attempt_terminal_envelope.type.outcomeClass",
+      "fault": "type",
+      "field": "/outcomeClass",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_terminal_envelope.type.status",
+      "fault": "type",
+      "field": "/status",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_terminal_envelope.type.runtimeObserved",
+      "fault": "type",
+      "field": "/runtimeObserved",
+      "tampered": "boom"
+    },
+    {
+      "id": "attempt_terminal_envelope.type.runtimeObserved/platform",
+      "fault": "type",
+      "field": "/runtimeObserved/platform",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_terminal_envelope.type.runtimeObserved/reportedBy",
+      "fault": "type",
+      "field": "/runtimeObserved/reportedBy",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_terminal_envelope.type.runtimeObserved/missingEvidenceReasons",
+      "fault": "type",
+      "field": "/runtimeObserved/missingEvidenceReasons",
+      "tampered": "boom"
+    },
+    {
+      "id": "attempt_terminal_envelope.type.resultArtifacts",
+      "fault": "type",
+      "field": "/resultArtifacts",
+      "tampered": "boom"
+    },
+    {
+      "id": "attempt_terminal_envelope.type.resultArtifacts/0/path",
+      "fault": "type",
+      "field": "/resultArtifacts/0/path",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_terminal_envelope.type.resultArtifacts/0/digest",
+      "fault": "type",
+      "field": "/resultArtifacts/0/digest",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_terminal_envelope.type.resultArtifacts/0/size",
+      "fault": "type",
+      "field": "/resultArtifacts/0/size",
+      "tampered": "not-an-int"
+    },
+    {
+      "id": "attempt_terminal_envelope.type.resultArtifacts/0/kind",
+      "fault": "type",
+      "field": "/resultArtifacts/0/kind",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_terminal_envelope.type.resultArtifacts/1/path",
+      "fault": "type",
+      "field": "/resultArtifacts/1/path",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_terminal_envelope.type.resultArtifacts/1/digest",
+      "fault": "type",
+      "field": "/resultArtifacts/1/digest",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_terminal_envelope.type.resultArtifacts/1/size",
+      "fault": "type",
+      "field": "/resultArtifacts/1/size",
+      "tampered": "not-an-int"
+    },
+    {
+      "id": "attempt_terminal_envelope.type.resultArtifacts/1/kind",
+      "fault": "type",
+      "field": "/resultArtifacts/1/kind",
+      "tampered": 123
+    },
+    {
+      "id": "attempt_terminal_envelope.type.unacknowledgedSideEffects",
+      "fault": "type",
+      "field": "/unacknowledgedSideEffects",
+      "tampered": "boom"
+    },
+    {
+      "id": "attempt_terminal_envelope.pattern.terminalEnvelopeId",
+      "fault": "pattern",
+      "field": "/terminalEnvelopeId",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "attempt_terminal_envelope.pattern.taskId",
+      "fault": "pattern",
+      "field": "/taskId",
+      "tampered": "!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "attempt_terminal_envelope.pattern.attemptId",
+      "fault": "pattern",
+      "field": "/attemptId",
+      "tampered": "!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "attempt_terminal_envelope.pattern.runId",
+      "fault": "pattern",
+      "field": "/runId",
+      "tampered": "!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "attempt_terminal_envelope.pattern.payloadDigest",
+      "fault": "pattern",
+      "field": "/payloadDigest",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "attempt_terminal_envelope.digest.payloadDigest",
+      "fault": "digest-pattern",
+      "field": "/payloadDigest",
+      "tampered": "sha256:zzfb3309518040a0614bcdf620a58fef5e11bd8d67ab49c5b0bd5da6b8f9a1e00a"
+    },
+    {
+      "id": "attempt_terminal_envelope.pattern.signature/payloadDigest",
+      "fault": "pattern",
+      "field": "/signature/payloadDigest",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "attempt_terminal_envelope.digest.signature/payloadDigest",
+      "fault": "digest-pattern",
+      "field": "/signature/payloadDigest",
+      "tampered": "sha256:zzfb3309518040a0614bcdf620a58fef5e11bd8d67ab49c5b0bd5da6b8f9a1e00a"
+    },
+    {
+      "id": "attempt_terminal_envelope.const.contractVersion",
+      "fault": "const",
+      "field": "/contractVersion",
+      "tampered": "violated"
+    },
+    {
+      "id": "attempt_terminal_envelope.const.workloadIdentity",
+      "fault": "const",
+      "field": "/workloadIdentity",
+      "tampered": "violated"
+    },
+    {
+      "id": "attempt_terminal_envelope.minimum.stepIndex",
+      "fault": "minimum",
+      "field": "/stepIndex",
+      "tampered": 0
+    },
+    {
+      "id": "attempt_terminal_envelope.unknown-field",
+      "fault": "unknown",
+      "field": "(root)",
+      "tampered": {
+        "__evil__": true
+      }
+    },
+    {
+      "id": "attempt_terminal_envelope.missing-required.attemptId",
+      "fault": "missing",
+      "field": "/attemptId",
+      "tampered": null
+    },
+    {
+      "id": "attempt_terminal_envelope.self-digest",
+      "fault": "self-digest",
+      "field": "/payloadDigest",
+      "tampered": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "id": "attempt_terminal_envelope.signature.value",
+      "fault": "signature-value",
+      "field": "/signature/value",
+      "tampered": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+    },
+    {
+      "id": "attempt_terminal_envelope.signature.issuer",
+      "fault": "signature-issuer",
+      "field": "/signature/issuer",
+      "tampered": "evil"
+    },
+    {
+      "id": "attempt_terminal_envelope.signature.keyId",
+      "fault": "signature-keyId",
+      "field": "/signature/keyId",
+      "tampered": "sk-evil"
+    },
+    {
+      "id": "attempt_terminal_envelope.signature.objectType",
+      "fault": "signature-objectType",
+      "field": "/signature/objectType",
+      "tampered": "other"
+    },
+    {
+      "id": "attempt_terminal_envelope.signature.payloadDigest",
+      "fault": "signature-payloadDigest",
+      "field": "/signature/payloadDigest",
+      "tampered": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "id": "skill_bundle_snapshot.type.contractVersion",
+      "fault": "type",
+      "field": "/contractVersion",
+      "tampered": 123
+    },
+    {
+      "id": "skill_bundle_snapshot.type.workloadIdentity",
+      "fault": "type",
+      "field": "/workloadIdentity",
+      "tampered": 123
+    },
+    {
+      "id": "skill_bundle_snapshot.type.skillBundleSnapshotId",
+      "fault": "type",
+      "field": "/skillBundleSnapshotId",
+      "tampered": 123
+    },
+    {
+      "id": "skill_bundle_snapshot.type.bundleName",
+      "fault": "type",
+      "field": "/bundleName",
+      "tampered": 123
+    },
+    {
+      "id": "skill_bundle_snapshot.type.bundleRevision",
+      "fault": "type",
+      "field": "/bundleRevision",
+      "tampered": "not-an-int"
+    },
+    {
+      "id": "skill_bundle_snapshot.type.packageVersions",
+      "fault": "type",
+      "field": "/packageVersions",
+      "tampered": "boom"
+    },
+    {
+      "id": "skill_bundle_snapshot.type.packageVersions/0/skillPackageId",
+      "fault": "type",
+      "field": "/packageVersions/0/skillPackageId",
+      "tampered": 123
+    },
+    {
+      "id": "skill_bundle_snapshot.type.packageVersions/0/skillPackageVersionId",
+      "fault": "type",
+      "field": "/packageVersions/0/skillPackageVersionId",
+      "tampered": 123
+    },
+    {
+      "id": "skill_bundle_snapshot.type.packageVersions/0/packageName",
+      "fault": "type",
+      "field": "/packageVersions/0/packageName",
+      "tampered": 123
+    },
+    {
+      "id": "skill_bundle_snapshot.type.packageVersions/0/packageVersion",
+      "fault": "type",
+      "field": "/packageVersions/0/packageVersion",
+      "tampered": 123
+    },
+    {
+      "id": "skill_bundle_snapshot.type.packageVersions/0/packageDigest",
+      "fault": "type",
+      "field": "/packageVersions/0/packageDigest",
+      "tampered": 123
+    },
+    {
+      "id": "skill_bundle_snapshot.type.packageVersions/0/mountPath",
+      "fault": "type",
+      "field": "/packageVersions/0/mountPath",
+      "tampered": 123
+    },
+    {
+      "id": "skill_bundle_snapshot.type.packageVersions/0/entrypointPath",
+      "fault": "type",
+      "field": "/packageVersions/0/entrypointPath",
+      "tampered": 123
+    },
+    {
+      "id": "skill_bundle_snapshot.type.compilerId",
+      "fault": "type",
+      "field": "/compilerId",
+      "tampered": 123
+    },
+    {
+      "id": "skill_bundle_snapshot.type.compilerVersion",
+      "fault": "type",
+      "field": "/compilerVersion",
+      "tampered": 123
+    },
+    {
+      "id": "skill_bundle_snapshot.type.bundleArtifactDigest",
+      "fault": "type",
+      "field": "/bundleArtifactDigest",
+      "tampered": 123
+    },
+    {
+      "id": "skill_bundle_snapshot.type.bundleManifestDigest",
+      "fault": "type",
+      "field": "/bundleManifestDigest",
+      "tampered": 123
+    },
+    {
+      "id": "skill_bundle_snapshot.type.expectedMountedSkillTreeDigest",
+      "fault": "type",
+      "field": "/expectedMountedSkillTreeDigest",
+      "tampered": 123
+    },
+    {
+      "id": "skill_bundle_snapshot.type.runtimeMountPolicy",
+      "fault": "type",
+      "field": "/runtimeMountPolicy",
+      "tampered": "boom"
+    },
+    {
+      "id": "skill_bundle_snapshot.type.runtimeMountPolicy/mountMode",
+      "fault": "type",
+      "field": "/runtimeMountPolicy/mountMode",
+      "tampered": 123
+    },
+    {
+      "id": "skill_bundle_snapshot.type.runtimeMountPolicy/runtimeDiscoveryMode",
+      "fault": "type",
+      "field": "/runtimeMountPolicy/runtimeDiscoveryMode",
+      "tampered": 123
+    },
+    {
+      "id": "skill_bundle_snapshot.type.runtimeMountPolicy/runtimeMutationAllowed",
+      "fault": "type",
+      "field": "/runtimeMountPolicy/runtimeMutationAllowed",
+      "tampered": "not-an-int"
+    },
+    {
+      "id": "skill_bundle_snapshot.type.runtimeMountPolicy/runtimeInstallAllowed",
+      "fault": "type",
+      "field": "/runtimeMountPolicy/runtimeInstallAllowed",
+      "tampered": "not-an-int"
+    },
+    {
+      "id": "skill_bundle_snapshot.type.runtimeMountPolicy/networkRequired",
+      "fault": "type",
+      "field": "/runtimeMountPolicy/networkRequired",
+      "tampered": "not-an-int"
+    },
+    {
+      "id": "skill_bundle_snapshot.type.runtimeMountPolicy/executableBinaryAllowed",
+      "fault": "type",
+      "field": "/runtimeMountPolicy/executableBinaryAllowed",
+      "tampered": "not-an-int"
+    },
+    {
+      "id": "skill_bundle_snapshot.type.runtimeMountPolicy/mcpAutoInstallAllowed",
+      "fault": "type",
+      "field": "/runtimeMountPolicy/mcpAutoInstallAllowed",
+      "tampered": "not-an-int"
+    },
+    {
+      "id": "skill_bundle_snapshot.type.approvalSetId",
+      "fault": "type",
+      "field": "/approvalSetId",
+      "tampered": 123
+    },
+    {
+      "id": "skill_bundle_snapshot.type.approvalSetDigest",
+      "fault": "type",
+      "field": "/approvalSetDigest",
+      "tampered": 123
+    },
+    {
+      "id": "skill_bundle_snapshot.type.approvalDecisionIds",
+      "fault": "type",
+      "field": "/approvalDecisionIds",
+      "tampered": "boom"
+    },
+    {
+      "id": "skill_bundle_snapshot.type.approvalDecisionIds/0",
+      "fault": "type",
+      "field": "/approvalDecisionIds/0",
+      "tampered": 123
+    },
+    {
+      "id": "skill_bundle_snapshot.type.approvalDecisionIds/1",
+      "fault": "type",
+      "field": "/approvalDecisionIds/1",
+      "tampered": 123
+    },
+    {
+      "id": "skill_bundle_snapshot.type.builtAt",
+      "fault": "type",
+      "field": "/builtAt",
+      "tampered": 123
+    },
+    {
+      "id": "skill_bundle_snapshot.pattern.skillBundleSnapshotId",
+      "fault": "pattern",
+      "field": "/skillBundleSnapshotId",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "skill_bundle_snapshot.pattern.bundleName",
+      "fault": "pattern",
+      "field": "/bundleName",
+      "tampered": "!!!!!!!!!!"
+    },
+    {
+      "id": "skill_bundle_snapshot.pattern.bundleArtifactDigest",
+      "fault": "pattern",
+      "field": "/bundleArtifactDigest",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "skill_bundle_snapshot.digest.bundleArtifactDigest",
+      "fault": "digest-pattern",
+      "field": "/bundleArtifactDigest",
+      "tampered": "sha256:zze1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1"
+    },
+    {
+      "id": "skill_bundle_snapshot.pattern.bundleManifestDigest",
+      "fault": "pattern",
+      "field": "/bundleManifestDigest",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "skill_bundle_snapshot.digest.bundleManifestDigest",
+      "fault": "digest-pattern",
+      "field": "/bundleManifestDigest",
+      "tampered": "sha256:zze2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2"
+    },
+    {
+      "id": "skill_bundle_snapshot.pattern.expectedMountedSkillTreeDigest",
+      "fault": "pattern",
+      "field": "/expectedMountedSkillTreeDigest",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "skill_bundle_snapshot.digest.expectedMountedSkillTreeDigest",
+      "fault": "digest-pattern",
+      "field": "/expectedMountedSkillTreeDigest",
+      "tampered": "sha256:zze2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2"
+    },
+    {
+      "id": "skill_bundle_snapshot.pattern.approvalSetId",
+      "fault": "pattern",
+      "field": "/approvalSetId",
+      "tampered": "!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "skill_bundle_snapshot.pattern.approvalSetDigest",
+      "fault": "pattern",
+      "field": "/approvalSetDigest",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "skill_bundle_snapshot.digest.approvalSetDigest",
+      "fault": "digest-pattern",
+      "field": "/approvalSetDigest",
+      "tampered": "sha256:zzdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+    },
+    {
+      "id": "skill_bundle_snapshot.pattern.builtAt",
+      "fault": "pattern",
+      "field": "/builtAt",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "skill_bundle_snapshot.pattern.payloadDigest",
+      "fault": "pattern",
+      "field": "/payloadDigest",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "skill_bundle_snapshot.digest.payloadDigest",
+      "fault": "digest-pattern",
+      "field": "/payloadDigest",
+      "tampered": "sha256:zze8d9a48e18be158a8272e83f0e2162eeb28e8ced784da1e4a40a9c675a9b618e"
+    },
+    {
+      "id": "skill_bundle_snapshot.pattern.signature/payloadDigest",
+      "fault": "pattern",
+      "field": "/signature/payloadDigest",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "skill_bundle_snapshot.digest.signature/payloadDigest",
+      "fault": "digest-pattern",
+      "field": "/signature/payloadDigest",
+      "tampered": "sha256:zze8d9a48e18be158a8272e83f0e2162eeb28e8ced784da1e4a40a9c675a9b618e"
+    },
+    {
+      "id": "skill_bundle_snapshot.const.contractVersion",
+      "fault": "const",
+      "field": "/contractVersion",
+      "tampered": "violated"
+    },
+    {
+      "id": "skill_bundle_snapshot.const.workloadIdentity",
+      "fault": "const",
+      "field": "/workloadIdentity",
+      "tampered": "violated"
+    },
+    {
+      "id": "skill_bundle_snapshot.minimum.bundleRevision",
+      "fault": "minimum",
+      "field": "/bundleRevision",
+      "tampered": 0
+    },
+    {
+      "id": "skill_bundle_snapshot.const.compilerId",
+      "fault": "const",
+      "field": "/compilerId",
+      "tampered": "violated"
+    },
+    {
+      "id": "skill_bundle_snapshot.unknown-field",
+      "fault": "unknown",
+      "field": "(root)",
+      "tampered": {
+        "__evil__": true
+      }
+    },
+    {
+      "id": "skill_bundle_snapshot.missing-required.approvalDecisionIds",
+      "fault": "missing",
+      "field": "/approvalDecisionIds",
+      "tampered": null
+    },
+    {
+      "id": "skill_bundle_snapshot.self-digest",
+      "fault": "self-digest",
+      "field": "/payloadDigest",
+      "tampered": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "id": "skill_bundle_snapshot.signature.value",
+      "fault": "signature-value",
+      "field": "/signature/value",
+      "tampered": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+    },
+    {
+      "id": "skill_bundle_snapshot.signature.issuer",
+      "fault": "signature-issuer",
+      "field": "/signature/issuer",
+      "tampered": "evil"
+    },
+    {
+      "id": "skill_bundle_snapshot.signature.keyId",
+      "fault": "signature-keyId",
+      "field": "/signature/keyId",
+      "tampered": "sk-evil"
+    },
+    {
+      "id": "skill_bundle_snapshot.signature.objectType",
+      "fault": "signature-objectType",
+      "field": "/signature/objectType",
+      "tampered": "other"
+    },
+    {
+      "id": "skill_bundle_snapshot.signature.payloadDigest",
+      "fault": "signature-payloadDigest",
+      "field": "/signature/payloadDigest",
+      "tampered": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "id": "commit_bundle.type.contractVersion",
+      "fault": "type",
+      "field": "/contractVersion",
+      "tampered": 123
+    },
+    {
+      "id": "commit_bundle.type.workloadIdentity",
+      "fault": "type",
+      "field": "/workloadIdentity",
+      "tampered": 123
+    },
+    {
+      "id": "commit_bundle.type.commitBundleId",
+      "fault": "type",
+      "field": "/commitBundleId",
+      "tampered": 123
+    },
+    {
+      "id": "commit_bundle.type.commitIntentId",
+      "fault": "type",
+      "field": "/commitIntentId",
+      "tampered": 123
+    },
+    {
+      "id": "commit_bundle.type.commitIntentDigest",
+      "fault": "type",
+      "field": "/commitIntentDigest",
+      "tampered": 123
+    },
+    {
+      "id": "commit_bundle.type.selectedAttemptId",
+      "fault": "type",
+      "field": "/selectedAttemptId",
+      "tampered": 123
+    },
+    {
+      "id": "commit_bundle.type.sourceBundleDigest",
+      "fault": "type",
+      "field": "/sourceBundleDigest",
+      "tampered": 123
+    },
+    {
+      "id": "commit_bundle.type.outputArtifactManifestDigest",
+      "fault": "type",
+      "field": "/outputArtifactManifestDigest",
+      "tampered": 123
+    },
+    {
+      "id": "commit_bundle.type.proposedTreeDigest",
+      "fault": "type",
+      "field": "/proposedTreeDigest",
+      "tampered": 123
+    },
+    {
+      "id": "commit_bundle.type.treeGitObjectId",
+      "fault": "type",
+      "field": "/treeGitObjectId",
+      "tampered": "boom"
+    },
+    {
+      "id": "commit_bundle.type.treeGitObjectId/algorithm",
+      "fault": "type",
+      "field": "/treeGitObjectId/algorithm",
+      "tampered": 123
+    },
+    {
+      "id": "commit_bundle.type.treeGitObjectId/hex",
+      "fault": "type",
+      "field": "/treeGitObjectId/hex",
+      "tampered": 123
+    },
+    {
+      "id": "commit_bundle.type.parentGitObjectIds",
+      "fault": "type",
+      "field": "/parentGitObjectIds",
+      "tampered": "boom"
+    },
+    {
+      "id": "commit_bundle.type.normalizedCommitMetadataDigest",
+      "fault": "type",
+      "field": "/normalizedCommitMetadataDigest",
+      "tampered": 123
+    },
+    {
+      "id": "commit_bundle.type.operationIdempotencyKey",
+      "fault": "type",
+      "field": "/operationIdempotencyKey",
+      "tampered": 123
+    },
+    {
+      "id": "commit_bundle.type.proposedCommitGitObjectId",
+      "fault": "type",
+      "field": "/proposedCommitGitObjectId",
+      "tampered": "boom"
+    },
+    {
+      "id": "commit_bundle.type.proposedCommitGitObjectId/algorithm",
+      "fault": "type",
+      "field": "/proposedCommitGitObjectId/algorithm",
+      "tampered": 123
+    },
+    {
+      "id": "commit_bundle.type.proposedCommitGitObjectId/hex",
+      "fault": "type",
+      "field": "/proposedCommitGitObjectId/hex",
+      "tampered": 123
+    },
+    {
+      "id": "commit_bundle.type.pathPolicyDigest",
+      "fault": "type",
+      "field": "/pathPolicyDigest",
+      "tampered": 123
+    },
+    {
+      "id": "commit_bundle.pattern.commitBundleId",
+      "fault": "pattern",
+      "field": "/commitBundleId",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "commit_bundle.pattern.commitIntentId",
+      "fault": "pattern",
+      "field": "/commitIntentId",
+      "tampered": "!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "commit_bundle.pattern.commitIntentDigest",
+      "fault": "pattern",
+      "field": "/commitIntentDigest",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "commit_bundle.digest.commitIntentDigest",
+      "fault": "digest-pattern",
+      "field": "/commitIntentDigest",
+      "tampered": "sha256:zz1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f"
+    },
+    {
+      "id": "commit_bundle.pattern.selectedAttemptId",
+      "fault": "pattern",
+      "field": "/selectedAttemptId",
+      "tampered": "!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "commit_bundle.pattern.sourceBundleDigest",
+      "fault": "pattern",
+      "field": "/sourceBundleDigest",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "commit_bundle.digest.sourceBundleDigest",
+      "fault": "digest-pattern",
+      "field": "/sourceBundleDigest",
+      "tampered": "sha256:zze3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "commit_bundle.pattern.outputArtifactManifestDigest",
+      "fault": "pattern",
+      "field": "/outputArtifactManifestDigest",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "commit_bundle.digest.outputArtifactManifestDigest",
+      "fault": "digest-pattern",
+      "field": "/outputArtifactManifestDigest",
+      "tampered": "sha256:zz2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f"
+    },
+    {
+      "id": "commit_bundle.pattern.proposedTreeDigest",
+      "fault": "pattern",
+      "field": "/proposedTreeDigest",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "commit_bundle.digest.proposedTreeDigest",
+      "fault": "digest-pattern",
+      "field": "/proposedTreeDigest",
+      "tampered": "sha256:zz3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f"
+    },
+    {
+      "id": "commit_bundle.pattern.normalizedCommitMetadataDigest",
+      "fault": "pattern",
+      "field": "/normalizedCommitMetadataDigest",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "commit_bundle.digest.normalizedCommitMetadataDigest",
+      "fault": "digest-pattern",
+      "field": "/normalizedCommitMetadataDigest",
+      "tampered": "sha256:zz4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f"
+    },
+    {
+      "id": "commit_bundle.pattern.operationIdempotencyKey",
+      "fault": "pattern",
+      "field": "/operationIdempotencyKey",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "commit_bundle.pattern.pathPolicyDigest",
+      "fault": "pattern",
+      "field": "/pathPolicyDigest",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "commit_bundle.digest.pathPolicyDigest",
+      "fault": "digest-pattern",
+      "field": "/pathPolicyDigest",
+      "tampered": "sha256:zz2bdf187aa9784eb48e76108baa90f0360d28670472f24216c125442c7c8371af"
+    },
+    {
+      "id": "commit_bundle.pattern.payloadDigest",
+      "fault": "pattern",
+      "field": "/payloadDigest",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "commit_bundle.digest.payloadDigest",
+      "fault": "digest-pattern",
+      "field": "/payloadDigest",
+      "tampered": "sha256:zz7e1d30a97a0e15d80fdfb28c7f42f7ff580c88f59c0d8f4b9e023c04761bc6c8"
+    },
+    {
+      "id": "commit_bundle.pattern.signature/payloadDigest",
+      "fault": "pattern",
+      "field": "/signature/payloadDigest",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "commit_bundle.digest.signature/payloadDigest",
+      "fault": "digest-pattern",
+      "field": "/signature/payloadDigest",
+      "tampered": "sha256:zz7e1d30a97a0e15d80fdfb28c7f42f7ff580c88f59c0d8f4b9e023c04761bc6c8"
+    },
+    {
+      "id": "commit_bundle.const.contractVersion",
+      "fault": "const",
+      "field": "/contractVersion",
+      "tampered": "violated"
+    },
+    {
+      "id": "commit_bundle.const.workloadIdentity",
+      "fault": "const",
+      "field": "/workloadIdentity",
+      "tampered": "violated"
+    },
+    {
+      "id": "commit_bundle.unknown-field",
+      "fault": "unknown",
+      "field": "(root)",
+      "tampered": {
+        "__evil__": true
+      }
+    },
+    {
+      "id": "commit_bundle.missing-required.commitBundleId",
+      "fault": "missing",
+      "field": "/commitBundleId",
+      "tampered": null
+    },
+    {
+      "id": "commit_bundle.self-digest",
+      "fault": "self-digest",
+      "field": "/payloadDigest",
+      "tampered": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "id": "commit_bundle.signature.value",
+      "fault": "signature-value",
+      "field": "/signature/value",
+      "tampered": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+    },
+    {
+      "id": "commit_bundle.signature.issuer",
+      "fault": "signature-issuer",
+      "field": "/signature/issuer",
+      "tampered": "evil"
+    },
+    {
+      "id": "commit_bundle.signature.keyId",
+      "fault": "signature-keyId",
+      "field": "/signature/keyId",
+      "tampered": "sk-evil"
+    },
+    {
+      "id": "commit_bundle.signature.objectType",
+      "fault": "signature-objectType",
+      "field": "/signature/objectType",
+      "tampered": "other"
+    },
+    {
+      "id": "commit_bundle.signature.payloadDigest",
+      "fault": "signature-payloadDigest",
+      "field": "/signature/payloadDigest",
+      "tampered": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "id": "git_staging_result.type.contractVersion",
+      "fault": "type",
+      "field": "/contractVersion",
+      "tampered": 123
+    },
+    {
+      "id": "git_staging_result.type.workloadIdentity",
+      "fault": "type",
+      "field": "/workloadIdentity",
+      "tampered": 123
+    },
+    {
+      "id": "git_staging_result.type.gitStagingResultId",
+      "fault": "type",
+      "field": "/gitStagingResultId",
+      "tampered": 123
+    },
+    {
+      "id": "git_staging_result.type.commitBundleId",
+      "fault": "type",
+      "field": "/commitBundleId",
+      "tampered": 123
+    },
+    {
+      "id": "git_staging_result.type.commitBundleDigest",
+      "fault": "type",
+      "field": "/commitBundleDigest",
+      "tampered": 123
+    },
+    {
+      "id": "git_staging_result.type.repositoryId",
+      "fault": "type",
+      "field": "/repositoryId",
+      "tampered": 123
+    },
+    {
+      "id": "git_staging_result.type.candidateRef",
+      "fault": "type",
+      "field": "/candidateRef",
+      "tampered": 123
+    },
+    {
+      "id": "git_staging_result.type.appliedCommitGitObjectId",
+      "fault": "type",
+      "field": "/appliedCommitGitObjectId",
+      "tampered": "boom"
+    },
+    {
+      "id": "git_staging_result.type.appliedCommitGitObjectId/algorithm",
+      "fault": "type",
+      "field": "/appliedCommitGitObjectId/algorithm",
+      "tampered": 123
+    },
+    {
+      "id": "git_staging_result.type.appliedCommitGitObjectId/hex",
+      "fault": "type",
+      "field": "/appliedCommitGitObjectId/hex",
+      "tampered": 123
+    },
+    {
+      "id": "git_staging_result.type.controlPlaneEpoch",
+      "fault": "type",
+      "field": "/controlPlaneEpoch",
+      "tampered": "not-an-int"
+    },
+    {
+      "id": "git_staging_result.type.gitStagingEpoch",
+      "fault": "type",
+      "field": "/gitStagingEpoch",
+      "tampered": "not-an-int"
+    },
+    {
+      "id": "git_staging_result.type.revocationEpoch",
+      "fault": "type",
+      "field": "/revocationEpoch",
+      "tampered": "not-an-int"
+    },
+    {
+      "id": "git_staging_result.type.operationIdempotencyKey",
+      "fault": "type",
+      "field": "/operationIdempotencyKey",
+      "tampered": 123
+    },
+    {
+      "id": "git_staging_result.type.stagedAt",
+      "fault": "type",
+      "field": "/stagedAt",
+      "tampered": 123
+    },
+    {
+      "id": "git_staging_result.pattern.gitStagingResultId",
+      "fault": "pattern",
+      "field": "/gitStagingResultId",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "git_staging_result.pattern.commitBundleId",
+      "fault": "pattern",
+      "field": "/commitBundleId",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "git_staging_result.pattern.commitBundleDigest",
+      "fault": "pattern",
+      "field": "/commitBundleDigest",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "git_staging_result.digest.commitBundleDigest",
+      "fault": "digest-pattern",
+      "field": "/commitBundleDigest",
+      "tampered": "sha256:zz5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e"
+    },
+    {
+      "id": "git_staging_result.pattern.repositoryId",
+      "fault": "pattern",
+      "field": "/repositoryId",
+      "tampered": "!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "git_staging_result.pattern.candidateRef",
+      "fault": "pattern",
+      "field": "/candidateRef",
+      "tampered": "!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "git_staging_result.pattern.operationIdempotencyKey",
+      "fault": "pattern",
+      "field": "/operationIdempotencyKey",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "git_staging_result.pattern.stagedAt",
+      "fault": "pattern",
+      "field": "/stagedAt",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "git_staging_result.pattern.payloadDigest",
+      "fault": "pattern",
+      "field": "/payloadDigest",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "git_staging_result.digest.payloadDigest",
+      "fault": "digest-pattern",
+      "field": "/payloadDigest",
+      "tampered": "sha256:zz2fbcb560c20c2aae0098cc7d0f2e5dfbe13c343ae8e800442b3a105c869478ec"
+    },
+    {
+      "id": "git_staging_result.pattern.signature/payloadDigest",
+      "fault": "pattern",
+      "field": "/signature/payloadDigest",
+      "tampered": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    },
+    {
+      "id": "git_staging_result.digest.signature/payloadDigest",
+      "fault": "digest-pattern",
+      "field": "/signature/payloadDigest",
+      "tampered": "sha256:zz2fbcb560c20c2aae0098cc7d0f2e5dfbe13c343ae8e800442b3a105c869478ec"
+    },
+    {
+      "id": "git_staging_result.const.contractVersion",
+      "fault": "const",
+      "field": "/contractVersion",
+      "tampered": "violated"
+    },
+    {
+      "id": "git_staging_result.const.workloadIdentity",
+      "fault": "const",
+      "field": "/workloadIdentity",
+      "tampered": "violated"
+    },
+    {
+      "id": "git_staging_result.minimum.gitStagingEpoch",
+      "fault": "minimum",
+      "field": "/gitStagingEpoch",
+      "tampered": 0
+    },
+    {
+      "id": "git_staging_result.unknown-field",
+      "fault": "unknown",
+      "field": "(root)",
+      "tampered": {
+        "__evil__": true
+      }
+    },
+    {
+      "id": "git_staging_result.missing-required.appliedCommitGitObjectId",
+      "fault": "missing",
+      "field": "/appliedCommitGitObjectId",
+      "tampered": null
+    },
+    {
+      "id": "git_staging_result.self-digest",
+      "fault": "self-digest",
+      "field": "/payloadDigest",
+      "tampered": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "id": "git_staging_result.signature.value",
+      "fault": "signature-value",
+      "field": "/signature/value",
+      "tampered": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+    },
+    {
+      "id": "git_staging_result.signature.issuer",
+      "fault": "signature-issuer",
+      "field": "/signature/issuer",
+      "tampered": "evil"
+    },
+    {
+      "id": "git_staging_result.signature.keyId",
+      "fault": "signature-keyId",
+      "field": "/signature/keyId",
+      "tampered": "sk-evil"
+    },
+    {
+      "id": "git_staging_result.signature.objectType",
+      "fault": "signature-objectType",
+      "field": "/signature/objectType",
+      "tampered": "other"
+    },
+    {
+      "id": "git_staging_result.signature.payloadDigest",
+      "fault": "signature-payloadDigest",
+      "field": "/signature/payloadDigest",
+      "tampered": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ]
+}
