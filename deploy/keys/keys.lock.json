@@ -122,6 +122,16 @@
       "privateKeyFile": "SEED-DERIVED（无文件，确定性派生）",
       "publicKeyFile": "SEED-DERIVED（无文件，确定性派生）"
     },
+    "sk-bundle-vector": {
+      "purpose": "SkillBundleSnapshot 契约向量测试签名（确定性 seed 派生，非生产；scripts/gen_skill_bundle_vectors.py TEST_KEY_SEED）",
+      "issuer": "skill-builder-test",
+      "allowedObjectTypes": [
+        "skill_bundle_snapshots"
+      ],
+      "pubFingerprintSha256": "6f4a3f6baa6d6f56187aed84b269bac5f636ab532215a7a27f2474bdbe9aa3fa",
+      "privateKeyFile": "SEED-DERIVED（无文件，确定性派生）",
+      "publicKeyFile": "SEED-DERIVED（无文件，确定性派生）"
+    },
     "sk-skill": {
       "purpose": "Skill Signer",
       "issuer": "skill-governance",

@@ -1,0 +1,39 @@
+{
+  "$id": "https://pi.local/contracts/jsonschema/skill_bundle_snapshot/v2/digestprofile",
+  "schemaVersion": "2",
+  "objectType": "skill_bundle_snapshot",
+  "digestAlgorithm": "sha256",
+  "canonicalEncoding": "RFC8785-JCS-lite",
+  "immutablePayloadPointers": [
+    "/contractVersion",
+    "/workloadIdentity",
+    "/skillBundleSnapshotId",
+    "/bundleName",
+    "/bundleRevision",
+    "/packageVersions",
+    "/compilerId",
+    "/compilerVersion",
+    "/bundleArtifactDigest",
+    "/bundleManifestDigest",
+    "/expectedMountedSkillTreeDigest",
+    "/runtimeMountPolicy/mountMode",
+    "/runtimeMountPolicy/runtimeDiscoveryMode",
+    "/runtimeMountPolicy/runtimeMutationAllowed",
+    "/runtimeMountPolicy/runtimeInstallAllowed",
+    "/runtimeMountPolicy/networkRequired",
+    "/runtimeMountPolicy/executableBinaryAllowed",
+    "/runtimeMountPolicy/mcpAutoInstallAllowed",
+    "/approvalSetId",
+    "/approvalSetDigest",
+    "/approvalDecisionIds",
+    "/builtAt"
+  ],
+  "optionalImmutablePointers": [],
+  "canonicalSortKeys": {
+    "/packageVersions": { "by": "key", "key": "mountPath" },
+    "/approvalDecisionIds": { "by": "value" }
+  },
+  "selfDigestPointer": "/payloadDigest",
+  "signatureEnvelopePointers": ["/signature"],
+  "notes": "SkillBundleSnapshot（蓝图 §10.4 单机子集）：确定性 Skill 供应链 Bundle 快照——builder 编译所选 packageVersions（packageDigest 指向 CAS blob）为可挂载归档（bundleArtifactDigest=tar 字节身份、bundleManifestDigest=规范文件树身份、expectedMountedSkillTreeDigest 单机恒等于 manifest，语义层校验）；runtimeMountPolicy 固定为蓝图首期只读静态挂载；审批四象（approvalSetId/approvalSetDigest/approvalDecisionIds）证明四-eyes 通过（UNIQUE(proposal,role)，quorum/veto 由服务层强制）；ID 派生含审批引用（approval 变化必变 ID，决议新提案→新快照）。packageVersions/approvalDecisionIds 为集合（by mountPath/by value）。"
+}

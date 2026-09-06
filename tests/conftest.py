@@ -19,6 +19,11 @@ def clean_tasks_before_each():
 
 
 def _clean():
+    execute("DELETE FROM pi_skill_publication_pointers")
+    execute("DELETE FROM pi_skill_bundle_snapshots")
+    execute("DELETE FROM pi_approval_decisions")
+    execute("DELETE FROM pi_approval_proposals")
+    execute("DELETE FROM pi_skill_packages")
     execute("DELETE FROM pi_tasks")
     for p in WS_ROOT.glob("w*"):
         if p.is_dir():

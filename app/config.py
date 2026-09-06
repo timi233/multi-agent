@@ -78,6 +78,8 @@ class Settings:
     # G3：产物快照上限（防超大工作区拖垮收存）
     max_artifact_files: int = int(os.environ.get("PI_MAX_ARTIFACT_FILES", "200"))
     max_artifact_bytes: int = int(os.environ.get("PI_MAX_ARTIFACT_BYTES", str(10 * 1024 * 1024)))
+    # G4：Skill 供应链源码目录（包以子目录形式存放，entrypoint=SKILL.md）
+    skills_dir: Path = field(default_factory=lambda: BASE_DIR / "skills")
 
     @property
     def db_dsn(self) -> str:

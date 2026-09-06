@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pi.local/contracts/jsonschema/skill_bundle_snapshot/v2",
+  "title": "SkillBundleSnapshot v2（蓝图 §10.4 单机子集：确定性 Skill 供应链 Bundle 快照）",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "contractVersion": { "const": "2" },
+    "workloadIdentity": { "const": "pi.skill-builder" },
+    "skillBundleSnapshotId": { "type": "string", "pattern": "^[a-f0-9]{32}$" },
+    "bundleName": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._\\-]{0,63}$" },
+    "bundleRevision": { "type": "integer", "minimum": 1 },
+    "packageVersions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "skillPackageId": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+          "skillPackageVersionId": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+          "packageName": { "type": "string", "minLength": 1, "maxLength": 128 },
+          "packageVersion": { "type": "string", "minLength": 1, "maxLength": 64 },
+          "packageDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "mountPath": { "type": "string", "pattern": "^skills/[^/]+(/[^/]+)*$" },
+          "entrypointPath": { "type": "string", "minLength": 1 }
+        },
+        "required": ["skillPackageId", "skillPackageVersionId", "packageName",
+                     "packageVersion", "packageDigest", "mountPath", "entrypointPath"]
+      },
+      "uniqueItems": true
+    },
+    "compilerId": { "const": "pi.skill-builder" },
+    "compilerVersion": { "type": "string", "minLength": 1 },
+    "bundleArtifactDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "bundleManifestDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "expectedMountedSkillTreeDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "runtimeMountPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mountMode": { "const": "READ_ONLY" },
+        "runtimeDiscoveryMode": { "const": "STATIC_INDEX_ONLY" },
+        "runtimeMutationAllowed": { "const": false },
+        "runtimeInstallAllowed": { "const": false },
+        "networkRequired": { "const": false },
+        "executableBinaryAllowed": { "const": false },
+        "mcpAutoInstallAllowed": { "const": false }
+      },
+      "required": ["mountMode", "runtimeDiscoveryMode", "runtimeMutationAllowed",
+                   "runtimeInstallAllowed", "networkRequired",
+                   "executableBinaryAllowed", "mcpAutoInstallAllowed"]
+    },
+    "approvalSetId": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+    "approvalSetDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "approvalDecisionIds": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+      "uniqueItems": true
+    },
+    "builtAt": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T" },
+    "payloadDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "objectType": { "const": "skill_bundle_snapshot" },
+        "schemaVersion": { "const": "2" },
+        "signatureAlgorithm": { "const": "Ed25519" },
+        "keyId": { "type": "string", "minLength": 1 },
+        "issuer": { "type": "string", "minLength": 1 },
+        "issuerWorkloadIdentity": { "const": "pi.skill-builder" },
+        "audience": { "type": "string" },
+        "controlPlaneEpoch": { "type": "integer", "minimum": 0 },
+        "signedAt": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T" },
+        "payloadDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "value": { "type": "string", "pattern": "^[A-Za-z0-9+/]{86}==$" }
+      },
+      "required": [
+        "objectType", "schemaVersion", "signatureAlgorithm", "keyId",
+        "issuer", "issuerWorkloadIdentity", "audience", "controlPlaneEpoch",
+        "signedAt", "payloadDigest", "value"
+      ]
+    }
+  },
+  "required": [
+    "contractVersion", "workloadIdentity", "skillBundleSnapshotId", "bundleName",
+    "bundleRevision", "packageVersions", "compilerId", "compilerVersion",
+    "bundleArtifactDigest", "bundleManifestDigest", "expectedMountedSkillTreeDigest",
+    "runtimeMountPolicy", "approvalSetId", "approvalSetDigest", "approvalDecisionIds",
+    "builtAt", "payloadDigest", "signature"
+  ]
+}

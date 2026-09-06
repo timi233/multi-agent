@@ -83,6 +83,13 @@
 - Grant 生命周期：任务收敛（成功/失败/预算耗尽）在终态事务中 `settle_grant`（SETTLED）。
 - 简化差距（记录）：GW-10"热路径不查询 PostgreSQL"未达（每预算操作一次 PG 往返，单实例可接受）；单实例单代次、无 Ledger Service 分片对账、预算为全局每 attempt（`PI_MAX_BUDGET_TOKENS`/`PI_BUDGET_RESERVE_TOKENS`）、Grant 轮换/故障转移未实现。
 
+## G4 Skill 供应链与审批（蓝图 §7/§10.4/§12.3 单机子集）
+
+- 产物：`skill_bundle_snapshot.v2` 契约（schema/digestprofile/10 向量/verified/Node 双实现 29 正向量/registry sk-bundle-vector）、`migrations/005_skills.sql` + `006_build_inputs.sql`（`pi_skill_packages`/`pi_approval_proposals`/`pi_approval_decisions`/`pi_skill_bundle_snapshots`/`pi_skill_publication_pointers`）、`app/runtime/skills.py`、`skills/`（示例包 file-ops）、API（`/skills/packages`、`/skills/bundles:build`、`/skills/proposals/{id}/decisions`、`/skills/publications:advance`、查询端点）、worker 将 ACTIVE bundle 技能说明注入 attempt。
+- **SkillBundleSnapshot（§10.4 子集）**：`packageVersions`（CAS 字节身份+挂载点+entrypoint）集合化 by mountPath；`bundleArtifactDigest`（确定性 tar 字节，mtime 固定）≠ `bundleManifestDigest`（规范文件树摘要）且验证 `expectedMountedSkillTreeDigest`==manifest（子集恒等）；`runtimeMountPolicy` 冻结为蓝图首期只读静态挂载；`approvalSetId/approvalSetDigest/approvalDecisionIds` 证明四象审批——**ID 派生含审批引用**（审批变化必变快照 ID，防审批集与内容错配）。
+- **审批链（§12.3 子集）**：构建→Proposal(PENDING)→FUNCTION_APPROVER/SECURITY_APPROVER 双槽（`UNIQUE(proposal_id, role)` 决策不可覆盖，改决定必须新提案；veto 直接 REJECTED）→quorum → ApprovalSet digest（决策集 canonical 重算）→ `publish_bundle`（签名 Snapshot 落库 + `env_scope='local'` ACTIVE 指针）；构建输入以 `build_inputs` 绑定提案（发布重放同字节 inputs，artifact digest 与审批时一致）。
+- 简化差距（记录）：无 CANARY/灰度/隔离（恢复通过新版本+新审批）；无 RevocationRecord/Containment；决策与领域职责分离由服务层拒绝（同一身份填双槽由 UNIQUE 保证但无独立身份系统）；包为单 entrypoint 文件（`SKILL.md`），多文件打包留 bundle 层；policy-approval 通用对象（ModelPolicy/SandboxProfile 等）未实现（G4 后随治理演进）。
+
 ## G3 Artifact / CAS / Evidence（蓝图 §6.9/§9.5/§11.1/§13.2 单机子集）
 
 - 产物：`attempt_terminal_envelope.v2` 契约（schema/digestprofile/10 向量/verified/Node 双实现 25 正向量/registry sk-terminal-vector）、`migrations/004_cas.sql`（`pi_cas_blobs` 内容寻址表 + `pi_artifacts` + `pi_terminal_envelopes`）、`app/runtime/cas.py`、`app/runtime/evidence.py`、`app/runtime/terminal.py::build_terminal_envelope`、worker 终态收存接线、`GET /api/v1/tasks/{id}/artifacts` 与 `/terminal-envelopes`。

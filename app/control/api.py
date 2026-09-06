@@ -169,6 +169,121 @@ def list_terminal_envelopes(task_id: str):
     return [models.TerminalEnvelopeOut(**r) for r in rows]
 
 
+# ---------- Skill 供应链（蓝图 §12.3 单机子集，G4） ----------
+
+@router.post("/skills/packages", response_model=models.SkillPackageOut)
+def create_skill_package(body: models.SkillPackageCreate):
+    from app.db import connect
+    from app.runtime.skills import register_package
+    conn = connect()
+    try:
+        pkg = register_package(conn, name=body.name, version=body.version,
+                               source_dir=body.source_dir,
+                               description=body.description)
+        conn.commit()
+    finally:
+        conn.close()
+    row = execute_one(
+        "SELECT skill_package_id, name, version, description, package_digest, "
+        "created_at FROM pi_skill_packages WHERE skill_package_id=%s",
+        (pkg["skill_package_id"],))
+    return models.SkillPackageOut(**row)
+
+
+@router.post("/skills/bundles:build")
+def build_skill_bundle_api(body: models.BundleBuildRequest):
+    from app.db import connect
+    from app.runtime import skills as skills_mod
+    conn = connect()
+    try:
+        refs = skills_mod.resolve_package_refs(conn, body.package_source_dirs)
+        build = skills_mod.build_skill_bundle(refs, body.bundle_name)
+        proposal = skills_mod.create_approval_proposal(
+            conn, subject_id=build["artifact_digest"],
+            subject_digest=build["manifest_digest"], bundle_name=body.bundle_name,
+            build_inputs=refs)
+        conn.commit()
+    finally:
+        conn.close()
+    return {"bundleName": body.bundle_name, "artifactDigest": build["artifact_digest"],
+            "manifestDigest": build["manifest_digest"], "proposalId": proposal}
+
+
+@router.post("/skills/proposals/{proposal_id}/decisions")
+def record_decision_api(proposal_id: str, body: models.ApprovalDecisionRequest):
+    from app.db import connect
+    from app.runtime.skills import record_approval_decision, approval_quorum_reached
+    conn = connect()
+    try:
+        decision = record_approval_decision(
+            conn, proposal_id=proposal_id, approval_role=body.approval_role,
+            approver_identity=body.approver_identity, approved=body.approved)
+        quorum = approval_quorum_reached(conn, proposal_id)
+        conn.commit()
+    finally:
+        conn.close()
+    return {"decisionId": decision["decision_id"], "approvalRole": body.approval_role,
+            "approved": body.approved, "quorumReached": quorum}
+
+
+@router.post("/skills/publications:advance")
+def advance_publication_api(body: models.PublicationAdvanceRequest):
+    from app.db import connect
+    from app.runtime.skills import publish_bundle
+    # 评审 should-1：提案不存在 → 404；存在但未达 quorum/拒绝 → 409
+    exists = execute_one("SELECT 1 FROM pi_approval_proposals WHERE proposal_id=%s",
+                         (body.proposal_id,))
+    if not exists:
+        raise HTTPException(404, f"proposal {body.proposal_id} not found")
+    conn = connect()
+    try:
+        try:
+            snap = publish_bundle(conn, proposal_id=body.proposal_id)
+        except ValueError as exc:
+            raise HTTPException(409, str(exc))
+        conn.commit()
+    finally:
+        conn.close()
+    return {"snapshotId": snap["skillBundleSnapshotId"], "state": "ACTIVE",
+            "bundleName": snap["bundleName"]}
+
+
+@router.get("/skills/bundles", response_model=list[models.SkillBundleOut])
+def list_skill_bundles():
+    rows = execute(
+        "SELECT snapshot_id, bundle_name, bundle_revision, approval_proposal_id, "
+        "artifact_digest, manifest_digest, created_at FROM pi_skill_bundle_snapshots "
+        "ORDER BY created_at DESC",
+    )
+    return [models.SkillBundleOut(**r) for r in rows]
+
+
+@router.get("/skills/proposals", response_model=list[models.ProposalOut])
+def list_skill_proposals():
+    rows = execute(
+        "SELECT proposal_id, bundle_name, status, subject_digest, created_at "
+        "FROM pi_approval_proposals ORDER BY created_at DESC",
+    )
+    return [models.ProposalOut(**r) for r in rows]
+
+
+@router.get("/skills/publication", response_model=models.PublicationOut)
+def get_publication():
+    from app.runtime.skills import active_bundle_summary
+    conn = connect()
+    try:
+        packages = active_bundle_summary(conn)
+    finally:
+        conn.close()
+    row = execute_one(
+        "SELECT env_scope, snapshot_id, state, row_version "
+        "FROM pi_skill_publication_pointers WHERE env_scope='local'")
+    if row is None:
+        return models.PublicationOut(env_scope="local", snapshot_id=None,
+                                     state="NONE", row_version=0)
+    return models.PublicationOut(**row, packages=packages or [])
+
+
 # ---------- 事件 ----------
 
 @router.get("/tasks/{task_id}/events", response_model=list[models.EventOut])

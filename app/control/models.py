@@ -86,3 +86,62 @@ class WorkspaceEntry(BaseModel):
     kind: str  # file|dir
     size: int | None = None
     mtime: datetime | None = None
+
+
+# ---------- Skill 供应链（蓝图 §12.3 单机子集，G4） ----------
+
+class SkillPackageCreate(BaseModel):
+    name: str
+    version: str
+    description: str | None = None
+    source_dir: str = "file-ops"
+
+
+class BundleBuildRequest(BaseModel):
+    bundle_name: str
+    package_source_dirs: list[str]
+
+
+class ApprovalDecisionRequest(BaseModel):
+    approval_role: str  # FUNCTION_APPROVER | SECURITY_APPROVER
+    approver_identity: str
+    approved: bool
+
+
+class PublicationAdvanceRequest(BaseModel):
+    proposal_id: str
+
+
+class SkillPackageOut(BaseModel):
+    skill_package_id: str
+    name: str
+    version: str
+    description: str | None = None
+    package_digest: str
+    created_at: datetime
+
+
+class SkillBundleOut(BaseModel):
+    snapshot_id: str
+    bundle_name: str
+    bundle_revision: int
+    approval_proposal_id: str
+    artifact_digest: str
+    manifest_digest: str
+    created_at: datetime
+
+
+class ProposalOut(BaseModel):
+    proposal_id: str
+    bundle_name: str
+    status: str
+    subject_digest: str
+    created_at: datetime
+
+
+class PublicationOut(BaseModel):
+    env_scope: str
+    snapshot_id: str | None = None
+    state: str
+    row_version: int
+    packages: list[dict] = []

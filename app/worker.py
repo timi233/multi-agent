@@ -383,6 +383,25 @@ def _run_task(conn, task_id: str) -> None:
             try:
                 step_input = dict(task)
                 step_input["prompt"] = step["promptContent"]
+                # G4：已发布（ACTIVE）skill 说明注入 attempt 上下文（只读消费；
+                # 独立连接查询，异常不得污染主事务——评审 should-1）
+                active = None
+                try:
+                    from app.db import connect as _connect
+                    from .runtime.skills import active_bundle_summary
+                    _c2 = _connect()
+                    try:
+                        active = active_bundle_summary(_c2)
+                    finally:
+                        _c2.close()
+                except Exception:
+                    pass  # skill 注入为尽力而为，失败不影响任务执行
+                if active:
+                    step_input["prompt"] = (
+                        "[已发布技能]\n" + "\n".join(
+                            f"- {s['name']}@{s['version']} "
+                            f"({s['mountPath']})" for s in active) +
+                        "\n\n" + step_input["prompt"])
                 ok, summary, error = run_attempt(
                     task=step_input,
                     workspace_dir=workspace_dir,

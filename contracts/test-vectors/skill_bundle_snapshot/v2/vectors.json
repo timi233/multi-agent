@@ -1,0 +1,658 @@
+{
+  "objectType": "skill_bundle_snapshot",
+  "schemaVersion": "2",
+  "canonicalEncoding": "RFC8785-JCS-lite",
+  "vectors": [
+    {
+      "id": "pos-single-package",
+      "kind": "positive",
+      "expectedSchemaValid": true,
+      "note": "单包 + 完整双 Decision 审批引用",
+      "expectedError": null,
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.skill-builder",
+        "skillBundleSnapshotId": "75ba9d2f40f0b17d4cd8b639e2759578",
+        "bundleName": "core-utils",
+        "bundleRevision": 1,
+        "packageVersions": [
+          {
+            "skillPackageId": "aaaa000000000001",
+            "skillPackageVersionId": "aaaa000000000002",
+            "packageName": "file-ops",
+            "packageVersion": "1.0.0",
+            "packageDigest": "sha256:a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+            "mountPath": "skills/file-ops",
+            "entrypointPath": "SKILL.md"
+          }
+        ],
+        "compilerId": "pi.skill-builder",
+        "compilerVersion": "0.1.0",
+        "bundleArtifactDigest": "sha256:e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1",
+        "bundleManifestDigest": "sha256:e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2",
+        "expectedMountedSkillTreeDigest": "sha256:e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2",
+        "runtimeMountPolicy": {
+          "mountMode": "READ_ONLY",
+          "runtimeDiscoveryMode": "STATIC_INDEX_ONLY",
+          "runtimeMutationAllowed": false,
+          "runtimeInstallAllowed": false,
+          "networkRequired": false,
+          "executableBinaryAllowed": false,
+          "mcpAutoInstallAllowed": false
+        },
+        "approvalSetId": "aa11bb22cc33dd44",
+        "approvalSetDigest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "approvalDecisionIds": [
+          "1111111111111111",
+          "2222222222222222"
+        ],
+        "builtAt": "2026-09-06T09:00:00Z",
+        "payloadDigest": "sha256:e8d9a48e18be158a8272e83f0e2162eeb28e8ced784da1e4a40a9c675a9b618e",
+        "signature": {
+          "objectType": "skill_bundle_snapshot",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-bundle-vector",
+          "issuer": "skill-builder-test",
+          "issuerWorkloadIdentity": "pi.skill-builder",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-06T09:01:00Z",
+          "payloadDigest": "sha256:e8d9a48e18be158a8272e83f0e2162eeb28e8ced784da1e4a40a9c675a9b618e",
+          "value": "PiovVGPrsWT3so7LB2944SsVqbmjCw3YTe/nXNxqkyC8ezTZ8Vn1aX/YC1sIgbBN7Ab9Xfg9qutczIow0FgTCg=="
+        }
+      },
+      "calculateOnLoad": true,
+      "canonicalPayloadB64": "eyJhcHByb3ZhbERlY2lzaW9uSWRzIjpbIjExMTExMTExMTExMTExMTEiLCIyMjIyMjIyMjIyMjIyMjIyIl0sImFwcHJvdmFsU2V0RGlnZXN0Ijoic2hhMjU2OmRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGQiLCJhcHByb3ZhbFNldElkIjoiYWExMWJiMjJjYzMzZGQ0NCIsImJ1aWx0QXQiOiIyMDI2LTA5LTA2VDA5OjAwOjAwWiIsImJ1bmRsZUFydGlmYWN0RGlnZXN0Ijoic2hhMjU2OmUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTEiLCJidW5kbGVNYW5pZmVzdERpZ2VzdCI6InNoYTI1NjplMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyIiwiYnVuZGxlTmFtZSI6ImNvcmUtdXRpbHMiLCJidW5kbGVSZXZpc2lvbiI6MSwiY29tcGlsZXJJZCI6InBpLnNraWxsLWJ1aWxkZXIiLCJjb21waWxlclZlcnNpb24iOiIwLjEuMCIsImNvbnRyYWN0VmVyc2lvbiI6IjIiLCJleHBlY3RlZE1vdW50ZWRTa2lsbFRyZWVEaWdlc3QiOiJzaGEyNTY6ZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMiIsInBhY2thZ2VWZXJzaW9ucyI6W3siZW50cnlwb2ludFBhdGgiOiJTS0lMTC5tZCIsIm1vdW50UGF0aCI6InNraWxscy9maWxlLW9wcyIsInBhY2thZ2VEaWdlc3QiOiJzaGEyNTY6YTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMSIsInBhY2thZ2VOYW1lIjoiZmlsZS1vcHMiLCJwYWNrYWdlVmVyc2lvbiI6IjEuMC4wIiwic2tpbGxQYWNrYWdlSWQiOiJhYWFhMDAwMDAwMDAwMDAxIiwic2tpbGxQYWNrYWdlVmVyc2lvbklkIjoiYWFhYTAwMDAwMDAwMDAwMiJ9XSwicnVudGltZU1vdW50UG9saWN5L2V4ZWN1dGFibGVCaW5hcnlBbGxvd2VkIjpmYWxzZSwicnVudGltZU1vdW50UG9saWN5L21jcEF1dG9JbnN0YWxsQWxsb3dlZCI6ZmFsc2UsInJ1bnRpbWVNb3VudFBvbGljeS9tb3VudE1vZGUiOiJSRUFEX09OTFkiLCJydW50aW1lTW91bnRQb2xpY3kvbmV0d29ya1JlcXVpcmVkIjpmYWxzZSwicnVudGltZU1vdW50UG9saWN5L3J1bnRpbWVEaXNjb3ZlcnlNb2RlIjoiU1RBVElDX0lOREVYX09OTFkiLCJydW50aW1lTW91bnRQb2xpY3kvcnVudGltZUluc3RhbGxBbGxvd2VkIjpmYWxzZSwicnVudGltZU1vdW50UG9saWN5L3J1bnRpbWVNdXRhdGlvbkFsbG93ZWQiOmZhbHNlLCJza2lsbEJ1bmRsZVNuYXBzaG90SWQiOiI3NWJhOWQyZjQwZjBiMTdkNGNkOGI2MzllMjc1OTU3OCIsIndvcmtsb2FkSWRlbnRpdHkiOiJwaS5za2lsbC1idWlsZGVyIn0=",
+      "payloadDigest": "sha256:e8d9a48e18be158a8272e83f0e2162eeb28e8ced784da1e4a40a9c675a9b618e"
+    },
+    {
+      "id": "pos-two-packages-sorted",
+      "kind": "positive",
+      "expectedSchemaValid": true,
+      "note": "双包乱序传入（集合按 mountPath 归一化）",
+      "expectedError": null,
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.skill-builder",
+        "skillBundleSnapshotId": "979256860f032e88ff4e8a7ef01128bf",
+        "bundleName": "core-utils",
+        "bundleRevision": 1,
+        "packageVersions": [
+          {
+            "skillPackageId": "aaaa000000000001",
+            "skillPackageVersionId": "aaaa000000000002",
+            "packageName": "file-ops",
+            "packageVersion": "1.0.0",
+            "packageDigest": "sha256:a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+            "mountPath": "skills/file-ops",
+            "entrypointPath": "SKILL.md"
+          },
+          {
+            "skillPackageId": "bbbb000000000001",
+            "skillPackageVersionId": "bbbb000000000002",
+            "packageName": "web-scrape",
+            "packageVersion": "0.3.0",
+            "packageDigest": "sha256:b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1",
+            "mountPath": "skills/web-scrape",
+            "entrypointPath": "INDEX.md"
+          }
+        ],
+        "compilerId": "pi.skill-builder",
+        "compilerVersion": "0.1.0",
+        "bundleArtifactDigest": "sha256:e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1",
+        "bundleManifestDigest": "sha256:e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2",
+        "expectedMountedSkillTreeDigest": "sha256:e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2",
+        "runtimeMountPolicy": {
+          "mountMode": "READ_ONLY",
+          "runtimeDiscoveryMode": "STATIC_INDEX_ONLY",
+          "runtimeMutationAllowed": false,
+          "runtimeInstallAllowed": false,
+          "networkRequired": false,
+          "executableBinaryAllowed": false,
+          "mcpAutoInstallAllowed": false
+        },
+        "approvalSetId": "aa11bb22cc33dd44",
+        "approvalSetDigest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "approvalDecisionIds": [
+          "1111111111111111",
+          "2222222222222222"
+        ],
+        "builtAt": "2026-09-06T09:00:00Z",
+        "payloadDigest": "sha256:692bb60ea7e148645676cdfae69fa376af9e8e1d0362412635ec5295bd463839",
+        "signature": {
+          "objectType": "skill_bundle_snapshot",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-bundle-vector",
+          "issuer": "skill-builder-test",
+          "issuerWorkloadIdentity": "pi.skill-builder",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-06T09:01:00Z",
+          "payloadDigest": "sha256:692bb60ea7e148645676cdfae69fa376af9e8e1d0362412635ec5295bd463839",
+          "value": "LMHmOC7Iperm7e81Wpt21sPATi8z+Ev6GHWENM0TcZt61NAe1wCk6BrWVyJAnyjzhCOlFsCC7lrbZOqsXz7KAA=="
+        }
+      },
+      "calculateOnLoad": true,
+      "canonicalPayloadB64": "eyJhcHByb3ZhbERlY2lzaW9uSWRzIjpbIjExMTExMTExMTExMTExMTEiLCIyMjIyMjIyMjIyMjIyMjIyIl0sImFwcHJvdmFsU2V0RGlnZXN0Ijoic2hhMjU2OmRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGQiLCJhcHByb3ZhbFNldElkIjoiYWExMWJiMjJjYzMzZGQ0NCIsImJ1aWx0QXQiOiIyMDI2LTA5LTA2VDA5OjAwOjAwWiIsImJ1bmRsZUFydGlmYWN0RGlnZXN0Ijoic2hhMjU2OmUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTEiLCJidW5kbGVNYW5pZmVzdERpZ2VzdCI6InNoYTI1NjplMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyIiwiYnVuZGxlTmFtZSI6ImNvcmUtdXRpbHMiLCJidW5kbGVSZXZpc2lvbiI6MSwiY29tcGlsZXJJZCI6InBpLnNraWxsLWJ1aWxkZXIiLCJjb21waWxlclZlcnNpb24iOiIwLjEuMCIsImNvbnRyYWN0VmVyc2lvbiI6IjIiLCJleHBlY3RlZE1vdW50ZWRTa2lsbFRyZWVEaWdlc3QiOiJzaGEyNTY6ZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMiIsInBhY2thZ2VWZXJzaW9ucyI6W3siZW50cnlwb2ludFBhdGgiOiJTS0lMTC5tZCIsIm1vdW50UGF0aCI6InNraWxscy9maWxlLW9wcyIsInBhY2thZ2VEaWdlc3QiOiJzaGEyNTY6YTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMSIsInBhY2thZ2VOYW1lIjoiZmlsZS1vcHMiLCJwYWNrYWdlVmVyc2lvbiI6IjEuMC4wIiwic2tpbGxQYWNrYWdlSWQiOiJhYWFhMDAwMDAwMDAwMDAxIiwic2tpbGxQYWNrYWdlVmVyc2lvbklkIjoiYWFhYTAwMDAwMDAwMDAwMiJ9LHsiZW50cnlwb2ludFBhdGgiOiJJTkRFWC5tZCIsIm1vdW50UGF0aCI6InNraWxscy93ZWItc2NyYXBlIiwicGFja2FnZURpZ2VzdCI6InNoYTI1NjpiMWIxYjFiMWIxYjFiMWIxYjFiMWIxYjFiMWIxYjFiMWIxYjFiMWIxYjFiMWIxYjFiMWIxYjFiMWIxYjFiMWIxIiwicGFja2FnZU5hbWUiOiJ3ZWItc2NyYXBlIiwicGFja2FnZVZlcnNpb24iOiIwLjMuMCIsInNraWxsUGFja2FnZUlkIjoiYmJiYjAwMDAwMDAwMDAwMSIsInNraWxsUGFja2FnZVZlcnNpb25JZCI6ImJiYmIwMDAwMDAwMDAwMDIifV0sInJ1bnRpbWVNb3VudFBvbGljeS9leGVjdXRhYmxlQmluYXJ5QWxsb3dlZCI6ZmFsc2UsInJ1bnRpbWVNb3VudFBvbGljeS9tY3BBdXRvSW5zdGFsbEFsbG93ZWQiOmZhbHNlLCJydW50aW1lTW91bnRQb2xpY3kvbW91bnRNb2RlIjoiUkVBRF9PTkxZIiwicnVudGltZU1vdW50UG9saWN5L25ldHdvcmtSZXF1aXJlZCI6ZmFsc2UsInJ1bnRpbWVNb3VudFBvbGljeS9ydW50aW1lRGlzY292ZXJ5TW9kZSI6IlNUQVRJQ19JTkRFWF9PTkxZIiwicnVudGltZU1vdW50UG9saWN5L3J1bnRpbWVJbnN0YWxsQWxsb3dlZCI6ZmFsc2UsInJ1bnRpbWVNb3VudFBvbGljeS9ydW50aW1lTXV0YXRpb25BbGxvd2VkIjpmYWxzZSwic2tpbGxCdW5kbGVTbmFwc2hvdElkIjoiOTc5MjU2ODYwZjAzMmU4OGZmNGU4YTdlZjAxMTI4YmYiLCJ3b3JrbG9hZElkZW50aXR5IjoicGkuc2tpbGwtYnVpbGRlciJ9",
+      "payloadDigest": "sha256:692bb60ea7e148645676cdfae69fa376af9e8e1d0362412635ec5295bd463839"
+    },
+    {
+      "id": "pos-mount-policy-frozen",
+      "kind": "positive",
+      "expectedSchemaValid": true,
+      "note": "runtimeMountPolicy 固定首期只读静态（不同 bundle 名区分 ID）",
+      "expectedError": null,
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.skill-builder",
+        "skillBundleSnapshotId": "ec8fb08a5dffa18cb39a31e06877d5e2",
+        "bundleName": "ro-static",
+        "bundleRevision": 1,
+        "packageVersions": [
+          {
+            "skillPackageId": "aaaa000000000001",
+            "skillPackageVersionId": "aaaa000000000002",
+            "packageName": "file-ops",
+            "packageVersion": "1.0.0",
+            "packageDigest": "sha256:a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+            "mountPath": "skills/file-ops",
+            "entrypointPath": "SKILL.md"
+          }
+        ],
+        "compilerId": "pi.skill-builder",
+        "compilerVersion": "0.1.0",
+        "bundleArtifactDigest": "sha256:e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1",
+        "bundleManifestDigest": "sha256:e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2",
+        "expectedMountedSkillTreeDigest": "sha256:e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2",
+        "runtimeMountPolicy": {
+          "mountMode": "READ_ONLY",
+          "runtimeDiscoveryMode": "STATIC_INDEX_ONLY",
+          "runtimeMutationAllowed": false,
+          "runtimeInstallAllowed": false,
+          "networkRequired": false,
+          "executableBinaryAllowed": false,
+          "mcpAutoInstallAllowed": false
+        },
+        "approvalSetId": "aa11bb22cc33dd44",
+        "approvalSetDigest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "approvalDecisionIds": [
+          "1111111111111111",
+          "2222222222222222"
+        ],
+        "builtAt": "2026-09-06T09:00:00Z",
+        "payloadDigest": "sha256:cf66bcdf6774adc0b8b0db0d64bbe30ba9c8f1f54f29977f78c6886502eb2be0",
+        "signature": {
+          "objectType": "skill_bundle_snapshot",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-bundle-vector",
+          "issuer": "skill-builder-test",
+          "issuerWorkloadIdentity": "pi.skill-builder",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-06T09:01:00Z",
+          "payloadDigest": "sha256:cf66bcdf6774adc0b8b0db0d64bbe30ba9c8f1f54f29977f78c6886502eb2be0",
+          "value": "C5d/3bYySz2aXmIsg37TVclY6aqVYMTU2AygGtmoFjo8xL/0yOZcF8JalRmF0ah/qEsA1icTLnT0M+I8C66wCA=="
+        }
+      },
+      "calculateOnLoad": true,
+      "canonicalPayloadB64": "eyJhcHByb3ZhbERlY2lzaW9uSWRzIjpbIjExMTExMTExMTExMTExMTEiLCIyMjIyMjIyMjIyMjIyMjIyIl0sImFwcHJvdmFsU2V0RGlnZXN0Ijoic2hhMjU2OmRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGQiLCJhcHByb3ZhbFNldElkIjoiYWExMWJiMjJjYzMzZGQ0NCIsImJ1aWx0QXQiOiIyMDI2LTA5LTA2VDA5OjAwOjAwWiIsImJ1bmRsZUFydGlmYWN0RGlnZXN0Ijoic2hhMjU2OmUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTEiLCJidW5kbGVNYW5pZmVzdERpZ2VzdCI6InNoYTI1NjplMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyIiwiYnVuZGxlTmFtZSI6InJvLXN0YXRpYyIsImJ1bmRsZVJldmlzaW9uIjoxLCJjb21waWxlcklkIjoicGkuc2tpbGwtYnVpbGRlciIsImNvbXBpbGVyVmVyc2lvbiI6IjAuMS4wIiwiY29udHJhY3RWZXJzaW9uIjoiMiIsImV4cGVjdGVkTW91bnRlZFNraWxsVHJlZURpZ2VzdCI6InNoYTI1NjplMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyIiwicGFja2FnZVZlcnNpb25zIjpbeyJlbnRyeXBvaW50UGF0aCI6IlNLSUxMLm1kIiwibW91bnRQYXRoIjoic2tpbGxzL2ZpbGUtb3BzIiwicGFja2FnZURpZ2VzdCI6InNoYTI1NjphMWExYTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMWExIiwicGFja2FnZU5hbWUiOiJmaWxlLW9wcyIsInBhY2thZ2VWZXJzaW9uIjoiMS4wLjAiLCJza2lsbFBhY2thZ2VJZCI6ImFhYWEwMDAwMDAwMDAwMDEiLCJza2lsbFBhY2thZ2VWZXJzaW9uSWQiOiJhYWFhMDAwMDAwMDAwMDAyIn1dLCJydW50aW1lTW91bnRQb2xpY3kvZXhlY3V0YWJsZUJpbmFyeUFsbG93ZWQiOmZhbHNlLCJydW50aW1lTW91bnRQb2xpY3kvbWNwQXV0b0luc3RhbGxBbGxvd2VkIjpmYWxzZSwicnVudGltZU1vdW50UG9saWN5L21vdW50TW9kZSI6IlJFQURfT05MWSIsInJ1bnRpbWVNb3VudFBvbGljeS9uZXR3b3JrUmVxdWlyZWQiOmZhbHNlLCJydW50aW1lTW91bnRQb2xpY3kvcnVudGltZURpc2NvdmVyeU1vZGUiOiJTVEFUSUNfSU5ERVhfT05MWSIsInJ1bnRpbWVNb3VudFBvbGljeS9ydW50aW1lSW5zdGFsbEFsbG93ZWQiOmZhbHNlLCJydW50aW1lTW91bnRQb2xpY3kvcnVudGltZU11dGF0aW9uQWxsb3dlZCI6ZmFsc2UsInNraWxsQnVuZGxlU25hcHNob3RJZCI6ImVjOGZiMDhhNWRmZmExOGNiMzlhMzFlMDY4NzdkNWUyIiwid29ya2xvYWRJZGVudGl0eSI6InBpLnNraWxsLWJ1aWxkZXIifQ==",
+      "payloadDigest": "sha256:cf66bcdf6774adc0b8b0db0d64bbe30ba9c8f1f54f29977f78c6886502eb2be0"
+    },
+    {
+      "id": "pos-signed",
+      "kind": "positive",
+      "expectedSchemaValid": true,
+      "note": "含 §9.4 签名信封（确定性测试密钥真实签名；不同审批摘要避免与双包向量同 ID）",
+      "expectedError": null,
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.skill-builder",
+        "skillBundleSnapshotId": "108f323be0edf2659780a79a8977485d",
+        "bundleName": "core-utils",
+        "bundleRevision": 1,
+        "packageVersions": [
+          {
+            "skillPackageId": "aaaa000000000001",
+            "skillPackageVersionId": "aaaa000000000002",
+            "packageName": "file-ops",
+            "packageVersion": "1.0.0",
+            "packageDigest": "sha256:a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+            "mountPath": "skills/file-ops",
+            "entrypointPath": "SKILL.md"
+          },
+          {
+            "skillPackageId": "bbbb000000000001",
+            "skillPackageVersionId": "bbbb000000000002",
+            "packageName": "web-scrape",
+            "packageVersion": "0.3.0",
+            "packageDigest": "sha256:b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1",
+            "mountPath": "skills/web-scrape",
+            "entrypointPath": "INDEX.md"
+          }
+        ],
+        "compilerId": "pi.skill-builder",
+        "compilerVersion": "0.1.0",
+        "bundleArtifactDigest": "sha256:e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1",
+        "bundleManifestDigest": "sha256:e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2",
+        "expectedMountedSkillTreeDigest": "sha256:e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2",
+        "runtimeMountPolicy": {
+          "mountMode": "READ_ONLY",
+          "runtimeDiscoveryMode": "STATIC_INDEX_ONLY",
+          "runtimeMutationAllowed": false,
+          "runtimeInstallAllowed": false,
+          "networkRequired": false,
+          "executableBinaryAllowed": false,
+          "mcpAutoInstallAllowed": false
+        },
+        "approvalSetId": "aa11bb22cc33dd44",
+        "approvalSetDigest": "sha256:d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1",
+        "approvalDecisionIds": [
+          "1111111111111111",
+          "2222222222222222"
+        ],
+        "builtAt": "2026-09-06T09:00:00Z",
+        "payloadDigest": "sha256:c30ee168729eebab806f1cb4a1eb4c3c1bd983629f3403340784e9c6c59dbae1",
+        "signature": {
+          "objectType": "skill_bundle_snapshot",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-bundle-vector",
+          "issuer": "skill-builder-test",
+          "issuerWorkloadIdentity": "pi.skill-builder",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-06T09:01:00Z",
+          "payloadDigest": "sha256:c30ee168729eebab806f1cb4a1eb4c3c1bd983629f3403340784e9c6c59dbae1",
+          "value": "MwruYfgChjFCOY4yduCaN+BAUwLUjlaDCtM3CvRuxjmc+wbNo6EhPozLapoaTUDwxdHx7CwVV6NgwQaX7W+tBg=="
+        }
+      },
+      "calculateOnLoad": true,
+      "canonicalPayloadB64": "eyJhcHByb3ZhbERlY2lzaW9uSWRzIjpbIjExMTExMTExMTExMTExMTEiLCIyMjIyMjIyMjIyMjIyMjIyIl0sImFwcHJvdmFsU2V0RGlnZXN0Ijoic2hhMjU2OmQxZDFkMWQxZDFkMWQxZDFkMWQxZDFkMWQxZDFkMWQxZDFkMWQxZDFkMWQxZDFkMWQxZDFkMWQxZDFkMWQxZDEiLCJhcHByb3ZhbFNldElkIjoiYWExMWJiMjJjYzMzZGQ0NCIsImJ1aWx0QXQiOiIyMDI2LTA5LTA2VDA5OjAwOjAwWiIsImJ1bmRsZUFydGlmYWN0RGlnZXN0Ijoic2hhMjU2OmUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTFlMWUxZTEiLCJidW5kbGVNYW5pZmVzdERpZ2VzdCI6InNoYTI1NjplMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyIiwiYnVuZGxlTmFtZSI6ImNvcmUtdXRpbHMiLCJidW5kbGVSZXZpc2lvbiI6MSwiY29tcGlsZXJJZCI6InBpLnNraWxsLWJ1aWxkZXIiLCJjb21waWxlclZlcnNpb24iOiIwLjEuMCIsImNvbnRyYWN0VmVyc2lvbiI6IjIiLCJleHBlY3RlZE1vdW50ZWRTa2lsbFRyZWVEaWdlc3QiOiJzaGEyNTY6ZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMmUyZTJlMiIsInBhY2thZ2VWZXJzaW9ucyI6W3siZW50cnlwb2ludFBhdGgiOiJTS0lMTC5tZCIsIm1vdW50UGF0aCI6InNraWxscy9maWxlLW9wcyIsInBhY2thZ2VEaWdlc3QiOiJzaGEyNTY6YTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMWExYTFhMSIsInBhY2thZ2VOYW1lIjoiZmlsZS1vcHMiLCJwYWNrYWdlVmVyc2lvbiI6IjEuMC4wIiwic2tpbGxQYWNrYWdlSWQiOiJhYWFhMDAwMDAwMDAwMDAxIiwic2tpbGxQYWNrYWdlVmVyc2lvbklkIjoiYWFhYTAwMDAwMDAwMDAwMiJ9LHsiZW50cnlwb2ludFBhdGgiOiJJTkRFWC5tZCIsIm1vdW50UGF0aCI6InNraWxscy93ZWItc2NyYXBlIiwicGFja2FnZURpZ2VzdCI6InNoYTI1NjpiMWIxYjFiMWIxYjFiMWIxYjFiMWIxYjFiMWIxYjFiMWIxYjFiMWIxYjFiMWIxYjFiMWIxYjFiMWIxYjFiMWIxIiwicGFja2FnZU5hbWUiOiJ3ZWItc2NyYXBlIiwicGFja2FnZVZlcnNpb24iOiIwLjMuMCIsInNraWxsUGFja2FnZUlkIjoiYmJiYjAwMDAwMDAwMDAwMSIsInNraWxsUGFja2FnZVZlcnNpb25JZCI6ImJiYmIwMDAwMDAwMDAwMDIifV0sInJ1bnRpbWVNb3VudFBvbGljeS9leGVjdXRhYmxlQmluYXJ5QWxsb3dlZCI6ZmFsc2UsInJ1bnRpbWVNb3VudFBvbGljeS9tY3BBdXRvSW5zdGFsbEFsbG93ZWQiOmZhbHNlLCJydW50aW1lTW91bnRQb2xpY3kvbW91bnRNb2RlIjoiUkVBRF9PTkxZIiwicnVudGltZU1vdW50UG9saWN5L25ldHdvcmtSZXF1aXJlZCI6ZmFsc2UsInJ1bnRpbWVNb3VudFBvbGljeS9ydW50aW1lRGlzY292ZXJ5TW9kZSI6IlNUQVRJQ19JTkRFWF9PTkxZIiwicnVudGltZU1vdW50UG9saWN5L3J1bnRpbWVJbnN0YWxsQWxsb3dlZCI6ZmFsc2UsInJ1bnRpbWVNb3VudFBvbGljeS9ydW50aW1lTXV0YXRpb25BbGxvd2VkIjpmYWxzZSwic2tpbGxCdW5kbGVTbmFwc2hvdElkIjoiMTA4ZjMyM2JlMGVkZjI2NTk3ODBhNzlhODk3NzQ4NWQiLCJ3b3JrbG9hZElkZW50aXR5IjoicGkuc2tpbGwtYnVpbGRlciJ9",
+      "payloadDigest": "sha256:c30ee168729eebab806f1cb4a1eb4c3c1bd983629f3403340784e9c6c59dbae1"
+    },
+    {
+      "id": "neg-missing-required",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "缺 bundleName 必须拒绝",
+      "expectedError": "required",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.skill-builder",
+        "skillBundleSnapshotId": "75ba9d2f40f0b17d4cd8b639e2759578",
+        "bundleRevision": 1,
+        "packageVersions": [
+          {
+            "skillPackageId": "aaaa000000000001",
+            "skillPackageVersionId": "aaaa000000000002",
+            "packageName": "file-ops",
+            "packageVersion": "1.0.0",
+            "packageDigest": "sha256:a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+            "mountPath": "skills/file-ops",
+            "entrypointPath": "SKILL.md"
+          }
+        ],
+        "compilerId": "pi.skill-builder",
+        "compilerVersion": "0.1.0",
+        "bundleArtifactDigest": "sha256:e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1",
+        "bundleManifestDigest": "sha256:e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2",
+        "expectedMountedSkillTreeDigest": "sha256:e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2",
+        "runtimeMountPolicy": {
+          "mountMode": "READ_ONLY",
+          "runtimeDiscoveryMode": "STATIC_INDEX_ONLY",
+          "runtimeMutationAllowed": false,
+          "runtimeInstallAllowed": false,
+          "networkRequired": false,
+          "executableBinaryAllowed": false,
+          "mcpAutoInstallAllowed": false
+        },
+        "approvalSetId": "aa11bb22cc33dd44",
+        "approvalSetDigest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "approvalDecisionIds": [
+          "1111111111111111",
+          "2222222222222222"
+        ],
+        "builtAt": "2026-09-06T09:00:00Z",
+        "payloadDigest": "sha256:e8d9a48e18be158a8272e83f0e2162eeb28e8ced784da1e4a40a9c675a9b618e",
+        "signature": {
+          "objectType": "skill_bundle_snapshot",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-bundle-vector",
+          "issuer": "skill-builder-test",
+          "issuerWorkloadIdentity": "pi.skill-builder",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-06T09:00:00Z",
+          "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "value": "wYVhgP0oZLFPwB6v31xDwApKad6i35WGBD5ItMC/B5/UNJJc3W8kVceAdhc6Y5MSEYbJka0Wt8SvV073HdzcBQ=="
+        }
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "required"
+    },
+    {
+      "id": "neg-dup-mount-path",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "packageVersions 同 mountPath 全同元素拒绝",
+      "expectedError": "uniqueItems",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.skill-builder",
+        "skillBundleSnapshotId": "9f72cfcfba94b934b243c61f67038a85",
+        "bundleName": "core-utils",
+        "bundleRevision": 1,
+        "packageVersions": [
+          {
+            "skillPackageId": "aaaa000000000001",
+            "skillPackageVersionId": "aaaa000000000002",
+            "packageName": "file-ops",
+            "packageVersion": "1.0.0",
+            "packageDigest": "sha256:a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+            "mountPath": "skills/file-ops",
+            "entrypointPath": "SKILL.md"
+          },
+          {
+            "skillPackageId": "aaaa000000000001",
+            "skillPackageVersionId": "aaaa000000000002",
+            "packageName": "file-ops",
+            "packageVersion": "1.0.0",
+            "packageDigest": "sha256:a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+            "mountPath": "skills/file-ops",
+            "entrypointPath": "SKILL.md"
+          }
+        ],
+        "compilerId": "pi.skill-builder",
+        "compilerVersion": "0.1.0",
+        "bundleArtifactDigest": "sha256:e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1",
+        "bundleManifestDigest": "sha256:e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2",
+        "expectedMountedSkillTreeDigest": "sha256:e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2",
+        "runtimeMountPolicy": {
+          "mountMode": "READ_ONLY",
+          "runtimeDiscoveryMode": "STATIC_INDEX_ONLY",
+          "runtimeMutationAllowed": false,
+          "runtimeInstallAllowed": false,
+          "networkRequired": false,
+          "executableBinaryAllowed": false,
+          "mcpAutoInstallAllowed": false
+        },
+        "approvalSetId": "aa11bb22cc33dd44",
+        "approvalSetDigest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "approvalDecisionIds": [
+          "1111111111111111",
+          "2222222222222222"
+        ],
+        "builtAt": "2026-09-06T09:00:00Z",
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "signature": {
+          "objectType": "skill_bundle_snapshot",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-bundle-vector",
+          "issuer": "skill-builder-test",
+          "issuerWorkloadIdentity": "pi.skill-builder",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-06T09:00:00Z",
+          "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "value": "wYVhgP0oZLFPwB6v31xDwApKad6i35WGBD5ItMC/B5/UNJJc3W8kVceAdhc6Y5MSEYbJka0Wt8SvV073HdzcBQ=="
+        }
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "uniqueItems"
+    },
+    {
+      "id": "neg-bad-pkg-digest",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "packageDigest 非 sha256:64hex 必须拒绝",
+      "expectedError": "pattern",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.skill-builder",
+        "skillBundleSnapshotId": "9510f5a34eb0370458843b4dd9953f28",
+        "bundleName": "core-utils",
+        "bundleRevision": 1,
+        "packageVersions": [
+          {
+            "skillPackageId": "aaaa000000000001",
+            "skillPackageVersionId": "aaaa000000000002",
+            "packageName": "file-ops",
+            "packageVersion": "1.0.0",
+            "packageDigest": "sha256:zz",
+            "mountPath": "skills/file-ops",
+            "entrypointPath": "SKILL.md"
+          }
+        ],
+        "compilerId": "pi.skill-builder",
+        "compilerVersion": "0.1.0",
+        "bundleArtifactDigest": "sha256:e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1",
+        "bundleManifestDigest": "sha256:e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2",
+        "expectedMountedSkillTreeDigest": "sha256:e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2",
+        "runtimeMountPolicy": {
+          "mountMode": "READ_ONLY",
+          "runtimeDiscoveryMode": "STATIC_INDEX_ONLY",
+          "runtimeMutationAllowed": false,
+          "runtimeInstallAllowed": false,
+          "networkRequired": false,
+          "executableBinaryAllowed": false,
+          "mcpAutoInstallAllowed": false
+        },
+        "approvalSetId": "aa11bb22cc33dd44",
+        "approvalSetDigest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "approvalDecisionIds": [
+          "1111111111111111",
+          "2222222222222222"
+        ],
+        "builtAt": "2026-09-06T09:00:00Z",
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "signature": {
+          "objectType": "skill_bundle_snapshot",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-bundle-vector",
+          "issuer": "skill-builder-test",
+          "issuerWorkloadIdentity": "pi.skill-builder",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-06T09:00:00Z",
+          "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "value": "wYVhgP0oZLFPwB6v31xDwApKad6i35WGBD5ItMC/B5/UNJJc3W8kVceAdhc6Y5MSEYbJka0Wt8SvV073HdzcBQ=="
+        }
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "pattern"
+    },
+    {
+      "id": "neg-dup-decision-id",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "approvalDecisionIds 全同元素重复必须拒绝",
+      "expectedError": "uniqueItems",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.skill-builder",
+        "skillBundleSnapshotId": "75ba9d2f40f0b17d4cd8b639e2759578",
+        "bundleName": "core-utils",
+        "bundleRevision": 1,
+        "packageVersions": [
+          {
+            "skillPackageId": "aaaa000000000001",
+            "skillPackageVersionId": "aaaa000000000002",
+            "packageName": "file-ops",
+            "packageVersion": "1.0.0",
+            "packageDigest": "sha256:a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+            "mountPath": "skills/file-ops",
+            "entrypointPath": "SKILL.md"
+          }
+        ],
+        "compilerId": "pi.skill-builder",
+        "compilerVersion": "0.1.0",
+        "bundleArtifactDigest": "sha256:e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1",
+        "bundleManifestDigest": "sha256:e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2",
+        "expectedMountedSkillTreeDigest": "sha256:e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2",
+        "runtimeMountPolicy": {
+          "mountMode": "READ_ONLY",
+          "runtimeDiscoveryMode": "STATIC_INDEX_ONLY",
+          "runtimeMutationAllowed": false,
+          "runtimeInstallAllowed": false,
+          "networkRequired": false,
+          "executableBinaryAllowed": false,
+          "mcpAutoInstallAllowed": false
+        },
+        "approvalSetId": "aa11bb22cc33dd44",
+        "approvalSetDigest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "approvalDecisionIds": [
+          "1111111111111111",
+          "1111111111111111"
+        ],
+        "builtAt": "2026-09-06T09:00:00Z",
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "signature": {
+          "objectType": "skill_bundle_snapshot",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-bundle-vector",
+          "issuer": "skill-builder-test",
+          "issuerWorkloadIdentity": "pi.skill-builder",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-06T09:00:00Z",
+          "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "value": "wYVhgP0oZLFPwB6v31xDwApKad6i35WGBD5ItMC/B5/UNJJc3W8kVceAdhc6Y5MSEYbJka0Wt8SvV073HdzcBQ=="
+        }
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "uniqueItems"
+    },
+    {
+      "id": "neg-unknown-field",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "未知字段必须拒绝",
+      "expectedError": "unknown field",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.skill-builder",
+        "skillBundleSnapshotId": "75ba9d2f40f0b17d4cd8b639e2759578",
+        "bundleName": "core-utils",
+        "bundleRevision": 1,
+        "packageVersions": [
+          {
+            "skillPackageId": "aaaa000000000001",
+            "skillPackageVersionId": "aaaa000000000002",
+            "packageName": "file-ops",
+            "packageVersion": "1.0.0",
+            "packageDigest": "sha256:a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+            "mountPath": "skills/file-ops",
+            "entrypointPath": "SKILL.md"
+          }
+        ],
+        "compilerId": "pi.skill-builder",
+        "compilerVersion": "0.1.0",
+        "bundleArtifactDigest": "sha256:e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1",
+        "bundleManifestDigest": "sha256:e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2",
+        "expectedMountedSkillTreeDigest": "sha256:e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2",
+        "runtimeMountPolicy": {
+          "mountMode": "READ_ONLY",
+          "runtimeDiscoveryMode": "STATIC_INDEX_ONLY",
+          "runtimeMutationAllowed": false,
+          "runtimeInstallAllowed": false,
+          "networkRequired": false,
+          "executableBinaryAllowed": false,
+          "mcpAutoInstallAllowed": false
+        },
+        "approvalSetId": "aa11bb22cc33dd44",
+        "approvalSetDigest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "approvalDecisionIds": [
+          "1111111111111111",
+          "2222222222222222"
+        ],
+        "builtAt": "2026-09-06T09:00:00Z",
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "bogusField": 1,
+        "signature": {
+          "objectType": "skill_bundle_snapshot",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-bundle-vector",
+          "issuer": "skill-builder-test",
+          "issuerWorkloadIdentity": "pi.skill-builder",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-06T09:00:00Z",
+          "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "value": "wYVhgP0oZLFPwB6v31xDwApKad6i35WGBD5ItMC/B5/UNJJc3W8kVceAdhc6Y5MSEYbJka0Wt8SvV073HdzcBQ=="
+        }
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "unknown field"
+    },
+    {
+      "id": "neg-mount-policy-tamper",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "mountMode 篡改（非 READ_ONLY）必须拒绝",
+      "expectedError": "enum",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.skill-builder",
+        "skillBundleSnapshotId": "75ba9d2f40f0b17d4cd8b639e2759578",
+        "bundleName": "core-utils",
+        "bundleRevision": 1,
+        "packageVersions": [
+          {
+            "skillPackageId": "aaaa000000000001",
+            "skillPackageVersionId": "aaaa000000000002",
+            "packageName": "file-ops",
+            "packageVersion": "1.0.0",
+            "packageDigest": "sha256:a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+            "mountPath": "skills/file-ops",
+            "entrypointPath": "SKILL.md"
+          }
+        ],
+        "compilerId": "pi.skill-builder",
+        "compilerVersion": "0.1.0",
+        "bundleArtifactDigest": "sha256:e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1",
+        "bundleManifestDigest": "sha256:e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2",
+        "expectedMountedSkillTreeDigest": "sha256:e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2e2",
+        "runtimeMountPolicy": {
+          "mountMode": "WRITE",
+          "runtimeDiscoveryMode": "STATIC_INDEX_ONLY",
+          "runtimeMutationAllowed": false,
+          "runtimeInstallAllowed": false,
+          "networkRequired": false,
+          "executableBinaryAllowed": false,
+          "mcpAutoInstallAllowed": false
+        },
+        "approvalSetId": "aa11bb22cc33dd44",
+        "approvalSetDigest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "approvalDecisionIds": [
+          "1111111111111111",
+          "2222222222222222"
+        ],
+        "builtAt": "2026-09-06T09:00:00Z",
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "signature": {
+          "objectType": "skill_bundle_snapshot",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-bundle-vector",
+          "issuer": "skill-builder-test",
+          "issuerWorkloadIdentity": "pi.skill-builder",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-06T09:00:00Z",
+          "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "value": "wYVhgP0oZLFPwB6v31xDwApKad6i35WGBD5ItMC/B5/UNJJc3W8kVceAdhc6Y5MSEYbJka0Wt8SvV073HdzcBQ=="
+        }
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "enum"
+    }
+  ]
+}
