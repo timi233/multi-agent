@@ -132,6 +132,16 @@
       "privateKeyFile": "SEED-DERIVED（无文件，确定性派生）",
       "publicKeyFile": "SEED-DERIVED（无文件，确定性派生）"
     },
+    "sk-git-vector": {
+      "purpose": "CommitBundle 契约向量测试签名（确定性 seed 派生，非生产；scripts/gen_commit_bundle_vectors.py TEST_KEY_SEED）",
+      "issuer": "git-assembler-test",
+      "allowedObjectTypes": [
+        "commit_bundles"
+      ],
+      "pubFingerprintSha256": "3eab694d9fa16b0fd5edd76f033a6f1c4c4d46ee8915d6ce1e7487f3dc40a7f6",
+      "privateKeyFile": "SEED-DERIVED（无文件，确定性派生）",
+      "publicKeyFile": "SEED-DERIVED（无文件，确定性派生）"
+    },
     "sk-skill": {
       "purpose": "Skill Signer",
       "issuer": "skill-governance",

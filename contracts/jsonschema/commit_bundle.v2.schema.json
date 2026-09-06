@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pi.local/contracts/jsonschema/commit_bundle/v2",
+  "title": "CommitBundle v2（蓝图 §10.10 单机子集：Commit Assembler 编译的不可变 Git 提交包）",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "contractVersion": { "const": "2" },
+    "workloadIdentity": { "const": "pi.commit-assembler" },
+    "commitBundleId": { "type": "string", "pattern": "^[a-f0-9]{32}$" },
+    "commitIntentId": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+    "commitIntentDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "selectedAttemptId": { "type": "string", "pattern": "^[a-f0-9]{16}$" },
+    "sourceBundleDigest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "基线内容（单机首提=空树 sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855；重试/追加=上一读回 tree 的亚类型摘要由运行时标注）"
+    },
+    "outputArtifactManifestDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "proposedTreeDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "treeGitObjectId": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "algorithm": { "const": "sha1" },
+        "hex": { "type": "string", "pattern": "^[a-f0-9]{40}$" }
+      },
+      "required": ["algorithm", "hex"]
+    },
+    "parentGitObjectIds": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "algorithm": { "const": "sha1" },
+          "hex": { "type": "string", "pattern": "^[a-f0-9]{40}$" }
+        },
+        "required": ["algorithm", "hex"]
+      },
+      "uniqueItems": true
+    },
+    "normalizedCommitMetadataDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "operationIdempotencyKey": { "type": "string", "pattern": "^[a-f0-9]{32}$" },
+    "proposedCommitGitObjectId": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "algorithm": { "const": "sha1" },
+        "hex": { "type": "string", "pattern": "^[a-f0-9]{40}$" }
+      },
+      "required": ["algorithm", "hex"]
+    },
+    "pathPolicyDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "payloadDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "objectType": { "const": "commit_bundle" },
+        "schemaVersion": { "const": "2" },
+        "signatureAlgorithm": { "const": "Ed25519" },
+        "keyId": { "type": "string", "minLength": 1 },
+        "issuer": { "type": "string", "minLength": 1 },
+        "issuerWorkloadIdentity": { "const": "pi.commit-assembler" },
+        "audience": { "type": "string" },
+        "controlPlaneEpoch": { "type": "integer", "minimum": 0 },
+        "signedAt": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T" },
+        "payloadDigest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "value": { "type": "string", "pattern": "^[A-Za-z0-9+/]{86}==$" }
+      },
+      "required": [
+        "objectType", "schemaVersion", "signatureAlgorithm", "keyId",
+        "issuer", "issuerWorkloadIdentity", "audience", "controlPlaneEpoch",
+        "signedAt", "payloadDigest", "value"
+      ]
+    }
+  },
+  "required": [
+    "contractVersion", "workloadIdentity", "commitBundleId", "commitIntentId",
+    "commitIntentDigest", "selectedAttemptId", "sourceBundleDigest",
+    "outputArtifactManifestDigest", "proposedTreeDigest", "treeGitObjectId",
+    "parentGitObjectIds", "normalizedCommitMetadataDigest",
+    "operationIdempotencyKey", "proposedCommitGitObjectId", "pathPolicyDigest",
+    "payloadDigest", "signature"
+  ]
+}

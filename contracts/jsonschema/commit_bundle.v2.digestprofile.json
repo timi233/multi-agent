@@ -1,0 +1,33 @@
+{
+  "$id": "https://pi.local/contracts/jsonschema/commit_bundle/v2/digestprofile",
+  "schemaVersion": "2",
+  "objectType": "commit_bundle",
+  "digestAlgorithm": "sha256",
+  "canonicalEncoding": "RFC8785-JCS-lite",
+  "immutablePayloadPointers": [
+    "/contractVersion",
+    "/workloadIdentity",
+    "/commitBundleId",
+    "/commitIntentId",
+    "/commitIntentDigest",
+    "/selectedAttemptId",
+    "/sourceBundleDigest",
+    "/outputArtifactManifestDigest",
+    "/proposedTreeDigest",
+    "/treeGitObjectId/algorithm",
+    "/treeGitObjectId/hex",
+    "/parentGitObjectIds",
+    "/normalizedCommitMetadataDigest",
+    "/operationIdempotencyKey",
+    "/proposedCommitGitObjectId/algorithm",
+    "/proposedCommitGitObjectId/hex",
+    "/pathPolicyDigest"
+  ],
+  "optionalImmutablePointers": [],
+  "canonicalSortKeys": {
+    "/parentGitObjectIds": { "by": "key", "key": "hex" }
+  },
+  "selfDigestPointer": "/payloadDigest",
+  "signatureEnvelopePointers": ["/signature"],
+  "notes": "CommitBundle（蓝图 §10.10 单机子集）：Commit Assembler 预计算的不可变 Git 提交包——sourceBundleDigest（基线，单机首提=空树 sha256）/outputArtifactManifestDigest（产物清单 JCS 摘要）/proposedTreeDigest（tree object bytes 的 sha256）+ treeGitObjectId（git sha1 双表示）/parentGitObjectIds（按 hex 排序集合）/normalizedCommitMetadataDigest（规范化提交元数据含 X-Platform-Operation-Key trailer）→ operationIdempotencyKey 参与 commit 对象计算与 Gate 验证（单机由 stager 校验预计算 === 实际读回）/proposedCommitGitObjectId={sha1,hex}/pathPolicyDigest（固定策略常量）。ID 派生含全部不可变字段（任一变必变）。"
+}

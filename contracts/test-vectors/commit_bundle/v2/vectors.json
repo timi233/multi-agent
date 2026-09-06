@@ -1,0 +1,448 @@
+{
+  "objectType": "commit_bundle",
+  "schemaVersion": "2",
+  "canonicalEncoding": "RFC8785-JCS-lite",
+  "vectors": [
+    {
+      "id": "pos-initial-commit",
+      "kind": "positive",
+      "expectedSchemaValid": true,
+      "note": "首次提交：空 parent + 空树基线",
+      "expectedError": null,
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.commit-assembler",
+        "commitBundleId": "d7fe0a39f81cf0ad31400feea44c8d78",
+        "commitIntentId": "ff00ff00ff00ff00",
+        "commitIntentDigest": "sha256:1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f",
+        "selectedAttemptId": "0022991122991122",
+        "sourceBundleDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "outputArtifactManifestDigest": "sha256:2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f",
+        "proposedTreeDigest": "sha256:3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f",
+        "treeGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b"
+        },
+        "parentGitObjectIds": [],
+        "normalizedCommitMetadataDigest": "sha256:4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f",
+        "operationIdempotencyKey": "00ff00ff00ff00ff00ff00ff00ff00ff",
+        "proposedCommitGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "cccccccccccccccccccccccccccccccccccccccc"
+        },
+        "pathPolicyDigest": "sha256:2bdf187aa9784eb48e76108baa90f0360d28670472f24216c125442c7c8371af",
+        "payloadDigest": "sha256:7e1d30a97a0e15d80fdfb28c7f42f7ff580c88f59c0d8f4b9e023c04761bc6c8",
+        "signature": {
+          "objectType": "commit_bundle",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-git-vector",
+          "issuer": "git-assembler-test",
+          "issuerWorkloadIdentity": "pi.commit-assembler",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-07T08:00:00Z",
+          "payloadDigest": "sha256:7e1d30a97a0e15d80fdfb28c7f42f7ff580c88f59c0d8f4b9e023c04761bc6c8",
+          "value": "1RMCaWJhOtFDIIDC2dQ/QxckB7pPV4wrZoBr0DUlnanPO0zNXo1u1somtDsjynIRbRsj3CIGClAxQ0C5lT97AQ=="
+        }
+      },
+      "calculateOnLoad": true,
+      "canonicalPayloadB64": "eyJjb21taXRCdW5kbGVJZCI6ImQ3ZmUwYTM5ZjgxY2YwYWQzMTQwMGZlZWE0NGM4ZDc4IiwiY29tbWl0SW50ZW50RGlnZXN0Ijoic2hhMjU2OjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYiLCJjb21taXRJbnRlbnRJZCI6ImZmMDBmZjAwZmYwMGZmMDAiLCJjb250cmFjdFZlcnNpb24iOiIyIiwibm9ybWFsaXplZENvbW1pdE1ldGFkYXRhRGlnZXN0Ijoic2hhMjU2OjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGYiLCJvcGVyYXRpb25JZGVtcG90ZW5jeUtleSI6IjAwZmYwMGZmMDBmZjAwZmYwMGZmMDBmZjAwZmYwMGZmIiwib3V0cHV0QXJ0aWZhY3RNYW5pZmVzdERpZ2VzdCI6InNoYTI1NjoyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmIiwicGFyZW50R2l0T2JqZWN0SWRzIjpbXSwicGF0aFBvbGljeURpZ2VzdCI6InNoYTI1NjoyYmRmMTg3YWE5Nzg0ZWI0OGU3NjEwOGJhYTkwZjAzNjBkMjg2NzA0NzJmMjQyMTZjMTI1NDQyYzdjODM3MWFmIiwicHJvcG9zZWRDb21taXRHaXRPYmplY3RJZC9hbGdvcml0aG0iOiJzaGExIiwicHJvcG9zZWRDb21taXRHaXRPYmplY3RJZC9oZXgiOiJjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjIiwicHJvcG9zZWRUcmVlRGlnZXN0Ijoic2hhMjU2OjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YiLCJzZWxlY3RlZEF0dGVtcHRJZCI6IjAwMjI5OTExMjI5OTExMjIiLCJzb3VyY2VCdW5kbGVEaWdlc3QiOiJzaGEyNTY6ZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsInRyZWVHaXRPYmplY3RJZC9hbGdvcml0aG0iOiJzaGExIiwidHJlZUdpdE9iamVjdElkL2hleCI6IjRiNGI0YjRiNGI0YjRiNGI0YjRiNGI0YjRiNGI0YjRiNGI0YjRiNGIiLCJ3b3JrbG9hZElkZW50aXR5IjoicGkuY29tbWl0LWFzc2VtYmxlciJ9",
+      "payloadDigest": "sha256:7e1d30a97a0e15d80fdfb28c7f42f7ff580c88f59c0d8f4b9e023c04761bc6c8"
+    },
+    {
+      "id": "pos-with-parents-sorted",
+      "kind": "positive",
+      "expectedSchemaValid": true,
+      "note": "带双父乱序传入（集合按 hex 归一化）",
+      "expectedError": null,
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.commit-assembler",
+        "commitBundleId": "6f5b211bcc478784aa3b9b1ec4164a08",
+        "commitIntentId": "ff00ff00ff00ff00",
+        "commitIntentDigest": "sha256:1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f",
+        "selectedAttemptId": "0022991122991122",
+        "sourceBundleDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "outputArtifactManifestDigest": "sha256:2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f",
+        "proposedTreeDigest": "sha256:3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f",
+        "treeGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b"
+        },
+        "parentGitObjectIds": [
+          {
+            "algorithm": "sha1",
+            "hex": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          {
+            "algorithm": "sha1",
+            "hex": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        ],
+        "normalizedCommitMetadataDigest": "sha256:4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f",
+        "operationIdempotencyKey": "00ff00ff00ff00ff00ff00ff00ff00ff",
+        "proposedCommitGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "cccccccccccccccccccccccccccccccccccccccc"
+        },
+        "pathPolicyDigest": "sha256:2bdf187aa9784eb48e76108baa90f0360d28670472f24216c125442c7c8371af",
+        "payloadDigest": "sha256:5cd76d408eb275acd96b2573caad3b421f1e869ea519d8b5722e78e2edca4700",
+        "signature": {
+          "objectType": "commit_bundle",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-git-vector",
+          "issuer": "git-assembler-test",
+          "issuerWorkloadIdentity": "pi.commit-assembler",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-07T08:00:00Z",
+          "payloadDigest": "sha256:5cd76d408eb275acd96b2573caad3b421f1e869ea519d8b5722e78e2edca4700",
+          "value": "fIA0pNm+EbfZh88EKWqz1tPlgB/xKhjoa1dDo0ccPoDtxufkBpWNPt+9V/cO767oDkB/Ih+Ur94mAQBaeMQcDQ=="
+        }
+      },
+      "calculateOnLoad": true,
+      "canonicalPayloadB64": "eyJjb21taXRCdW5kbGVJZCI6IjZmNWIyMTFiY2M0Nzg3ODRhYTNiOWIxZWM0MTY0YTA4IiwiY29tbWl0SW50ZW50RGlnZXN0Ijoic2hhMjU2OjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYiLCJjb21taXRJbnRlbnRJZCI6ImZmMDBmZjAwZmYwMGZmMDAiLCJjb250cmFjdFZlcnNpb24iOiIyIiwibm9ybWFsaXplZENvbW1pdE1ldGFkYXRhRGlnZXN0Ijoic2hhMjU2OjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGYiLCJvcGVyYXRpb25JZGVtcG90ZW5jeUtleSI6IjAwZmYwMGZmMDBmZjAwZmYwMGZmMDBmZjAwZmYwMGZmIiwib3V0cHV0QXJ0aWZhY3RNYW5pZmVzdERpZ2VzdCI6InNoYTI1NjoyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmIiwicGFyZW50R2l0T2JqZWN0SWRzIjpbeyJhbGdvcml0aG0iOiJzaGExIiwiaGV4IjoiYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYSJ9LHsiYWxnb3JpdGhtIjoic2hhMSIsImhleCI6ImJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmIifV0sInBhdGhQb2xpY3lEaWdlc3QiOiJzaGEyNTY6MmJkZjE4N2FhOTc4NGViNDhlNzYxMDhiYWE5MGYwMzYwZDI4NjcwNDcyZjI0MjE2YzEyNTQ0MmM3YzgzNzFhZiIsInByb3Bvc2VkQ29tbWl0R2l0T2JqZWN0SWQvYWxnb3JpdGhtIjoic2hhMSIsInByb3Bvc2VkQ29tbWl0R2l0T2JqZWN0SWQvaGV4IjoiY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjYyIsInByb3Bvc2VkVHJlZURpZ2VzdCI6InNoYTI1NjozZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmIiwic2VsZWN0ZWRBdHRlbXB0SWQiOiIwMDIyOTkxMTIyOTkxMTIyIiwic291cmNlQnVuZGxlRGlnZXN0Ijoic2hhMjU2OmUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJ0cmVlR2l0T2JqZWN0SWQvYWxnb3JpdGhtIjoic2hhMSIsInRyZWVHaXRPYmplY3RJZC9oZXgiOiI0YjRiNGI0YjRiNGI0YjRiNGI0YjRiNGI0YjRiNGI0YjRiNGI0YjRiIiwid29ya2xvYWRJZGVudGl0eSI6InBpLmNvbW1pdC1hc3NlbWJsZXIifQ==",
+      "payloadDigest": "sha256:5cd76d408eb275acd96b2573caad3b421f1e869ea519d8b5722e78e2edca4700"
+    },
+    {
+      "id": "pos-custom-opkey",
+      "kind": "positive",
+      "expectedSchemaValid": true,
+      "note": "专用操作键参与派生与元数据",
+      "expectedError": null,
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.commit-assembler",
+        "commitBundleId": "675e35a6c40b725397c6fdfee8a7227e",
+        "commitIntentId": "ff00ff00ff00ff00",
+        "commitIntentDigest": "sha256:1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f",
+        "selectedAttemptId": "0022991122991122",
+        "sourceBundleDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "outputArtifactManifestDigest": "sha256:2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f",
+        "proposedTreeDigest": "sha256:3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f",
+        "treeGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b"
+        },
+        "parentGitObjectIds": [],
+        "normalizedCommitMetadataDigest": "sha256:4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f",
+        "operationIdempotencyKey": "abababababababababababababababab",
+        "proposedCommitGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "cccccccccccccccccccccccccccccccccccccccc"
+        },
+        "pathPolicyDigest": "sha256:2bdf187aa9784eb48e76108baa90f0360d28670472f24216c125442c7c8371af",
+        "payloadDigest": "sha256:3d37623abd5476a993fec6393fd3b402628ae4ccff02995eeb0ed6385093980a",
+        "signature": {
+          "objectType": "commit_bundle",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-git-vector",
+          "issuer": "git-assembler-test",
+          "issuerWorkloadIdentity": "pi.commit-assembler",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-07T08:00:00Z",
+          "payloadDigest": "sha256:3d37623abd5476a993fec6393fd3b402628ae4ccff02995eeb0ed6385093980a",
+          "value": "xhzFnnY/+NWwYZQvT83f+oubKOFVoqZ8inHNr/gNVoD1CCvPxOTajWVu0ue4TDPUb2FfXDN7W2Jeaj67c0MfDA=="
+        }
+      },
+      "calculateOnLoad": true,
+      "canonicalPayloadB64": "eyJjb21taXRCdW5kbGVJZCI6IjY3NWUzNWE2YzQwYjcyNTM5N2M2ZmRmZWU4YTcyMjdlIiwiY29tbWl0SW50ZW50RGlnZXN0Ijoic2hhMjU2OjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYiLCJjb21taXRJbnRlbnRJZCI6ImZmMDBmZjAwZmYwMGZmMDAiLCJjb250cmFjdFZlcnNpb24iOiIyIiwibm9ybWFsaXplZENvbW1pdE1ldGFkYXRhRGlnZXN0Ijoic2hhMjU2OjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGYiLCJvcGVyYXRpb25JZGVtcG90ZW5jeUtleSI6ImFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiYWJhYmFiIiwib3V0cHV0QXJ0aWZhY3RNYW5pZmVzdERpZ2VzdCI6InNoYTI1NjoyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmIiwicGFyZW50R2l0T2JqZWN0SWRzIjpbXSwicGF0aFBvbGljeURpZ2VzdCI6InNoYTI1NjoyYmRmMTg3YWE5Nzg0ZWI0OGU3NjEwOGJhYTkwZjAzNjBkMjg2NzA0NzJmMjQyMTZjMTI1NDQyYzdjODM3MWFmIiwicHJvcG9zZWRDb21taXRHaXRPYmplY3RJZC9hbGdvcml0aG0iOiJzaGExIiwicHJvcG9zZWRDb21taXRHaXRPYmplY3RJZC9oZXgiOiJjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjIiwicHJvcG9zZWRUcmVlRGlnZXN0Ijoic2hhMjU2OjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YiLCJzZWxlY3RlZEF0dGVtcHRJZCI6IjAwMjI5OTExMjI5OTExMjIiLCJzb3VyY2VCdW5kbGVEaWdlc3QiOiJzaGEyNTY6ZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsInRyZWVHaXRPYmplY3RJZC9hbGdvcml0aG0iOiJzaGExIiwidHJlZUdpdE9iamVjdElkL2hleCI6IjRiNGI0YjRiNGI0YjRiNGI0YjRiNGI0YjRiNGI0YjRiNGI0YjRiNGIiLCJ3b3JrbG9hZElkZW50aXR5IjoicGkuY29tbWl0LWFzc2VtYmxlciJ9",
+      "payloadDigest": "sha256:3d37623abd5476a993fec6393fd3b402628ae4ccff02995eeb0ed6385093980a"
+    },
+    {
+      "id": "pos-signed",
+      "kind": "positive",
+      "expectedSchemaValid": true,
+      "note": "含 §9.4 签名信封（确定性测试密钥真实签名）",
+      "expectedError": null,
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.commit-assembler",
+        "commitBundleId": "f838d3d5b8812e03857b375b83e41eba",
+        "commitIntentId": "ff00ff00ff00ff00",
+        "commitIntentDigest": "sha256:1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f",
+        "selectedAttemptId": "0022991122991122",
+        "sourceBundleDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "outputArtifactManifestDigest": "sha256:2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f",
+        "proposedTreeDigest": "sha256:3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f",
+        "treeGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b"
+        },
+        "parentGitObjectIds": [
+          {
+            "algorithm": "sha1",
+            "hex": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        ],
+        "normalizedCommitMetadataDigest": "sha256:4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f",
+        "operationIdempotencyKey": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+        "proposedCommitGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "cccccccccccccccccccccccccccccccccccccccc"
+        },
+        "pathPolicyDigest": "sha256:2bdf187aa9784eb48e76108baa90f0360d28670472f24216c125442c7c8371af",
+        "payloadDigest": "sha256:70742944941085de17845b996816222d6148e7cb04c183fbdd9df3346c39ff40",
+        "signature": {
+          "objectType": "commit_bundle",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-git-vector",
+          "issuer": "git-assembler-test",
+          "issuerWorkloadIdentity": "pi.commit-assembler",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-07T08:00:00Z",
+          "payloadDigest": "sha256:70742944941085de17845b996816222d6148e7cb04c183fbdd9df3346c39ff40",
+          "value": "UBzZ2AlLs1XbegFxWPr9h80cKYNYqJHhtZa44yBhuprpvluLPMz09sljOiZ+efhxsjt5JAst2d7ZJScBmrU0Cg=="
+        }
+      },
+      "calculateOnLoad": true,
+      "canonicalPayloadB64": "eyJjb21taXRCdW5kbGVJZCI6ImY4MzhkM2Q1Yjg4MTJlMDM4NTdiMzc1YjgzZTQxZWJhIiwiY29tbWl0SW50ZW50RGlnZXN0Ijoic2hhMjU2OjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYxZjFmMWYiLCJjb21taXRJbnRlbnRJZCI6ImZmMDBmZjAwZmYwMGZmMDAiLCJjb250cmFjdFZlcnNpb24iOiIyIiwibm9ybWFsaXplZENvbW1pdE1ldGFkYXRhRGlnZXN0Ijoic2hhMjU2OjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGY0ZjRmNGYiLCJvcGVyYXRpb25JZGVtcG90ZW5jeUtleSI6ImNkY2RjZGNkY2RjZGNkY2RjZGNkY2RjZGNkY2RjZGNkIiwib3V0cHV0QXJ0aWZhY3RNYW5pZmVzdERpZ2VzdCI6InNoYTI1NjoyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmMmYyZjJmIiwicGFyZW50R2l0T2JqZWN0SWRzIjpbeyJhbGdvcml0aG0iOiJzaGExIiwiaGV4IjoiYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYSJ9XSwicGF0aFBvbGljeURpZ2VzdCI6InNoYTI1NjoyYmRmMTg3YWE5Nzg0ZWI0OGU3NjEwOGJhYTkwZjAzNjBkMjg2NzA0NzJmMjQyMTZjMTI1NDQyYzdjODM3MWFmIiwicHJvcG9zZWRDb21taXRHaXRPYmplY3RJZC9hbGdvcml0aG0iOiJzaGExIiwicHJvcG9zZWRDb21taXRHaXRPYmplY3RJZC9oZXgiOiJjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjIiwicHJvcG9zZWRUcmVlRGlnZXN0Ijoic2hhMjU2OjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YzZjNmM2YiLCJzZWxlY3RlZEF0dGVtcHRJZCI6IjAwMjI5OTExMjI5OTExMjIiLCJzb3VyY2VCdW5kbGVEaWdlc3QiOiJzaGEyNTY6ZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsInRyZWVHaXRPYmplY3RJZC9hbGdvcml0aG0iOiJzaGExIiwidHJlZUdpdE9iamVjdElkL2hleCI6IjRiNGI0YjRiNGI0YjRiNGI0YjRiNGI0YjRiNGI0YjRiNGI0YjRiNGIiLCJ3b3JrbG9hZElkZW50aXR5IjoicGkuY29tbWl0LWFzc2VtYmxlciJ9",
+      "payloadDigest": "sha256:70742944941085de17845b996816222d6148e7cb04c183fbdd9df3346c39ff40"
+    },
+    {
+      "id": "neg-dup-parent",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "parentGitObjectIds 全同元素重复必须拒绝",
+      "expectedError": "uniqueItems",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.commit-assembler",
+        "commitBundleId": "a175d40c6d2238cef2449f0dc6476bce",
+        "commitIntentId": "ff00ff00ff00ff00",
+        "commitIntentDigest": "sha256:1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f",
+        "selectedAttemptId": "0022991122991122",
+        "sourceBundleDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "outputArtifactManifestDigest": "sha256:2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f",
+        "proposedTreeDigest": "sha256:3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f",
+        "treeGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b"
+        },
+        "parentGitObjectIds": [
+          {
+            "algorithm": "sha1",
+            "hex": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          {
+            "algorithm": "sha1",
+            "hex": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        ],
+        "normalizedCommitMetadataDigest": "sha256:4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f",
+        "operationIdempotencyKey": "00ff00ff00ff00ff00ff00ff00ff00ff",
+        "proposedCommitGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "cccccccccccccccccccccccccccccccccccccccc"
+        },
+        "pathPolicyDigest": "sha256:2bdf187aa9784eb48e76108baa90f0360d28670472f24216c125442c7c8371af",
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "signature": {
+          "objectType": "commit_bundle",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-git-vector",
+          "issuer": "git-assembler-test",
+          "issuerWorkloadIdentity": "pi.commit-assembler",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-07T08:00:00Z",
+          "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "value": "yKH9y4jvDCztufDKGVUPP9zlV8PBDlIvqHNks/jGmCoCHj/WWSggWIcOJ4FKQ2WVGyr8ZFxi26ix7oF0BEwGCg=="
+        }
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "uniqueItems"
+    },
+    {
+      "id": "neg-missing-required",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "缺 opKey 同层字段（operationIdempotencyKey）拒绝",
+      "expectedError": "required",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.commit-assembler",
+        "commitBundleId": "d7fe0a39f81cf0ad31400feea44c8d78",
+        "commitIntentId": "ff00ff00ff00ff00",
+        "commitIntentDigest": "sha256:1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f",
+        "selectedAttemptId": "0022991122991122",
+        "sourceBundleDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "outputArtifactManifestDigest": "sha256:2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f",
+        "proposedTreeDigest": "sha256:3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f",
+        "treeGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b"
+        },
+        "parentGitObjectIds": [],
+        "normalizedCommitMetadataDigest": "sha256:4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f",
+        "proposedCommitGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "cccccccccccccccccccccccccccccccccccccccc"
+        },
+        "pathPolicyDigest": "sha256:2bdf187aa9784eb48e76108baa90f0360d28670472f24216c125442c7c8371af",
+        "payloadDigest": "sha256:7e1d30a97a0e15d80fdfb28c7f42f7ff580c88f59c0d8f4b9e023c04761bc6c8",
+        "signature": {
+          "objectType": "commit_bundle",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-git-vector",
+          "issuer": "git-assembler-test",
+          "issuerWorkloadIdentity": "pi.commit-assembler",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-07T08:00:00Z",
+          "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "value": "yKH9y4jvDCztufDKGVUPP9zlV8PBDlIvqHNks/jGmCoCHj/WWSggWIcOJ4FKQ2WVGyr8ZFxi26ix7oF0BEwGCg=="
+        }
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "required"
+    },
+    {
+      "id": "neg-tree-algorithm",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "treeGitObjectId 算法非 sha1 必须拒绝",
+      "expectedError": "enum",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.commit-assembler",
+        "commitBundleId": "9ea662838d2d8624d8b50b77440757db",
+        "commitIntentId": "ff00ff00ff00ff00",
+        "commitIntentDigest": "sha256:1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f",
+        "selectedAttemptId": "0022991122991122",
+        "sourceBundleDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "outputArtifactManifestDigest": "sha256:2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f",
+        "proposedTreeDigest": "sha256:3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f",
+        "treeGitObjectId": {
+          "algorithm": "sha256",
+          "hex": "4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b"
+        },
+        "parentGitObjectIds": [],
+        "normalizedCommitMetadataDigest": "sha256:4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f",
+        "operationIdempotencyKey": "00ff00ff00ff00ff00ff00ff00ff00ff",
+        "proposedCommitGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "cccccccccccccccccccccccccccccccccccccccc"
+        },
+        "pathPolicyDigest": "sha256:2bdf187aa9784eb48e76108baa90f0360d28670472f24216c125442c7c8371af",
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "signature": {
+          "objectType": "commit_bundle",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-git-vector",
+          "issuer": "git-assembler-test",
+          "issuerWorkloadIdentity": "pi.commit-assembler",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-07T08:00:00Z",
+          "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "value": "yKH9y4jvDCztufDKGVUPP9zlV8PBDlIvqHNks/jGmCoCHj/WWSggWIcOJ4FKQ2WVGyr8ZFxi26ix7oF0BEwGCg=="
+        }
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "enum"
+    },
+    {
+      "id": "neg-bad-opkey-pattern",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "operationIdempotencyKey 非 32hex 必须拒绝",
+      "expectedError": "pattern",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.commit-assembler",
+        "commitBundleId": "085a73332c8cc2b92a3c5ff023399f74",
+        "commitIntentId": "ff00ff00ff00ff00",
+        "commitIntentDigest": "sha256:1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f",
+        "selectedAttemptId": "0022991122991122",
+        "sourceBundleDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "outputArtifactManifestDigest": "sha256:2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f",
+        "proposedTreeDigest": "sha256:3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f",
+        "treeGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b"
+        },
+        "parentGitObjectIds": [],
+        "normalizedCommitMetadataDigest": "sha256:4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f",
+        "operationIdempotencyKey": "nothex",
+        "proposedCommitGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "cccccccccccccccccccccccccccccccccccccccc"
+        },
+        "pathPolicyDigest": "sha256:2bdf187aa9784eb48e76108baa90f0360d28670472f24216c125442c7c8371af",
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "signature": {
+          "objectType": "commit_bundle",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-git-vector",
+          "issuer": "git-assembler-test",
+          "issuerWorkloadIdentity": "pi.commit-assembler",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-07T08:00:00Z",
+          "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "value": "yKH9y4jvDCztufDKGVUPP9zlV8PBDlIvqHNks/jGmCoCHj/WWSggWIcOJ4FKQ2WVGyr8ZFxi26ix7oF0BEwGCg=="
+        }
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "pattern"
+    },
+    {
+      "id": "neg-unknown-field",
+      "kind": "negative",
+      "expectedSchemaValid": false,
+      "note": "未知字段必须拒绝",
+      "expectedError": "unknown field",
+      "object": {
+        "contractVersion": "2",
+        "workloadIdentity": "pi.commit-assembler",
+        "commitBundleId": "d7fe0a39f81cf0ad31400feea44c8d78",
+        "commitIntentId": "ff00ff00ff00ff00",
+        "commitIntentDigest": "sha256:1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f",
+        "selectedAttemptId": "0022991122991122",
+        "sourceBundleDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "outputArtifactManifestDigest": "sha256:2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f",
+        "proposedTreeDigest": "sha256:3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f",
+        "treeGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b4b"
+        },
+        "parentGitObjectIds": [],
+        "normalizedCommitMetadataDigest": "sha256:4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f",
+        "operationIdempotencyKey": "00ff00ff00ff00ff00ff00ff00ff00ff",
+        "proposedCommitGitObjectId": {
+          "algorithm": "sha1",
+          "hex": "cccccccccccccccccccccccccccccccccccccccc"
+        },
+        "pathPolicyDigest": "sha256:2bdf187aa9784eb48e76108baa90f0360d28670472f24216c125442c7c8371af",
+        "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "bogus": 1,
+        "signature": {
+          "objectType": "commit_bundle",
+          "schemaVersion": "2",
+          "signatureAlgorithm": "Ed25519",
+          "keyId": "sk-git-vector",
+          "issuer": "git-assembler-test",
+          "issuerWorkloadIdentity": "pi.commit-assembler",
+          "audience": "pi.platform",
+          "controlPlaneEpoch": 0,
+          "signedAt": "2026-09-07T08:00:00Z",
+          "payloadDigest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "value": "yKH9y4jvDCztufDKGVUPP9zlV8PBDlIvqHNks/jGmCoCHj/WWSggWIcOJ4FKQ2WVGyr8ZFxi26ix7oF0BEwGCg=="
+        }
+      },
+      "calculateOnLoad": true,
+      "invalidReason": "unknown field"
+    }
+  ]
+}
